@@ -135,9 +135,10 @@ function drawCircleImage (ctx, imagePath, x, y, radius) {
 /**
  * 生成打卡分享海报
  * @param {Object} data - 打卡数据
+ * @param {Object} component - 组件实例(用于查询Canvas)
  * @returns {Promise<string>} 海报临时路径
  */
-function generateCheckinPoster (data) {
+function generateCheckinPoster (data, component) {
   return new Promise((resolve, reject) => {
     const {
       userName = '用户',
@@ -149,109 +150,130 @@ function generateCheckinPoster (data) {
     } = data;
 
     const canvasId = 'shareCanvas';
-    const ctx = createCanvasContext(canvasId);
-    const { width, height, padding } = POSTER_CONFIG;
 
-    try {
-      // 1. 绘制渐变背景
-      drawGradientBackground(ctx, ['#4FD1C5', '#45B7AA'], width, height);
-
-      // 2. 绘制白色卡片
-      ctx.setFillStyle('#ffffff');
-      drawRoundRect(ctx, padding, padding * 3, width - padding * 2, height - padding * 6, 32);
-      ctx.fill();
-
-      // 3-11. 绘制内容
-      const drawContent = () => {
-        // 4. 绘制用户名
-        ctx.setFillStyle('#333333');
-        ctx.setFontSize(40);
-        ctx.setTextAlign('center');
-        ctx.fillText(userName, width / 2, padding * 5.5);
-
-        // 5. 绘制主标题
-        ctx.setFillStyle('#4FD1C5');
-        ctx.font = 'bold 80px sans-serif';
-        ctx.setTextAlign('center');
-        ctx.fillText(`${completedCount}/${totalCount}`, width / 2, padding * 8);
-
-        // 6. 绘制副标题
-        ctx.setFillStyle('#666666');
-        ctx.setFontSize(36);
-        ctx.fillText('今日完成任务', width / 2, padding * 9.5);
-
-        // 7. 绘制连续天数
-        if (streakDays > 0) {
-          ctx.setFillStyle('#FF6B6B');
-          ctx.setFontSize(48);
-          ctx.fillText(`🔥 连续打卡 ${streakDays} 天`, width / 2, padding * 11);
-        }
-
-        // 8. 绘制日期
-        ctx.setFillStyle('#999999');
-        ctx.setFontSize(28);
-        ctx.fillText(date, width / 2, padding * 12.5);
-
-        // 9. 绘制分割线
-        ctx.setStrokeStyle('#eeeeee');
-        ctx.setLineWidth(2);
-        ctx.beginPath();
-        ctx.moveTo(padding * 2, padding * 14);
-        ctx.lineTo(width - padding * 2, padding * 14);
-        ctx.stroke();
-
-        // 10. 绘制底部文字
-        ctx.setFillStyle('#999999');
-        ctx.setFontSize(24);
-        ctx.fillText('自律教练 · 让自律成为习惯', width / 2, padding * 15.5);
-
-        // 11. 绘制小程序码区域提示
-        ctx.setFillStyle('#f7f8fa');
-        drawRoundRect(ctx, width - padding * 2.5, height - padding * 2.5, padding * 1.8, padding * 1.8, 16);
-        ctx.fill();
-        ctx.setFillStyle('#999999');
-        ctx.setFontSize(20);
-        ctx.setTextAlign('right');
-        ctx.fillText('长按识别', width - padding * 0.8, height - padding * 0.8);
-
-        // 绘制完成
-        ctx.draw(false, () => {
-          setTimeout(() => {
-            wx.canvasToTempFilePath({
-              canvasId,
-              success: (res) => {
-                resolve(res.tempFilePath);
-              },
-              fail: reject
-            });
-          }, 500);
-        });
-      };
-
-      // 3. 绘制头像 (可选)
-      if (avatarUrl) {
-        drawCircleImage(ctx, avatarUrl, width / 2, padding * 4, 80)
-          .then(drawContent)
-          .catch(() => {
-            // 头像加载失败,继续绘制其他内容
-            drawContent();
-          });
-      } else {
-        drawContent();
+    // 验证Canvas是否存在
+    const query = wx.createSelectorQuery();
+    query.select(`#${canvasId}`).boundingClientRect();
+    query.exec((res) => {
+      if (!res || !res[0]) {
+        console.error('Canvas元素不存在');
+        reject(new Error('Canvas初始化失败，请重试'));
+        return;
       }
-    } catch (error) {
-      console.error('生成打卡海报失败:', error);
-      reject(error);
-    }
+
+      try {
+        const ctx = createCanvasContext(canvasId);
+        const { width, height, padding } = POSTER_CONFIG;
+
+        // 1. 绘制渐变背景
+        drawGradientBackground(ctx, ['#4FD1C5', '#45B7AA'], width, height);
+
+        // 2. 绘制白色卡片
+        ctx.setFillStyle('#ffffff');
+        drawRoundRect(ctx, padding, padding * 3, width - padding * 2, height - padding * 6, 32);
+        ctx.fill();
+
+        // 3-11. 绘制内容
+        const drawContent = () => {
+          // 4. 绘制用户名
+          ctx.setFillStyle('#333333');
+          ctx.setFontSize(40);
+          ctx.setTextAlign('center');
+          ctx.fillText(userName, width / 2, padding * 5.5);
+
+          // 5. 绘制主标题
+          ctx.setFillStyle('#4FD1C5');
+          ctx.font = 'bold 80px sans-serif';
+          ctx.setTextAlign('center');
+          ctx.fillText(`${completedCount}/${totalCount}`, width / 2, padding * 8);
+
+          // 6. 绘制副标题
+          ctx.setFillStyle('#666666');
+          ctx.setFontSize(36);
+          ctx.fillText('今日完成任务', width / 2, padding * 9.5);
+
+          // 7. 绘制连续天数
+          if (streakDays > 0) {
+            ctx.setFillStyle('#FF6B6B');
+            ctx.setFontSize(48);
+            ctx.fillText(`🔥 连续打卡 ${streakDays} 天`, width / 2, padding * 11);
+          }
+
+          // 8. 绘制日期
+          ctx.setFillStyle('#999999');
+          ctx.setFontSize(28);
+          ctx.fillText(date, width / 2, padding * 12.5);
+
+          // 9. 绘制分割线
+          ctx.setStrokeStyle('#eeeeee');
+          ctx.setLineWidth(2);
+          ctx.beginPath();
+          ctx.moveTo(padding * 2, padding * 14);
+          ctx.lineTo(width - padding * 2, padding * 14);
+          ctx.stroke();
+
+          // 10. 绘制底部文字
+          ctx.setFillStyle('#999999');
+          ctx.setFontSize(24);
+          ctx.fillText('自律教练 · 让自律成为习惯', width / 2, padding * 15.5);
+
+          // 11. 绘制小程序码区域提示
+          ctx.setFillStyle('#f7f8fa');
+          drawRoundRect(ctx, width - padding * 2.5, height - padding * 2.5, padding * 1.8, padding * 1.8, 16);
+          ctx.fill();
+          ctx.setFillStyle('#999999');
+          ctx.setFontSize(20);
+          ctx.setTextAlign('right');
+          ctx.fillText('长按识别', width - padding * 0.8, height - padding * 0.8);
+
+          // 绘制完成
+          ctx.draw(false, () => {
+            // 延迟获取图片，确保绘制完成
+            setTimeout(() => {
+              wx.canvasToTempFilePath({
+                canvasId,
+                success: (res) => {
+                  if (res.tempFilePath) {
+                    resolve(res.tempFilePath);
+                  } else {
+                    reject(new Error('生成失败：未获取到图片路径'));
+                  }
+                },
+                fail: (err) => {
+                  console.error('canvasToTempFilePath失败:', err);
+                  reject(new Error('图片生成失败，请重试'));
+                }
+              });
+            }, 1000);
+          });
+        };
+
+        // 3. 绘制头像 (可选)
+        if (avatarUrl) {
+          drawCircleImage(ctx, avatarUrl, width / 2, padding * 4, 80)
+            .then(drawContent)
+            .catch(() => {
+              // 头像加载失败,继续绘制其他内容
+              drawContent();
+            });
+        } else {
+          drawContent();
+        }
+      } catch (error) {
+        console.error('生成打卡海报失败:', error);
+        reject(new Error('海报绘制失败，请重试'));
+      }
+    });
   });
 }
 
 /**
  * 生成连续打卡海报
  * @param {Object} data - 连续打卡数据
+ * @param {Object} component - 组件实例(用于查询Canvas)
  * @returns {Promise<string>} 海报临时路径
  */
-function generateStreakPoster (data) {
+function generateStreakPoster (data, component) {
   return new Promise((resolve, reject) => {
     const {
       userName = '用户',
@@ -262,53 +284,76 @@ function generateStreakPoster (data) {
     } = data;
 
     const canvasId = 'shareCanvas';
-    const ctx = createCanvasContext(canvasId);
-    const { width, height, padding } = POSTER_CONFIG;
 
-    try {
-      // 绘制炫耀风格的连续打卡海报
-      drawGradientBackground(ctx, ['#FFD700', '#FFA500'], width, height);
+    // 验证Canvas是否存在
+    const query = component ? component.createSelectorQuery() : wx.createSelectorQuery();
+    query.select(`#${canvasId}`).boundingClientRect();
+    query.exec((res) => {
+      if (!res || !res[0]) {
+        console.error('Canvas元素不存在', res);
+        reject(new Error('Canvas初始化失败，请重试'));
+        return;
+      }
 
-      // 主标题区域
-      ctx.setFillStyle('#ffffff');
-      ctx.font = 'bold 120px sans-serif';
-      ctx.setTextAlign('center');
-      ctx.fillText(`${streakDays}`, width / 2, height / 3);
+      try {
+        const ctx = createCanvasContext(canvasId);
+        const { width, height, padding } = POSTER_CONFIG;
 
-      ctx.setFontSize(48);
-      ctx.fillText('天', width / 2, height / 3 + 100);
+        // 绘制炫耀风格的连续打卡海报
+        drawGradientBackground(ctx, ['#FFD700', '#FFA500'], width, height);
 
-      // 副标题
-      ctx.setFontSize(36);
-      ctx.fillText(`已坚持 ${streakDays} 天，共 ${totalDays} 天`, width / 2, height / 2);
+        // 主标题区域
+        ctx.setFillStyle('#ffffff');
+        ctx.font = 'bold 120px sans-serif';
+        ctx.setTextAlign('center');
+        ctx.fillText(`${streakDays}`, width / 2, height / 3);
 
-      // 底部信息
-      ctx.setFillStyle('rgba(255, 255, 255, 0.8)');
-      ctx.setFontSize(28);
-      ctx.fillText('自律给我自由', width / 2, height - padding * 3);
+        ctx.setFontSize(48);
+        ctx.fillText('天', width / 2, height / 3 + 100);
 
-      ctx.draw(false, () => {
-        setTimeout(() => {
-          wx.canvasToTempFilePath({
-            canvasId,
-            success: (res) => resolve(res.tempFilePath),
-            fail: reject
-          });
-        }, 500);
-      });
-    } catch (error) {
-      console.error('生成连续打卡海报失败:', error);
-      reject(error);
-    }
+        // 副标题
+        ctx.setFontSize(36);
+        ctx.fillText(`已坚持 ${streakDays} 天，共 ${totalDays} 天`, width / 2, height / 2);
+
+        // 底部信息
+        ctx.setFillStyle('rgba(255, 255, 255, 0.8)');
+        ctx.setFontSize(28);
+        ctx.fillText('自律给我自由', width / 2, height - padding * 3);
+
+        ctx.draw(false, () => {
+          // 增加延迟确保绘制完成
+          setTimeout(() => {
+            wx.canvasToTempFilePath({
+              canvasId,
+              success: (res) => {
+                if (res.tempFilePath) {
+                  resolve(res.tempFilePath);
+                } else {
+                  reject(new Error('生成失败：未获取到图片路径'));
+                }
+              },
+              fail: (err) => {
+                console.error('canvasToTempFilePath失败:', err);
+                reject(new Error('图片生成失败，请重试'));
+              }
+            });
+          }, 800); // 增加延迟时间
+        });
+      } catch (error) {
+        console.error('生成连续打卡海报失败:', error);
+        reject(new Error('海报绘制失败，请重试'));
+      }
+    });
   });
 }
 
 /**
  * 生成成就分享海报
  * @param {Object} data - 成就数据
+ * @param {Object} component - 组件实例(用于查询Canvas)
  * @returns {Promise<string>} 海报临时路径
  */
-function generateAchievementPoster (data) {
+function generateAchievementPoster (data, component) {
   return new Promise((resolve, reject) => {
     const {
       achievementName = '成就',
@@ -319,41 +364,62 @@ function generateAchievementPoster (data) {
     } = data;
 
     const canvasId = 'shareCanvas';
-    const ctx = createCanvasContext(canvasId);
-    const { width, height } = POSTER_CONFIG;
 
-    try {
-      // 绘制成就风格海报
-      drawGradientBackground(ctx, ['#9B59B6', '#8E44AD'], width, height);
+    // 验证Canvas是否存在
+    const query = component ? component.createSelectorQuery() : wx.createSelectorQuery();
+    query.select(`#${canvasId}`).boundingClientRect();
+    query.exec((res) => {
+      if (!res || !res[0]) {
+        console.error('Canvas元素不存在', res);
+        reject(new Error('Canvas初始化失败，请重试'));
+        return;
+      }
 
-      // 图标
-      ctx.setFontSize(200);
-      ctx.setTextAlign('center');
-      ctx.fillText(achievementIcon, width / 2, height / 3);
+      try {
+        const ctx = createCanvasContext(canvasId);
+        const { width, height } = POSTER_CONFIG;
 
-      // 成就名称
-      ctx.setFillStyle('#ffffff');
-      ctx.font = 'bold 64px sans-serif';
-      ctx.setTextAlign('center');
-      ctx.fillText(achievementName, width / 2, height / 2);
+        // 绘制成就风格海报
+        drawGradientBackground(ctx, ['#9B59B6', '#8E44AD'], width, height);
 
-      // 描述
-      ctx.setFontSize(32);
-      ctx.fillText(achievementDesc, width / 2, height / 2 + 80);
+        // 图标
+        ctx.setFontSize(200);
+        ctx.setTextAlign('center');
+        ctx.fillText(achievementIcon, width / 2, height / 3);
 
-      ctx.draw(false, () => {
-        setTimeout(() => {
-          wx.canvasToTempFilePath({
-            canvasId,
-            success: (res) => resolve(res.tempFilePath),
-            fail: reject
-          });
-        }, 500);
-      });
-    } catch (error) {
-      console.error('生成成就海报失败:', error);
-      reject(error);
-    }
+        // 成就名称
+        ctx.setFillStyle('#ffffff');
+        ctx.font = 'bold 64px sans-serif';
+        ctx.setTextAlign('center');
+        ctx.fillText(achievementName, width / 2, height / 2);
+
+        // 描述
+        ctx.setFontSize(32);
+        ctx.fillText(achievementDesc, width / 2, height / 2 + 80);
+
+        ctx.draw(false, () => {
+          setTimeout(() => {
+            wx.canvasToTempFilePath({
+              canvasId,
+              success: (res) => {
+                if (res.tempFilePath) {
+                  resolve(res.tempFilePath);
+                } else {
+                  reject(new Error('生成失败：未获取到图片路径'));
+                }
+              },
+              fail: (err) => {
+                console.error('canvasToTempFilePath失败:', err);
+                reject(new Error('图片生成失败，请重试'));
+              }
+            });
+          }, 800);
+        });
+      } catch (error) {
+        console.error('生成成就海报失败:', error);
+        reject(new Error('海报绘制失败，请重试'));
+      }
+    });
   });
 }
 

@@ -51,7 +51,7 @@ exports.main = async (event, context) => {
  * 创建打卡记录
  */
 async function createRecord (event, wxContext) {
-  const { planId, actualValue, remark } = event
+  const { planId, date, actualValue, remark } = event
   const openid = wxContext.OPENID
 
   if (!planId) {
@@ -77,19 +77,21 @@ async function createRecord (event, wxContext) {
 
     const plan = planRes.data[0]
     const now = new Date()
-    const today = formatDate(now)
 
-    // 检查今日是否已打卡
+    // ✅ 支持自定义日期，默认今天
+    const recordDate = date || formatDate(now)
+
+    // 检查该日期是否已打卡
     const existRes = await db.collection('records').where({
       _openid: openid,
       planId: planId,
-      date: today
+      date: recordDate
     }).get()
 
     if (existRes.data.length > 0) {
       return {
         success: false,
-        errMsg: '今日已打卡，请勿重复提交'
+        errMsg: `${recordDate} 已打卡，请勿重复提交`
       }
     }
 
@@ -115,7 +117,7 @@ async function createRecord (event, wxContext) {
       actualValue: actualValue,
       isCompleted: isCompleted,
       remark: remark || '',
-      date: today,
+      date: recordDate,
       createTime: now,
       updateTime: now
     }
@@ -135,7 +137,8 @@ async function createRecord (event, wxContext) {
       data: {
         _id: addRes._id,
         ...newRecord
-      }
+      },
+      message: `${recordDate} 打卡成功`
     }
   } catch (err) {
     console.error('[createRecord] 创建记录失败', err)

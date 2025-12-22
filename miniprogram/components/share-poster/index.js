@@ -69,21 +69,40 @@ Component({
         mask: true
       });
 
+      // 添加超时保护
+      const timeoutId = setTimeout(() => {
+        wx.hideLoading();
+        this.setData({ isGenerating: false });
+        wx.showToast({
+          title: '生成超时，请重试',
+          icon: 'none',
+          duration: 2000
+        });
+        vibrate.error();
+        this.handleClose();
+      }, 15000); // 15秒超时
+
       try {
         let posterPath = '';
 
         switch (type) {
           case 'checkin':
-            posterPath = await generateCheckinPoster(data);
+            posterPath = await generateCheckinPoster(data, this);
             break;
           case 'streak':
-            posterPath = await generateStreakPoster(data);
+            posterPath = await generateStreakPoster(data, this);
             break;
           case 'achievement':
-            posterPath = await generateAchievementPoster(data);
+            posterPath = await generateAchievementPoster(data, this);
             break;
           default:
             throw new Error('未知的分享类型');
+        }
+
+        clearTimeout(timeoutId);
+
+        if (!posterPath) {
+          throw new Error('海报生成失败：返回路径为空');
         }
 
         this.setData({
@@ -93,10 +112,12 @@ Component({
 
         vibrate.success();
       } catch (error) {
+        clearTimeout(timeoutId);
         console.error('生成海报失败:', error);
         wx.showToast({
-          title: '生成失败',
-          icon: 'none'
+          title: error.message || '生成失败，请重试',
+          icon: 'none',
+          duration: 2000
         });
         vibrate.error();
         this.handleClose();

@@ -237,6 +237,62 @@ function getRelativeTime (date) {
   return formatDateChinese(date)
 }
 
+/**
+ * 获取日期范围
+ * @param {number} startDaysAgo - 过去天数
+ * @param {number} endDaysAhead - 未来天数
+ * @returns {Object} { start, end } YYYY-MM-DD 格式
+ */
+function getDateRange (startDaysAgo, endDaysAhead) {
+  const today = new Date()
+  const start = new Date(today.getTime() - startDaysAgo * 24 * 60 * 60 * 1000)
+  const end = new Date(today.getTime() + endDaysAhead * 24 * 60 * 60 * 1000)
+  return {
+    start: formatDate(start),
+    end: formatDate(end)
+  }
+}
+
+/**
+ * 格式化日期显示（今天/明天/昨天/具体日期）
+ * @param {string} dateStr - YYYY-MM-DD 格式
+ * @returns {string} 友好的日期显示
+ */
+function formatDateDisplay (dateStr) {
+  const today = getToday()
+  const tomorrow = getDateByOffset(1)
+  const yesterday = getDateByOffset(-1)
+
+  const [year, month, day] = dateStr.split('-')
+  const displayDate = `${month}-${day}`
+
+  if (dateStr === today) return `今天 ${displayDate}`
+  if (dateStr === tomorrow) return `明天 ${displayDate}`
+  if (dateStr === yesterday) return `昨天 ${displayDate}`
+
+  // 判断是今年还是往年
+  const currentYear = new Date().getFullYear()
+  if (parseInt(year) === currentYear) {
+    return displayDate
+  } else {
+    return `${year}-${displayDate}`
+  }
+}
+
+/**
+ * 校验日期是否在允许范围内
+ * @param {string} dateStr - YYYY-MM-DD
+ * @param {string} startDate - YYYY-MM-DD
+ * @param {string} endDate - YYYY-MM-DD
+ * @returns {boolean}
+ */
+function validateDateRange (dateStr, startDate, endDate) {
+  const date = new Date(dateStr).getTime()
+  const start = new Date(startDate).getTime()
+  const end = new Date(endDate).getTime()
+  return date >= start && date <= end
+}
+
 module.exports = {
   formatDate,
   formatDateChinese,
@@ -252,5 +308,8 @@ module.exports = {
   formatTime,
   formatDateTime,
   calculateSleepHours,
-  getRelativeTime
+  getRelativeTime,
+  getDateRange,
+  formatDateDisplay,
+  validateDateRange
 }

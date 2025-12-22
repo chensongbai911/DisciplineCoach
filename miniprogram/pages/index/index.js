@@ -1,7 +1,7 @@
 // index.js
 const app = getApp()
 const { recordAPI, planAPI } = require('../../utils/api.js')
-const { formatDateChinese, getToday, getWeekday } = require('../../utils/date.js')
+const { formatDateChinese, getToday, getWeekday, getDateByOffset, formatDateDisplay } = require('../../utils/date.js')
 const { handleAPIError, wrapAPICall } = require('../../utils/errorHandler.js')
 const vibrate = require('../../utils/vibrate.js')
 
@@ -27,6 +27,11 @@ Page({
     currentTask: null,
     checkinValue: '',
     checkinRemark: '',
+    checkinDate: '',          // 选中的日期 YYYY-MM-DD
+    checkinDateDisplay: '',   // 显示文本 "今天 12-22"
+    dateRangeStart: '',       // 可选开始日期
+    dateRangeEnd: '',         // 可选结束日期
+    todayDate: '',            // 今天的日期（用于对比）
 
     // 成功反馈
     showSuccessFeedback: false,
@@ -54,10 +59,28 @@ Page({
   },
 
   onLoad () {
+    this.initDateRange()
     this.initPage()
     this.updateNetworkStatus()
     // 首次加载数据
     this.loadData()
+  },
+
+  /**
+   * 初始化日期范围
+   */
+  initDateRange () {
+    const today = getToday()
+    const startDate = getDateByOffset(-7) // 7天前
+    const endDate = getDateByOffset(30)   // 30天后
+
+    this.setData({
+      todayDate: today,
+      checkinDate: today,
+      checkinDateDisplay: formatDateDisplay(today),
+      dateRangeStart: startDate,
+      dateRangeEnd: endDate
+    })
   },
 
   onShow () {
@@ -445,11 +468,16 @@ Page({
 
     console.log('打卡 - 任务对象:', task)
 
+    // 重置日期为今天
+    const today = getToday()
+
     this.setData({
       showCheckinModal: true,
       currentTask: task,
       checkinValue: task.type === 'boolean' ? 1 : task.targetValue,
-      checkinRemark: ''
+      checkinRemark: '',
+      checkinDate: today,
+      checkinDateDisplay: formatDateDisplay(today)
     })
   },
 
@@ -459,8 +487,24 @@ Page({
       showCheckinModal: false,
       currentTask: null,
       checkinValue: '',
-      checkinRemark: ''
+      checkinRemark: '',
+      checkinDate: getToday(),
+      checkinDateDisplay: formatDateDisplay(getToday())
     })
+  },
+
+  /**
+   * 日期选择器变化
+   */
+  onCheckinDateChange (e) {
+    const selectedDate = e.detail.value
+    this.setData({
+      checkinDate: selectedDate,
+      checkinDateDisplay: formatDateDisplay(selectedDate)
+    })
+
+    // 轻微震动反馈
+    vibrate.light()
   },
 
   /**
@@ -592,7 +636,7 @@ Page({
 
   // 确认打卡
   async confirmCheckin () {
-    const { currentTask, checkinValue, checkinRemark, isOnline } = this.data
+    const { currentTask, checkinValue, checkinRemark, checkinDate, isOnline, todayDate } = this.data
 
     // 检查网络状态
     if (!isOnline) {
@@ -606,6 +650,7 @@ Page({
 
     console.log('确认打卡 - 当前任务:', currentTask)
     console.log('确认打卡 - 输入值:', checkinValue)
+    console.log('确认打卡 - 选择日期:', checkinDate)
 
     // 校验
     if (currentTask.type !== 'boolean' && !checkinValue) {
@@ -625,38 +670,54 @@ Page({
       return
     }
 
-    // 1️⃣ 乐观更新：立即更新本地UI
-    this.updateTaskStatusLocally(currentTask.id, {
-      completed: true,
-      actualValue: Number(checkinValue),
-      remark: checkinRemark
-    });
+    // 1️⃣ 乐观更新：立即更新本地UI（仅当打卡今天时）
+    if (checkinDate === todayDate) {
+      this.updateTaskStatusLocally(currentTask.id, {
+        completed: true,
+        actualValue: Number(checkinValue),
+        remark: checkinRemark
+      });
+    }
 
     // 关闭弹窗并显示成功动画（立即响应）
     this.closeCheckinModal();
     vibrate.success(); // 成功震动反馈
-    this.showSuccessAnimation();
+
+    // 仅在打卡今天时显示成功动画
+    if (checkinDate === todayDate) {
+      this.showSuccessAnimation();
+    }
 
     // 2️⃣ 异步保存到云端
     try {
       console.log('发送打卡请求，参数:', {
         planId: currentTask.id,
-        date: getToday(),
+        date: checkinDate,
         actualValue: Number(checkinValue),
         remark: checkinRemark
       })
 
-      await recordAPI.create({
+      const result = await recordAPI.create({
         planId: currentTask.id,
-        date: getToday(),
+        date: checkinDate,
         actualValue: Number(checkinValue),
         remark: checkinRemark
       })
 
-      console.log('打卡成功，已同步到云端')
+      console.log('打卡成功，已同步到云端:', result)
 
-      // 检测成就解锁
-      this.checkAchievements();
+      // 显示成功提示
+      const dateDisplay = formatDateDisplay(checkinDate)
+      wx.showToast({
+        title: `${dateDisplay} 打卡成功`,
+        icon: 'success',
+        duration: 2000
+      })
+
+      // 检测成就解锁（仅今天的打卡）
+      if (checkinDate === todayDate) {
+        this.checkAchievements();
+      }
 
       // 延迟刷新数据以获取最新的连续天数等统计
       setTimeout(() => {
@@ -666,8 +727,10 @@ Page({
     } catch (err) {
       console.error('打卡失败:', err)
 
-      // 3️⃣ 失败回滚：恢复原状态
-      this.rollbackTaskStatus(currentTask.id);
+      // 3️⃣ 失败回滚：恢复原状态（仅今天的打卡）
+      if (checkinDate === todayDate) {
+        this.rollbackTaskStatus(currentTask.id);
+      }
       vibrate.error(); // 错误震动反馈
 
       wx.showToast({

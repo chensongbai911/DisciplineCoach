@@ -1,7 +1,9 @@
 /* pages/plan/plan-detail.wxss */
 
 .container {
-  padding-bottom: 120rpx;
+  padding-bottom: 180rpx;
+  background: #F7F8FA;
+  min-height: 100vh;
 }
 
 /* 头部卡片 */
@@ -50,13 +52,20 @@
   padding: 0 32rpx;
 }
 
+/* swipe-action容器样式 */
+.task-list swipe-action {
+  display: block;
+  margin-bottom: 24rpx;
+}
+
 .task-item-card {
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 32rpx;
-  margin-bottom: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
   transition: all 0.3s;
+  position: relative;
+  z-index: 2;
 }
 
 .task-item-card:active {
@@ -75,6 +84,21 @@
   font-weight: 700;
   color: #333333;
   flex: 1;
+}
+
+/* 任务状态标签 */
+.task-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 8rpx 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  font-weight: 500;
+  background: linear-gradient(135deg, #F6AD55 0%, #ED8936 100%);
+  color: #FFFFFF;
+  margin-left: 16rpx;
+  white-space: nowrap;
+  box-shadow: 0 4rpx 12rpx rgba(246, 173, 85, 0.3);
 }
 
 .task-item-actions {
@@ -146,8 +170,11 @@
   right: 0;
   padding: 24rpx 32rpx;
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  background: #FFFFFF;
-  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.95) 20%, #FFFFFF 100%);
+  box-shadow: 0 -4rpx 24rpx rgba(0, 0, 0, 0.08);
+  z-index: 500;
+  backdrop-filter: blur(20rpx);
+  pointer-events: auto;
 }
 
 .icon-add {

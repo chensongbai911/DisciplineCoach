@@ -9,7 +9,8 @@
     "pages/vip/index",
     "pages/user/index",
     "pages/feedback/index",
-    "pages/about/index"
+    "pages/about/index",
+    "pages/report/preview"
   ],
   "window": {
     "navigationBarTitleText": "自律教练",

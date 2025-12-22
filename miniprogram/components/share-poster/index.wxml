@@ -6,6 +6,7 @@
   <view class="poster-content" catchtap="preventBubble">
     <!-- Canvas画布 (隐藏) -->
     <canvas
+      id="shareCanvas"
       canvas-id="shareCanvas"
       class="canvas-hidden"
       style="width: 750px; height: 1334px;"

@@ -2,6 +2,28 @@
  * 左滑操作组件
  * 支持任务卡片左滑显示快捷操作按钮
  */
+
+// 全局实例管理器
+const instanceManager = {
+  instances: [],
+  register (instance) {
+    this.instances.push(instance);
+  },
+  unregister (instance) {
+    const index = this.instances.indexOf(instance);
+    if (index > -1) {
+      this.instances.splice(index, 1);
+    }
+  },
+  closeAll (except) {
+    this.instances.forEach(instance => {
+      if (instance !== except && instance.data.isOpen) {
+        instance.close();
+      }
+    });
+  }
+};
+
 Component({
   options: {
     multipleSlots: true
@@ -40,8 +62,16 @@ Component({
   lifetimes: {
     attached () {
       // 计算动作按钮总宽度
-      const actionsWidth = this.data.actions.length * 160; // 每个按钮160rpx
+      const actionsWidth = this.data.actions.length * 120; // 每个按钮120rpx
       this.setData({ actionsWidth });
+
+      // 注册到实例管理器
+      instanceManager.register(this);
+    },
+
+    detached () {
+      // 从实例管理器注销
+      instanceManager.unregister(this);
     }
   },
 
@@ -70,28 +100,38 @@ Component({
       if (this.data.disabled) return;
 
       const touch = e.touches[0];
-      const { startX, startY, actionsWidth } = this.data;
+      const { startX, startY, actionsWidth, isOpen } = this.data;
 
       const deltaX = touch.clientX - startX;
       const deltaY = touch.clientY - startY;
 
       // 判断滑动方向（水平滑动才生效）
       if (!this.data.isMoving) {
-        if (Math.abs(deltaX) < Math.abs(deltaY)) {
-          // 垂直滑动，不处理
+        // 需要水平滑动距离明显大于垂直距离
+        if (Math.abs(deltaX) < Math.abs(deltaY) * 1.5) {
+          // 垂直滑动为主，不处理
           return;
         }
         this.setData({ isMoving: true });
       }
 
-      // 只允许左滑
-      if (deltaX >= 0) {
-        this.setData({ moveX: 0 });
-        return;
+      let moveX;
+
+      if (isOpen) {
+        // 已打开状态：支持右滑关闭
+        moveX = Math.min(deltaX - actionsWidth, 0);
+        moveX = Math.max(moveX, -actionsWidth);
+      } else {
+        // 关闭状态：支持左滑打开
+        if (deltaX >= 0) {
+          // 右滑不处理
+          moveX = 0;
+        } else {
+          // 左滑打开
+          moveX = Math.max(deltaX, -actionsWidth);
+        }
       }
 
-      // 限制滑动距离
-      const moveX = Math.max(deltaX, -actionsWidth);
       this.setData({ moveX });
     },
 
@@ -101,15 +141,25 @@ Component({
     handleTouchEnd () {
       if (this.data.disabled) return;
 
-      const { moveX, threshold, actionsWidth } = this.data;
+      const { moveX, threshold, actionsWidth, isOpen } = this.data;
 
-      // 判断是打开还是关闭
-      if (Math.abs(moveX) > threshold) {
-        // 打开
-        this.open();
-      } else {
-        // 关闭
+      // 计算当前位置相对于目标状态的距离
+      const distanceToOpen = Math.abs(moveX + actionsWidth);
+      const distanceToClose = Math.abs(moveX);
+
+      // 如果移动距离太小，恢复原状态
+      if (Math.abs(moveX) < threshold && !isOpen) {
         this.close();
+        return;
+      }
+
+      // 根据距离判断最终状态
+      if (distanceToClose < distanceToOpen) {
+        // 更接近关闭状态
+        this.close();
+      } else {
+        // 更接近打开状态
+        this.open();
       }
     },
 
@@ -118,6 +168,10 @@ Component({
      */
     open () {
       const { actionsWidth } = this.data;
+
+      // 关闭其他打开的实例
+      instanceManager.closeAll(this);
+
       this.setData({
         moveX: -actionsWidth,
         isOpen: true

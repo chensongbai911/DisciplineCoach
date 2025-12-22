@@ -2,10 +2,10 @@
   <!-- 内容区域 -->
   <view
     class="swipe-content {{isOpen ? 'open' : ''}}"
-    style="transform: translateX({{moveX}}px); transition: {{isMoving ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'}}"
-    bindtouchstart="handleTouchStart"
-    bindtouchmove="handleTouchMove"
-    bindtouchend="handleTouchEnd"
+    style="transform: translateX({{moveX}}px); transition: {{isMoving ? 'none' : 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'}}"
+    catchtouchstart="handleTouchStart"
+    catchtouchmove="handleTouchMove"
+    catchtouchend="handleTouchEnd"
     bindtap="handleContentTap">
     <slot name="content"></slot>
   </view>
@@ -17,7 +17,7 @@
       wx:for="{{actions}}"
       wx:key="text"
       data-index="{{index}}"
-      bindtap="handleActionTap">
+      catchtap="handleActionTap">
       <text class="action-icon" wx:if="{{item.icon}}">{{item.icon}}</text>
       <text class="action-text">{{item.text}}</text>
     </view>

@@ -7,6 +7,10 @@ const vibrate = require('../../utils/vibrate');
 
 Page({
   data: {
+    // 编辑模式
+    editMode: false,
+    selectedTasks: [], // 选中的任务ID列表
+
     // 五大维度配置
     dimensions: [
       {
@@ -344,5 +348,107 @@ Page({
     this.loadPlans().then(() => {
       wx.stopPullDownRefresh();
     });
+  },
+
+  /**
+   * 切换编辑模式
+   */
+  toggleEditMode () {
+    const editMode = !this.data.editMode;
+    this.setData({
+      editMode,
+      selectedTasks: [] // 清空选中
+    });
+    vibrate.light();
+  },
+
+  /**
+   * 切换任务选中状态
+   */
+  toggleTaskSelection (e) {
+    const { taskId } = e.currentTarget.dataset;
+    const { selectedTasks } = this.data;
+
+    const index = selectedTasks.indexOf(taskId);
+    if (index > -1) {
+      selectedTasks.splice(index, 1);
+    } else {
+      selectedTasks.push(taskId);
+    }
+
+    this.setData({ selectedTasks });
+    vibrate.light();
+  },
+
+  /**
+   * 全选/取消全选
+   */
+  toggleSelectAll () {
+    const { dimensions, selectedTasks } = this.data;
+
+    // 收集所有任务ID
+    const allTaskIds = [];
+    dimensions.forEach(dim => {
+      if (dim.tasks && dim.tasks.length > 0) {
+        dim.tasks.forEach(task => {
+          allTaskIds.push(task._id);
+        });
+      }
+    });
+
+    // 判断是全选还是取消全选
+    const isAllSelected = selectedTasks.length === allTaskIds.length;
+
+    this.setData({
+      selectedTasks: isAllSelected ? [] : allTaskIds
+    });
+
+    vibrate.medium();
+  },
+
+  /**
+   * 批量删除选中的任务
+   */
+  async batchDelete () {
+    const { selectedTasks } = this.data;
+
+    if (selectedTasks.length === 0) {
+      showToast('请先选择要删除的任务');
+      return;
+    }
+
+    const result = await showModal(
+      '确认删除',
+      `确定要删除选中的 ${selectedTasks.length} 个任务吗？`,
+      true
+    );
+
+    if (!result.confirm) return;
+
+    showLoading('删除中...');
+
+    const { batchDeletePlans, showBatchResults } = require('../../utils/batchOperations');
+
+    try {
+      const results = await batchDeletePlans(selectedTasks, {
+        showLoading: false
+      });
+
+      hideLoading();
+      showBatchResults(results, '删除');
+
+      // 退出编辑模式并刷新
+      this.setData({
+        editMode: false,
+        selectedTasks: []
+      });
+
+      this.loadPlans();
+
+    } catch (error) {
+      hideLoading();
+      showToast('删除失败，请重试');
+      console.error('批量删除失败:', error);
+    }
   }
 });

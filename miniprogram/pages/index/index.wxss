@@ -683,44 +683,97 @@ page {
   bottom: 120rpx;
   right: 0;
   background: #fff;
-  border-radius: 16rpx;
-  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  border-radius: 20rpx;
+  box-shadow: 0 8rpx 40rpx rgba(0, 0, 0, 0.15), 0 0 0 1rpx rgba(0, 0, 0, 0.05);
   overflow: hidden;
-  animation: fabMenuSlideUp 0.3s ease;
+  animation: fabMenuSlideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  min-width: 340rpx;
 }
 
 @keyframes fabMenuSlideUp {
   0% {
     opacity: 0;
-    transform: translateY(20rpx);
+    transform: translateY(20rpx) scale(0.95);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .fab-menu-item {
-  padding: 24rpx 32rpx;
-  font-size: 28rpx;
-  color: #2D3748;
-  white-space: nowrap;
-  transition: background 0.2s ease;
+  padding: 28rpx 32rpx;
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  transition: all 0.2s ease;
   position: relative;
+  cursor: pointer;
 }
 
 .fab-menu-item:not(:last-child)::after {
   content: '';
   position: absolute;
   bottom: 0;
-  left: 16rpx;
-  right: 16rpx;
+  left: 80rpx;
+  right: 24rpx;
   height: 1rpx;
-  background: #E2E8F0;
+  background: linear-gradient(90deg, #E2E8F0 0%, transparent 100%);
 }
 
 .fab-menu-item:active {
-  background: rgba(79, 209, 197, 0.08);
+  background: linear-gradient(90deg, rgba(79, 209, 197, 0.08) 0%, rgba(79, 209, 197, 0.02) 100%);
+  transform: scale(0.98);
+}
+
+/* FAB 菜单图标 */
+.fab-menu-icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  font-weight: 600;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.fab-menu-item:active .fab-menu-icon {
+  transform: scale(1.1);
+}
+
+.icon-check {
+  background: linear-gradient(135deg, #48BB78 0%, #38A169 100%);
+  color: #fff;
+}
+
+.icon-add {
+  background: linear-gradient(135deg, #4FD1C5 0%, #38B2AC 100%);
+  color: #fff;
+}
+
+/* FAB 菜单内容 */
+.fab-menu-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.fab-menu-text {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #2D3748;
+  line-height: 1.4;
+}
+
+.fab-menu-desc {
+  font-size: 24rpx;
+  color: #718096;
+  line-height: 1.4;
 }
 
 @keyframes fabPulse {
@@ -754,14 +807,20 @@ page {
   position: fixed;
   bottom: 0;
   left: 0;
+  right: 0;
   width: 100%;
+  max-height: 85vh;
   background: linear-gradient(180deg, #FFFFFF 0%, #F7F8FA 100%);
   border-radius: 32rpx 32rpx 0 0;
   padding: 32rpx;
-  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
+  padding-bottom: 32rpx;
   z-index: 1000;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 -8rpx 32rpx rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 @keyframes slideUp {
@@ -775,11 +834,12 @@ page {
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 32rpx;
   padding-bottom: 24rpx;
+  padding-right: 64rpx;
   border-bottom: 2rpx solid #EEEEEE;
+  position: relative;
 }
 
 .modal-title {
@@ -790,19 +850,22 @@ page {
 }
 
 .btn-close {
+  position: absolute;
+  top: -8rpx;
+  right: 0;
   background: none;
   border: none;
   padding: 0;
   margin: 0;
-  width: 56rpx;
-  height: 56rpx;
+  width: 64rpx;
+  height: 64rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32rpx;
+  font-size: 40rpx;
   color: #999999;
   line-height: 1;
-  flex-shrink: 0;
+  z-index: 10;
 }
 
 .btn-close::after {
@@ -811,6 +874,10 @@ page {
 
 .modal-body {
   margin-bottom: 32rpx;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  -webkit-overflow-scrolling: touch;
 }
 
 .input-group {
@@ -823,6 +890,38 @@ page {
   font-weight: 600;
   color: #333333;
   margin-bottom: 12rpx;
+}
+
+/* 日期选择器样式 */
+.date-picker {
+  width: 100%;
+  padding: 24rpx 28rpx;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  color: #333;
+  text-align: center;
+  font-weight: 600;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.date-picker::after {
+  content: ' 📅';
+  font-size: 32rpx;
+  margin-left: 12rpx;
+}
+
+/* 高亮今天 */
+.date-today {
+  background: linear-gradient(135deg, #4FD1C5 0%, #38B2AC 100%);
+  color: #ffffff;
+  box-shadow: 0 4rpx 16rpx rgba(79, 209, 197, 0.4);
+}
+
+.date-today::after {
+  content: ' ✨';
 }
 
 .input-base {
@@ -851,7 +950,9 @@ page {
   display: flex;
   gap: 16rpx;
   padding-top: 32rpx;
+  padding-bottom: env(safe-area-inset-bottom);
   border-top: 2rpx solid #EEEEEE;
+  flex-shrink: 0;
 }
 
 .modal-btn {

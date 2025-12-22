@@ -1,0 +1,66 @@
+<!--pages/report/preview.wxml-->
+<!-- 报告预览页 -->
+
+<view class="container">
+  <!-- 报告头部 -->
+  <view class="report-header">
+    <text class="report-title">{{title}}</text>
+    <text class="report-date">{{dateRange}}</text>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="summary-section">
+    <view class="summary-title">数据概览</view>
+    <view class="summary-grid">
+      <view class="summary-item">
+        <text class="summary-value">{{summary.totalRecords || 0}}</text>
+        <text class="summary-label">总打卡数</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{summary.completionRate || 0}}%</text>
+        <text class="summary-label">完成率</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{summary.streakDays || 0}}</text>
+        <text class="summary-label">连续天数</text>
+      </view>
+      <view class="summary-item">
+        <text class="summary-value">{{summary.activeDimensions || 0}}</text>
+        <text class="summary-label">活跃维度</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 图表区域 -->
+  <view class="charts-section" wx:if="{{charts.length > 0}}">
+    <view class="section-title">趋势图表</view>
+    <view class="chart-container" wx:for="{{charts}}" wx:key="type">
+      <text class="chart-title">{{item.title}}</text>
+      <!-- TODO: 集成echarts-for-weixin渲染图表 -->
+      <view class="chart-placeholder">
+        <text>{{item.type}} 图表</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成就展示 -->
+  <view class="achievements-section" wx:if="{{achievements.length > 0}}">
+    <view class="section-title">已获成就</view>
+    <view class="achievement-list">
+      <view class="achievement-item" wx:for="{{achievements}}" wx:key="name">
+        <text class="achievement-icon">{{item.icon}}</text>
+        <text class="achievement-name">{{item.name}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="action-buttons">
+    <button class="btn btn-secondary" bindtap="handleSaveImage">
+      保存为图片
+    </button>
+    <button class="btn btn-primary" open-type="share">
+      分享报告
+    </button>
+  </view>
+</view>
