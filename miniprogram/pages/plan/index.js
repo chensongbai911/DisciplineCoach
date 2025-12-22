@@ -3,6 +3,7 @@
 
 const { planAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading, showModal } = require('../../utils/common');
+const vibrate = require('../../utils/vibrate');
 
 Page({
   data: {
@@ -188,9 +189,10 @@ Page({
   /**
    * 处理维度卡片点击
    */
-  handleDimensionTap (e) {
+  handleDimensionClick (e) {
     const { category } = e.currentTarget.dataset;
     const dimension = this.data.dimensions.find(d => d.category === category);
+    vibrate.light();
 
     if (dimension.enabled) {
       // 已开启，进入管理页
@@ -226,6 +228,7 @@ Page({
       });
       this.saveDimensionSettings();
 
+      vibrate.success();
       showToast(`已开启${dimension.name}，快去添加任务吧~`, 'success');
     } else {
       // 关闭维度
@@ -257,6 +260,7 @@ Page({
         });
         this.saveDimensionSettings();
 
+        vibrate.light();
         showToast(`已关闭${dimension.name}`);
       }
     }
@@ -296,6 +300,7 @@ Page({
       });
       this.saveDimensionSettings();
 
+      vibrate.light();
       showToast('已关闭');
     } catch (error) {
       console.error('关闭维度失败:', error);

@@ -2,6 +2,7 @@
 
 /* 引入通用样式 */
 @import "styles/common.wxss";
+@import "styles/iconfont.wxss";
 
 /* 页面基础样式 */
 page {

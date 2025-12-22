@@ -47,10 +47,20 @@ Component({
         const map = require('../../icons/iconfont.map.json')
         const code = map[this.properties.type]
         const fb = FALLBACK_MAP[this.properties.type] || 'ℹ️'
-        this.setData({
-          fallback: fb,
-          glyph: code ? String.fromCharCode(parseInt(code.replace('\\u', ''), 16)) : ''
-        })
+
+        if (code) {
+          // 支持多种格式: &#xe834; 或 \ue834 或 e834
+          let hex = code
+          if (hex.startsWith('&#x')) {
+            hex = hex.replace('&#x', '').replace(';', '')
+          } else if (hex.startsWith('\\u')) {
+            hex = hex.replace('\\u', '')
+          }
+          const char = String.fromCharCode(parseInt(hex, 16))
+          this.setData({ fallback: fb, glyph: char })
+        } else {
+          this.setData({ fallback: fb, glyph: '' })
+        }
       } catch (e) {
         const fb = FALLBACK_MAP[this.properties.type] || 'ℹ️'
         this.setData({ fallback: fb, glyph: '' })

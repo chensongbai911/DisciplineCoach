@@ -4,6 +4,7 @@
   "backgroundColor": "#f7f8fa",
   "usingComponents": {
     "app-image": "/components/app-image/index",
-    "app-icon": "/components/app-icon/index"
+    "app-icon": "/components/app-icon/index",
+    "share-poster": "/components/share-poster/index"
   }
 }

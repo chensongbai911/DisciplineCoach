@@ -4,6 +4,7 @@
 const { statisticsAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading } = require('../../utils/common');
 const { formatDate, getRecentDays } = require('../../utils/date');
+const vibrate = require('../../utils/vibrate');
 
 // 维度配置
 const DIMENSIONS = {
@@ -46,7 +47,11 @@ Page({
     unlockedBadges: 0,
     totalBadges: BADGE_CONFIG.length,
     showBadgeDetail: false,
-    selectedBadge: {}
+    selectedBadge: {},
+
+    // 分享海报
+    showSharePoster: false,
+    shareData: null
   },
 
   onLoad () {
@@ -100,6 +105,7 @@ Page({
         currentStreak: overviewData.currentStreak || 0,
         bestStreak: overviewData.bestStreak || overviewData.maxStreak || 0,
         trendData: trendData || [],
+        trendChartData: this.formatTrendChartData(trendData || []),
         dimensionData: dimensionData || []
       });
 
@@ -206,10 +212,23 @@ Page({
   },
 
   /**
+   * 格式化趋势图数据
+   */
+  formatTrendChartData (trendData) {
+    if (!trendData || trendData.length === 0) return [];
+
+    return trendData.map(item => ({
+      date: item.date,
+      value: item.rate || 0
+    }));
+  },
+
+  /**
    * 切换时间范围
    */
   handleTimeRangeChange (e) {
     const { range } = e.currentTarget.dataset;
+    vibrate.light();
 
     // 检查会员限制
     if (range !== 'week') {
@@ -269,5 +288,53 @@ Page({
     this.loadStatistics().then(() => {
       wx.stopPullDownRefresh();
     });
+  },
+
+  /**
+   * 分享战绩
+   */
+  handleShare () {
+    vibrate.light();
+
+    const { currentStreak, completionRate, totalDays } = this.data;
+    const app = getApp();
+    const userInfo = app.globalData.userInfo || {};
+
+    this.setData({
+      showSharePoster: true,
+      shareData: {
+        userName: userInfo.nickName || '自律达人',
+        avatarUrl: userInfo.avatarUrl || '',
+        streakDays: currentStreak,
+        totalDays,
+        completionRate: Math.round(completionRate),
+        startDate: `坚持了${totalDays}天`
+      }
+    });
+  },
+
+  /**
+   * 关闭分享海报
+   */
+  closeSharePoster () {
+    vibrate.light();
+    this.setData({
+      showSharePoster: false,
+      shareData: null
+    });
+  },
+
+  /**
+   * 分享海报保存回调
+   */
+  onSharePosterSave (e) {
+    console.log('海报已保存:', e.detail);
+  },
+
+  /**
+   * 分享海报分享回调
+   */
+  onSharePosterShare (e) {
+    console.log('海报已分享:', e.detail);
   }
 });

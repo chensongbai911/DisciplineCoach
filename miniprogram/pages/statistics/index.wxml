@@ -49,27 +49,11 @@
 
   <!-- 完成度趋势图 -->
   <view class="chart-section">
-    <view class="section-header">
-      <text class="section-title">完成度趋势</text>
-      <text class="section-hint">{{trendData.length > 0 ? '← 左右滑动查看更多 →' : '最近'+(timeRange === 'week' ? '7天' : timeRange === 'month' ? '30天' : '12个月')}}</text>
-    </view>
-    <view class="chart-container">
-      <scroll-view class="trend-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}" wx:if="{{trendData.length > 0}}">
-        <view class="trend-chart">
-          <view class="trend-item" wx:for="{{trendData}}" wx:key="date">
-            <view class="trend-bar-wrapper">
-              <view class="trend-bar" style="height: {{item.rate}}%;">
-                <text class="trend-value">{{item.rate}}%</text>
-              </view>
-            </view>
-            <text class="trend-label">{{item.date.slice(5)}}</text>
-          </view>
-        </view>
-      </scroll-view>
-      <view class="empty-hint" wx:else>
-        <text>暂无数据</text>
-      </view>
-    </view>
+    <trend-chart
+      title="完成度趋势"
+      data="{{trendChartData}}"
+      primaryColor="#4FD1C5"
+    />
   </view>
 
   <!-- 维度分布 -->
@@ -164,6 +148,12 @@
     </view>
     <text class="entry-arrow">›</text>
   </view>
+
+  <!-- 分享按钮 -->
+  <view class="share-button" bindtap="handleShare">
+    <text class="share-icon">📤</text>
+    <text class="share-text">分享我的战绩</text>
+  </view>
 </view>
 
 <!-- 徽章详情弹窗 -->
@@ -178,3 +168,13 @@
   </text>
   <button class="btn-primary btn-block mt-4" bindtap="closeBadgeDetail">知道了</button>
 </view>
+
+<!-- 分享海报 -->
+<share-poster
+  type="streak"
+  data="{{shareData}}"
+  visible="{{showSharePoster}}"
+  bind:close="closeSharePoster"
+  bind:save="onSharePosterSave"
+  bind:share="onSharePosterShare"
+/>

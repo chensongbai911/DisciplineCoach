@@ -5,6 +5,7 @@ const { feedbackAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading, chooseImage } = require('../../utils/common');
 const { validateFeedback } = require('../../utils/validator');
 const { formatDate } = require('../../utils/date');
+const vibrate = require('../../utils/vibrate');
 
 // 反馈类型映射
 const TYPE_MAP = {
@@ -147,6 +148,7 @@ Page({
       });
 
       hideLoading();
+      vibrate.success();
       showToast('提交成功，感谢您的反馈！', 'success');
 
       // 重置表单

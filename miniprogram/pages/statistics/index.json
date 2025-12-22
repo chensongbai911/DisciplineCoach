@@ -2,5 +2,8 @@
   "navigationBarTitleText": "数据统计",
   "enablePullDownRefresh": true,
   "backgroundColor": "#f7f8fa",
-  "usingComponents": {}
+  "usingComponents": {
+    "trend-chart": "../../components/trend-chart/index",
+    "share-poster": "../../components/share-poster/index"
+  }
 }

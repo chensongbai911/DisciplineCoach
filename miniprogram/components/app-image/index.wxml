@@ -1,13 +1,23 @@
 <view class="app-image" style="width: {{size}}rpx; height: {{size}}rpx; {{customStyle}}">
+  <!-- 加载中状态 -->
+  <view wx:if="{{loading && !error}}" class="loading-placeholder" style="width: 100%; height: 100%; border-radius: {{radius}}rpx;">
+    <view class="loading-shimmer"></view>
+  </view>
+
+  <!-- 图片 -->
   <image
     wx:if="{{!error}}"
-    class="img"
-    src="{{src}}"
+    class="img {{loading ? 'img-loading' : 'img-loaded'}}"
+    src="{{finalSrc}}"
     mode="{{mode}}"
+    lazy-load="{{lazyLoad}}"
     binderror="onError"
+    bindload="onLoad"
     style="border-radius: {{radius}}rpx;"
   />
-  <view wx:else class="fallback" style="width: 100%; height: 100%; border-radius: {{radius}}rpx;">
+
+  <!-- 错误备用 -->
+  <view wx:if="{{error}}" class="fallback" style="width: 100%; height: 100%; border-radius: {{radius}}rpx;">
     <text wx:if="{{fallbackText}}" class="fallback-text">{{fallbackText}}</text>
     <icon wx:else type="{{fallbackIconType}}" size="{{Math.floor(size*0.6)}}" />
   </view>

@@ -3,6 +3,7 @@ const app = getApp()
 const { recordAPI, planAPI } = require('../../utils/api.js')
 const { formatDateChinese, getToday, getWeekday } = require('../../utils/date.js')
 const { handleAPIError, wrapAPICall } = require('../../utils/errorHandler.js')
+const vibrate = require('../../utils/vibrate.js')
 
 Page({
   data: {
@@ -30,6 +31,13 @@ Page({
     // 成功反馈
     showSuccessFeedback: false,
     successMessage: '',
+
+    // 分享海报
+    showSharePoster: false,
+    shareData: null,
+
+    // FAB菜单
+    showFabMenu: false,
 
     // 加载状态
     isLoading: true,
@@ -410,12 +418,18 @@ Page({
 
     dimensions[index].expanded = !dimensions[index].expanded
 
+    // 轻微震动反馈
+    vibrate.light();
+
     this.setData({ dimensions })
   },
 
   // 打卡
   handleCheckin (e) {
     const { taskId, taskTitle, taskType, taskUnit, taskTargetValue } = e.currentTarget.dataset
+
+    // 轻微震动反馈
+    vibrate.light();
 
     const task = {
       id: taskId,
@@ -443,6 +457,119 @@ Page({
       checkinValue: '',
       checkinRemark: ''
     })
+  },
+
+  /**
+   * 长按任务项快捷打卡
+   */
+  handleLongPress (e) {
+    const { taskId, taskTitle, taskType, taskUnit, taskTargetValue, taskCompleted } = e.currentTarget.dataset;
+
+    // 已完成的任务不处理
+    if (taskCompleted) {
+      return;
+    }
+
+    // 检查网络状态
+    if (!this.data.isOnline) {
+      wx.showToast({
+        title: '当前离线，无法打卡',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
+
+    // 中等震动反馈
+    vibrate.medium();
+
+    // 布尔型任务直接快速打卡
+    if (taskType === 'boolean') {
+      wx.showModal({
+        title: '快速打卡',
+        content: `确认完成「${taskTitle}」？`,
+        confirmText: '确认',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            this.quickCheckin(taskId, taskTitle, 1, '');
+          }
+        }
+      });
+    } else {
+      // 数值型任务显示快捷输入
+      this.showQuickInput(taskId, taskTitle, taskType, taskUnit, taskTargetValue);
+    }
+  },
+
+  /**
+   * 快速打卡（无弹窗）
+   */
+  async quickCheckin (taskId, taskTitle, actualValue, remark) {
+    vibrate.light();
+
+    // 乐观更新UI
+    this.updateTaskStatusLocally(taskId, {
+      completed: true,
+      actualValue: Number(actualValue),
+      remark: remark || ''
+    });
+
+    // 显示成功动画
+    this.showSuccessAnimation();
+
+    // 异步保存到云端
+    try {
+      await recordAPI.create({
+        planId: taskId,
+        date: getToday(),
+        actualValue: Number(actualValue),
+        remark: remark || ''
+      });
+
+      console.log('快速打卡成功');
+
+      // 延迟刷新数据
+      setTimeout(() => {
+        this.loadData();
+      }, 1000);
+
+    } catch (err) {
+      console.error('快速打卡失败:', err);
+      this.rollbackTaskStatus(taskId);
+      vibrate.error();
+
+      wx.showToast({
+        title: '打卡失败',
+        icon: 'none',
+        duration: 2000
+      });
+    }
+  },
+
+  /**
+   * 显示快捷输入框
+   */
+  showQuickInput (taskId, taskTitle, taskType, taskUnit, taskTargetValue) {
+    wx.showModal({
+      title: `快速打卡：${taskTitle}`,
+      content: `请输入完成情况（目标${taskTargetValue}${taskUnit}）`,
+      editable: true,
+      placeholderText: `输入${taskUnit}`,
+      success: (res) => {
+        if (res.confirm && res.content) {
+          const value = parseFloat(res.content);
+          if (isNaN(value) || value <= 0) {
+            wx.showToast({
+              title: '请输入有效数值',
+              icon: 'none'
+            });
+            return;
+          }
+          this.quickCheckin(taskId, taskTitle, value, '快速打卡');
+        }
+      }
+    });
   },
 
   // 输入打卡数值
@@ -503,6 +630,7 @@ Page({
 
     // 关闭弹窗并显示成功动画（立即响应）
     this.closeCheckinModal();
+    vibrate.success(); // 成功震动反馈
     this.showSuccessAnimation();
 
     // 2️⃣ 异步保存到云端
@@ -533,6 +661,7 @@ Page({
 
       // 3️⃣ 失败回滚：恢复原状态
       this.rollbackTaskStatus(currentTask.id);
+      vibrate.error(); // 错误震动反馈
 
       wx.showToast({
         title: '打卡失败: ' + (err.message || '未知错误'),
@@ -622,11 +751,181 @@ Page({
       this.setData({
         showSuccessFeedback: false
       })
+      // 成功动画结束后,询问是否分享
+      this.askForShare()
     }, 2000)
+  },
+
+  // 询问是否分享
+  askForShare () {
+    const { completedTasks, totalTasks, streakDays } = this.data;
+
+    // 只有全部完成或连续天数是特殊数字时才询问
+    const shouldAsk = (completedTasks === totalTasks && totalTasks > 0) ||
+      [7, 14, 21, 30, 50, 100].includes(streakDays);
+
+    if (!shouldAsk) {
+      return;
+    }
+
+    wx.showModal({
+      title: '分享成就',
+      content: completedTasks === totalTasks
+        ? '今日目标全部完成！要不要分享一下你的自律成果？'
+        : `恭喜坚持${streakDays}天！要不要分享一下你的坚持？`,
+      confirmText: '分享',
+      cancelText: '下次',
+      success: (res) => {
+        if (res.confirm) {
+          this.showShare();
+        }
+      }
+    });
+  },
+
+  // 显示分享海报
+  showShare () {
+    const { completedTasks, totalTasks, streakDays } = this.data;
+    const app = getApp();
+    const userInfo = app.globalData.userInfo || {};
+
+    this.setData({
+      showSharePoster: true,
+      shareData: {
+        userName: userInfo.nickName || '自律达人',
+        avatarUrl: userInfo.avatarUrl || '',
+        completedCount: completedTasks,
+        totalCount: totalTasks,
+        streakDays,
+        date: this.data.currentDate
+      }
+    });
+  },
+
+  // 关闭分享海报
+  closeSharePoster () {
+    vibrate.light();
+    this.setData({
+      showSharePoster: false,
+      shareData: null
+    });
+  },
+
+  // 分享海报保存回调
+  onSharePosterSave (e) {
+    console.log('海报已保存:', e.detail);
+  },
+
+  // 分享海报分享回调
+  onSharePosterShare (e) {
+    console.log('海报已分享:', e.detail);
+  },
+
+  /**
+   * 切换FAB菜单
+   */
+  toggleFabMenu () {
+    vibrate.light();
+    this.setData({
+      showFabMenu: !this.data.showFabMenu
+    });
+  },
+
+  /**
+   * 快速全部打卡（仅布尔型任务）
+   */
+  handleQuickCheckAll () {
+    vibrate.light();
+    this.setData({ showFabMenu: false });
+
+    const { dimensions } = this.data;
+
+    // 收集所有未完成的布尔型任务
+    const booleanTasks = [];
+    dimensions.forEach(dim => {
+      dim.tasks.forEach(task => {
+        if (!task.completed && task.type === 'boolean') {
+          booleanTasks.push(task);
+        }
+      });
+    });
+
+    if (booleanTasks.length === 0) {
+      wx.showToast({
+        title: '没有可快速打卡的任务',
+        icon: 'none'
+      });
+      return;
+    }
+
+    wx.showModal({
+      title: '快速打卡',
+      content: `确认完成所有${booleanTasks.length}个任务吗？`,
+      confirmText: '确认',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          this.batchQuickCheckin(booleanTasks);
+        }
+      }
+    });
+  },
+
+  /**
+   * 批量快速打卡
+   */
+  async batchQuickCheckin (tasks) {
+    wx.showLoading({ title: '打卡中...' });
+    vibrate.success();
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (const task of tasks) {
+      try {
+        // 更新本地UI
+        this.updateTaskStatusLocally(task.id, {
+          completed: true,
+          actualValue: 1,
+          remark: '快速批量打卡'
+        });
+
+        // 保存到云端
+        await recordAPI.create({
+          planId: task.id,
+          date: getToday(),
+          actualValue: 1,
+          remark: '快速批量打卡'
+        });
+
+        successCount++;
+      } catch (err) {
+        console.error(`任务${task.id}打卡失败:`, err);
+        failCount++;
+      }
+    }
+
+    wx.hideLoading();
+
+    if (successCount > 0) {
+      this.showSuccessAnimation();
+      this.askForShare();
+    }
+
+    wx.showToast({
+      title: `成功${successCount}个${failCount > 0 ? '，失败' + failCount + '个' : ''}`,
+      icon: successCount > 0 ? 'success' : 'none'
+    });
+
+    // 刷新数据
+    setTimeout(() => {
+      this.loadData();
+    }, 1000);
   },
 
   // 跳转到计划页面
   goToPlan () {
+    this.setData({ showFabMenu: false });
     wx.navigateTo({
       url: '/pages/plan/index'
     })

@@ -92,7 +92,15 @@
         <!-- 卡片内容 -->
         <view class="task-card-body" wx:if="{{item.expanded}}">
           <block wx:for="{{item.tasks}}" wx:for-item="task" wx:key="id">
-            <view class="task-item">
+            <view
+              class="task-item"
+              bindlongpress="handleLongPress"
+              data-task-id="{{task.id}}"
+              data-task-title="{{task.title}}"
+              data-task-type="{{task.type}}"
+              data-task-unit="{{task.unit}}"
+              data-task-target-value="{{task.targetValue}}"
+              data-task-completed="{{task.completed}}">
               <view class="task-item-left">
                 <text class="task-item-title">{{task.title}}</text>
                 <text class="task-item-desc">目标: {{task.targetText}}</text>
@@ -143,8 +151,23 @@
     </view>
 
     <!-- 快速添加浮动按钮 -->
-    <view wx:if="{{totalTasks > 0}}" class="fab" bindtap="goToPlan">
-      <text class="fab-icon">+</text>
+    <view wx:if="{{totalTasks > 0}}" class="fab-container">
+      <!-- 展开的快捷菜单 -->
+      <view class="fab-menu" wx:if="{{showFabMenu}}">
+        <view class="fab-menu-item" bindtap="handleQuickCheckAll">
+          <view class="fab-menu-icon">✓</view>
+          <text class="fab-menu-text">快速全部打卡</text>
+        </view>
+        <view class="fab-menu-item" bindtap="goToPlan">
+          <view class="fab-menu-icon">+</view>
+          <text class="fab-menu-text">添加新计划</text>
+        </view>
+      </view>
+
+      <!-- 主按钮 -->
+      <view class="fab {{showFabMenu ? 'fab-active' : ''}}" bindtap="toggleFabMenu">
+        <text class="fab-icon">{{showFabMenu ? '×' : '+'}}</text>
+      </view>
     </view>
   </view> <!-- content-container 结束 -->
 </view> <!-- page-container 结束 -->
@@ -195,3 +218,13 @@
     <text>{{successMessage}}</text>
   </view>
 </view>
+
+<!-- 分享海报 -->
+<share-poster
+  type="checkin"
+  data="{{shareData}}"
+  visible="{{showSharePoster}}"
+  bind:close="closeSharePoster"
+  bind:save="onSharePosterSave"
+  bind:share="onSharePosterShare"
+/>

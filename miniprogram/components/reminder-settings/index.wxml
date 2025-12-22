@@ -1,0 +1,146 @@
+<view class="reminder-settings-modal" wx:if="{{visible}}">
+  <view class="modal-mask" bindtap="handleClose"></view>
+
+  <view class="modal-content">
+    <!-- 标题栏 -->
+    <view class="modal-header">
+      <text class="header-title">提醒设置</text>
+      <view class="header-close" bindtap="handleClose">
+        <app-icon type="circle" size="32" customStyle="color: #999;" />
+      </view>
+    </view>
+
+    <!-- 设置内容 -->
+    <scroll-view class="modal-body" scroll-y>
+      <!-- 总开关 -->
+      <view class="setting-section">
+        <view class="section-item">
+          <view class="item-label">
+            <app-icon type="bell" size="40" customStyle="color: #4FD1C5;" />
+            <text class="label-text">打卡提醒</text>
+          </view>
+          <switch
+            checked="{{settings.enabled}}"
+            bindchange="handleEnableChange"
+            color="#4FD1C5"
+          />
+        </view>
+        <view class="item-desc">每天定时提醒您完成打卡任务</view>
+      </view>
+
+      <!-- 提醒时间 -->
+      <view class="setting-section" wx:if="{{settings.enabled}}">
+        <view class="section-title">提醒时间</view>
+
+        <!-- 智能推荐 -->
+        <view class="recommend-box" wx:if="{{recommendedTime}}">
+          <view class="recommend-header">
+            <app-icon type="chart" size="32" customStyle="color: #FFD700;" />
+            <text class="recommend-title">智能推荐</text>
+          </view>
+          <view class="recommend-content">
+            <text class="recommend-text">根据您的打卡习惯，推荐</text>
+            <text class="recommend-time">{{recommendedTime}}</text>
+            <text class="recommend-text">提醒</text>
+          </view>
+          <button class="recommend-btn" size="mini" bindtap="applyRecommendedTime">
+            应用推荐
+          </button>
+        </view>
+
+        <!-- 时间选择 -->
+        <picker
+          mode="time"
+          value="{{settings.time}}"
+          bindchange="handleTimeChange">
+          <view class="time-selector">
+            <app-icon type="clock" size="36" customStyle="color: #4FD1C5;" />
+            <text class="time-text">{{nextReminderTime}}</text>
+            <app-icon type="arrow-down" size="24" customStyle="color: #999;" />
+          </view>
+        </picker>
+      </view>
+
+      <!-- 提醒类型 -->
+      <view class="setting-section" wx:if="{{settings.enabled}}">
+        <view class="section-title">提醒类型</view>
+
+        <view class="section-item">
+          <view class="item-label">
+            <text class="label-icon">📅</text>
+            <view class="label-info">
+              <text class="label-text">每日打卡</text>
+              <text class="label-desc">每天提醒您完成任务</text>
+            </view>
+          </view>
+          <switch
+            checked="{{settings.types.dailyCheckin}}"
+            data-type="dailyCheckin"
+            bindchange="handleTypeChange"
+            color="#4FD1C5"
+          />
+        </view>
+
+        <view class="section-item">
+          <view class="item-label">
+            <text class="label-icon">🔥</text>
+            <view class="label-info">
+              <text class="label-text">连续中断警告</text>
+              <text class="label-desc">连续打卡即将中断时提醒</text>
+            </view>
+          </view>
+          <switch
+            checked="{{settings.types.streakWarning}}"
+            data-type="streakWarning"
+            bindchange="handleTypeChange"
+            color="#FF6B6B"
+          />
+        </view>
+
+        <view class="section-item">
+          <view class="item-label">
+            <text class="label-icon">📊</text>
+            <view class="label-info">
+              <text class="label-text">周报推送</text>
+              <text class="label-desc">每周一推送上周数据总结</text>
+            </view>
+          </view>
+          <switch
+            checked="{{settings.types.weeklyReport}}"
+            data-type="weeklyReport"
+            bindchange="handleTypeChange"
+            color="#4ECDC4"
+          />
+        </view>
+
+        <view class="section-item">
+          <view class="item-label">
+            <text class="label-icon">📈</text>
+            <view class="label-info">
+              <text class="label-text">月报推送</text>
+              <text class="label-desc">每月1号推送上月数据总结</text>
+            </view>
+          </view>
+          <switch
+            checked="{{settings.types.monthlyReport}}"
+            data-type="monthlyReport"
+            bindchange="handleTypeChange"
+            color="#9B59B6"
+          />
+        </view>
+      </view>
+
+      <!-- 说明 -->
+      <view class="setting-tip" wx:if="{{settings.enabled}}">
+        <app-icon type="info" size="32" customStyle="color: #999;" />
+        <text class="tip-text">提醒功能需要您授权接收订阅消息，如未收到提醒，请在系统设置中检查通知权限</text>
+      </view>
+
+      <!-- 系统设置入口 -->
+      <view class="system-settings-btn" wx:if="{{settings.enabled}}" bindtap="openSystemSettings">
+        <text class="btn-text">打开系统通知设置</text>
+        <app-icon type="arrow-down" size="24" customStyle="color: #4FD1C5; transform: rotate(-90deg);" />
+      </view>
+    </scroll-view>
+  </view>
+</view>

@@ -51,6 +51,17 @@ page {
   }
 }
 
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 
 .page-container::before {
   content: '';
@@ -81,12 +92,22 @@ page {
   margin-right: 24rpx;
   box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.5);
   border: 4rpx solid rgba(255, 255, 255, 0.9);
-  animation: float 3s ease-in-out infinite;
+  animation: float 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.coach-avatar:active {
+  transform: scale(0.95);
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10rpx); }
+}
+
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.5); }
+  50% { box-shadow: 0 12rpx 36rpx rgba(79, 209, 197, 0.7); }
 }
 
 .coach-bubble {
@@ -98,6 +119,7 @@ page {
   box-shadow: 0 8rpx 32rpx rgba(79, 209, 197, 0.15);
   position: relative;
   border: 2rpx solid rgba(255, 255, 255, 0.8);
+  animation: slideInRight 0.5s ease-out;
 }
 
 .coach-bubble::before {
@@ -131,6 +153,18 @@ page {
   border-radius: 28rpx;
   padding: 36rpx;
   box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.12);
+  animation: fadeInScale 0.6s ease-out;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .overview-card::before {
@@ -257,8 +291,29 @@ page {
   transition: all 0.3s;
   box-shadow: 0 6rpx 16rpx rgba(79, 209, 197, 0.4);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   letter-spacing: 1rpx;
+}
+
+/* 按钮脉冲动画 */
+.checkin-btn::after {
+  content: '';
+  position: absolute;
+  inset: -4rpx;
+  border: 3rpx solid rgba(79, 209, 197, 0.6);
+  border-radius: 38rpx;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
 }
 
 .checkin-btn::before {
@@ -287,14 +342,33 @@ page {
 .task-card {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20rpx);
+  border-radius: 24rpx;
+  margin-bottom: 20rpx;
+  padding: 32rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.8);
-  transition: all 0.3s ease;
+  box-shadow: 0 6rpx 20rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  border-radius: 28rpx;
-  padding: 36rpx;
-  margin-bottom: 28rpx;
-  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+  animation: slideInUp 0.4s ease-out backwards;
+}
+
+/* 为不同的卡片添加延迟 */
+.task-card:nth-child(1) { animation-delay: 0.1s; }
+.task-card:nth-child(2) { animation-delay: 0.15s; }
+.task-card:nth-child(3) { animation-delay: 0.2s; }
+.task-card:nth-child(4) { animation-delay: 0.25s; }
+.task-card:nth-child(5) { animation-delay: 0.3s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .task-card::after {
@@ -427,6 +501,40 @@ page {
   padding: 24rpx 0;
   border-bottom: 2rpx solid rgba(226, 232, 240, 0.8);
   transition: all 0.3s ease;
+  position: relative;
+}
+
+/* 长按反馈效果 */
+.task-item:active {
+  background: rgba(79, 209, 197, 0.08);
+  transform: scale(0.98);
+  border-radius: 16rpx;
+  margin: 0 -16rpx;
+  padding: 24rpx 16rpx;
+}
+
+/* 长按提示动画 */
+.task-item::after {
+  content: '长按快速打卡';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24rpx;
+  color: #4FD1C5;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.task-item:active::after {
+  opacity: 0.6;
+  animation: fadeInOut 0.8s ease;
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0; }
+  50% { opacity: 0.8; }
 }
 
 .task-item:last-child {
@@ -535,34 +643,84 @@ page {
   font-weight: 400;
 }
 
+/* FAB 悬浮按钮容器 */
+.fab-container {
+  position: fixed;
+  right: 30rpx;
+  bottom: calc(env(safe-area-inset-bottom) + 100rpx);
+  z-index: 999;
+}
+
 /* 浮动添加按钮 */
 .fab {
-  position: fixed;
-  right: 32rpx;
-  bottom: calc(140rpx + env(safe-area-inset-bottom));
-  width: 112rpx;
-  height: 112rpx;
-  border-radius: 56rpx;
-  background: linear-gradient(135deg, #4FD1C5 0%, #3182CE 100%);
-  box-shadow: 0 12rpx 32rpx rgba(79, 209, 197, 0.4);
+  width: 100rpx;
+  height: 100rpx;
+  background: linear-gradient(135deg, #4FD1C5 0%, #38B2AC 100%);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: fabPulse 2s ease-in-out infinite;
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.4);
+  color: #fff;
+  font-size: 48rpx;
+  font-weight: 300;
+  transition: all 0.3s ease;
 }
 
 .fab:active {
-  transform: scale(0.92);
-  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.35);
+  transform: scale(0.9);
+  box-shadow: 0 4rpx 12rpx rgba(79, 209, 197, 0.3);
 }
 
-.fab-icon {
-  font-size: 56rpx;
-  color: #FFFFFF;
-  font-weight: 300;
-  line-height: 1;
+.fab-active {
+  background: linear-gradient(135deg, #38B2AC 0%, #2C7A7B 100%);
+  transform: rotate(45deg);
+}
+
+/* FAB 菜单 */
+.fab-menu {
+  position: absolute;
+  bottom: 120rpx;
+  right: 0;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  animation: fabMenuSlideUp 0.3s ease;
+}
+
+@keyframes fabMenuSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fab-menu-item {
+  padding: 24rpx 32rpx;
+  font-size: 28rpx;
+  color: #2D3748;
+  white-space: nowrap;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.fab-menu-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 16rpx;
+  right: 16rpx;
+  height: 1rpx;
+  background: #E2E8F0;
+}
+
+.fab-menu-item:active {
+  background: rgba(79, 209, 197, 0.08);
 }
 
 @keyframes fabPulse {

@@ -1,0 +1,183 @@
+.share-poster-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 遮罩层 */
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  animation: fadeIn 0.3s ease;
+}
+
+/* 海报内容 */
+.poster-content {
+  position: relative;
+  width: 90%;
+  max-width: 600rpx;
+  background: #ffffff;
+  border-radius: 32rpx;
+  padding: 40rpx;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Canvas画布 (隐藏) */
+.canvas-hidden {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  z-index: -1;
+}
+
+/* 海报预览 */
+.poster-preview {
+  width: 100%;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: #f7f8fa;
+  margin-bottom: 40rpx;
+}
+
+.poster-image {
+  width: 100%;
+  display: block;
+}
+
+/* 加载中 */
+.loading-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 0;
+}
+
+.loading-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border: 6rpx solid #e5e5e5;
+  border-top-color: #4FD1C5;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin-top: 32rpx;
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* 操作按钮 */
+.actions {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.action-btn::after {
+  border: none;
+}
+
+.action-btn.primary {
+  background: linear-gradient(135deg, #4FD1C5 0%, #45B7AA 100%);
+  color: #ffffff;
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.3);
+}
+
+.action-btn.primary:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(79, 209, 197, 0.3);
+}
+
+.action-btn.secondary {
+  background: #f7f8fa;
+  color: #666666;
+}
+
+.action-btn.secondary:active {
+  background: #ebedf0;
+  transform: scale(0.95);
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: -80rpx;
+  right: 0;
+  width: 64rpx;
+  height: 64rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.close-btn:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 提示文字 */
+.tips {
+  margin-top: 24rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

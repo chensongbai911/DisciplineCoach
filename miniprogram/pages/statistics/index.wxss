@@ -548,3 +548,33 @@
 .mt-4 {
   margin-top: 32rpx;
 }
+
+/* 分享按钮 */
+.share-button {
+  margin: 40rpx 32rpx 32rpx;
+  height: 96rpx;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+  border-radius: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  box-shadow: 0 8rpx 24rpx rgba(255, 107, 107, 0.3);
+  transition: all 0.3s ease;
+}
+
+.share-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.3);
+}
+
+.share-icon {
+  font-size: 40rpx;
+}
+
+.share-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #ffffff;
+}
+

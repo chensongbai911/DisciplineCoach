@@ -1,0 +1,70 @@
+<!-- 趋势图表组件 -->
+<view class="trend-chart">
+  <view class="chart-header">
+    <text class="chart-title">{{title}}</text>
+    <view class="chart-legend">
+      <view class="legend-item">
+        <view class="legend-dot" style="background: {{primaryColor}}"></view>
+        <text class="legend-text">完成率</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="chart-container">
+    <!-- Y轴刻度 -->
+    <view class="y-axis">
+      <text class="y-label" wx:for="{{yLabels}}" wx:key="*this">{{item}}%</text>
+    </view>
+
+    <!-- 图表区域 -->
+    <view class="chart-area">
+      <!-- 网格线 -->
+      <view class="grid-lines">
+        <view class="grid-line" wx:for="{{5}}" wx:key="*this"></view>
+      </view>
+
+      <!-- 折线路径 -->
+      <view class="line-path" wx:if="{{data.length > 0}}">
+        <view
+          class="line-segment"
+          wx:for="{{lineSegments}}"
+          wx:key="index"
+          style="{{item.style}}"
+        ></view>
+      </view>
+
+      <!-- 数据点 -->
+      <view class="data-points">
+        <view
+          class="data-point"
+          wx:for="{{data}}"
+          wx:key="date"
+          style="left: {{item.x}}%; bottom: {{item.y}}%"
+          bindtap="handlePointTap"
+          data-index="{{index}}"
+        >
+          <view class="point-dot" style="background: {{primaryColor}}"></view>
+          <view class="point-value" wx:if="{{item.showValue}}">{{item.value}}%</view>
+        </view>
+      </view>
+
+      <!-- X轴标签 -->
+      <view class="x-axis">
+        <text
+          class="x-label"
+          wx:for="{{xLabels}}"
+          wx:key="*this"
+          style="left: {{item.position}}%"
+        >
+          {{item.text}}
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 提示信息 -->
+  <view class="chart-tooltip" wx:if="{{tooltip.show}}" style="left: {{tooltip.x}}rpx; top: {{tooltip.y}}rpx">
+    <text class="tooltip-date">{{tooltip.date}}</text>
+    <text class="tooltip-value">完成率: {{tooltip.value}}%</text>
+  </view>
+</view>
