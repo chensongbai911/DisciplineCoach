@@ -15,35 +15,32 @@
 
   <!-- 任务列表 -->
   <view class="task-list" wx:if="{{tasks.length > 0}}">
-    <view
-      class="task-item-card"
+    <swipe-action
       wx:for="{{tasks}}"
       wx:key="_id"
-      bindtap="handleEditTask"
+      actions="{{swipeActions}}"
+      bind:actiontap="handleSwipeAction"
+      bind:contenttap="handleEditTask"
       data-id="{{item._id}}"
+      data-index="{{index}}"
     >
-      <view class="task-item-header">
-        <text class="task-item-title">{{item.title}}</text>
-        <view class="task-item-actions">
-          <text
-            class="action-icon"
-            bindtap="handleDeleteTask"
-            data-id="{{item._id}}"
-            catchtap="handleActionTap"
-          >🗑️</text>
+      <view slot="content" class="task-item-card">
+        <view class="task-item-header">
+          <text class="task-item-title">{{item.title}}</text>
+          <text class="task-status">{{item.status === 'active' ? '⚡ 进行中' : '⏸ 已暂停'}}</text>
+        </view>
+        <view class="task-item-body">
+          <view class="task-meta">
+            <text class="meta-label">目标：</text>
+            <text class="meta-value">{{item.targetDesc}}</text>
+          </view>
+          <view class="task-meta" wx:if="{{item.reminder}}">
+            <text class="meta-label">提醒：</text>
+            <text class="meta-value">{{item.reminder.time}}</text>
+          </view>
         </view>
       </view>
-      <view class="task-item-body">
-        <view class="task-meta">
-          <text class="meta-label">目标：</text>
-          <text class="meta-value">{{item.targetDesc}}</text>
-        </view>
-        <view class="task-meta" wx:if="{{item.reminder}}">
-          <text class="meta-label">提醒：</text>
-          <text class="meta-value">{{item.reminder.time}}</text>
-        </view>
-      </view>
-    </view>
+    </swipe-action>
   </view>
 
   <!-- 空状态 -->

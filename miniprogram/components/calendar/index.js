@@ -21,7 +21,12 @@ Component({
     days: [],
     selectedDate: null,
     selectedDateInfo: null,
-    today: ''
+    today: '',
+    // 滑动相关
+    touchStartX: 0,
+    touchStartY: 0,
+    touchEndX: 0,
+    swipeThreshold: 50 // 滑动阈值(px)
   },
 
   lifetimes: {
@@ -304,6 +309,50 @@ Component({
           });
         }
       }, 100);
+    },
+
+    /**
+     * 触摸开始
+     */
+    handleTouchStart (e) {
+      const touch = e.touches[0];
+      this.setData({
+        touchStartX: touch.clientX,
+        touchStartY: touch.clientY
+      });
+    },
+
+    /**
+     * 触摸移动
+     */
+    handleTouchMove (e) {
+      const touch = e.touches[0];
+      this.setData({
+        touchEndX: touch.clientX
+      });
+    },
+
+    /**
+     * 触摸结束
+     */
+    handleTouchEnd () {
+      const { touchStartX, touchStartY, touchEndX, swipeThreshold } = this.data;
+      const deltaX = touchEndX - touchStartX;
+      const deltaY = Math.abs(touchStartY - (this.data.touchEndX || touchStartY));
+
+      // 确保是水平滑动（水平位移大于垂直位移）
+      if (Math.abs(deltaX) < deltaY) {
+        return;
+      }
+
+      // 判断滑动方向
+      if (deltaX > swipeThreshold) {
+        // 右滑 - 上一月
+        this.prevMonth();
+      } else if (deltaX < -swipeThreshold) {
+        // 左滑 - 下一月
+        this.nextMonth();
+      }
     }
   }
 });

@@ -1,0 +1,25 @@
+<view class="swipe-action">
+  <!-- 内容区域 -->
+  <view
+    class="swipe-content {{isOpen ? 'open' : ''}}"
+    style="transform: translateX({{moveX}}px); transition: {{isMoving ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)'}}"
+    bindtouchstart="handleTouchStart"
+    bindtouchmove="handleTouchMove"
+    bindtouchend="handleTouchEnd"
+    bindtap="handleContentTap">
+    <slot name="content"></slot>
+  </view>
+
+  <!-- 右侧动作按钮 -->
+  <view class="swipe-actions" style="width: {{actionsWidth}}rpx">
+    <view
+      class="action-item action-{{item.type || 'default'}}"
+      wx:for="{{actions}}"
+      wx:key="text"
+      data-index="{{index}}"
+      bindtap="handleActionTap">
+      <text class="action-icon" wx:if="{{item.icon}}">{{item.icon}}</text>
+      <text class="action-text">{{item.text}}</text>
+    </view>
+  </view>
+</view>

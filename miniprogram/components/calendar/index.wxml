@@ -32,7 +32,12 @@
   </view>
 
   <!-- 日期网格 -->
-  <view class="calendar-grid">
+  <view
+    class="calendar-grid"
+    bindtouchstart="handleTouchStart"
+    bindtouchmove="handleTouchMove"
+    bindtouchend="handleTouchEnd"
+  >
     <view
       class="day-cell {{item.isToday ? 'today' : ''}} {{item.isSelected ? 'selected' : ''}} {{item.hasRecord ? 'has-record' : ''}} {{item.isOtherMonth ? 'other-month' : ''}} {{item.isFuture ? 'future' : ''}}"
       wx:for="{{days}}"

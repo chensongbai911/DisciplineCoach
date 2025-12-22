@@ -3,6 +3,7 @@
   "enablePullDownRefresh": true,
   "backgroundColor": "#f7f8fa",
   "usingComponents": {
-    "app-image": "/components/app-image/index"
+    "app-image": "/components/app-image/index",
+    "swipe-action": "/components/swipe-action/index"
   }
 }

@@ -20,6 +20,12 @@ Page({
     dimension: {},
     tasks: [],
 
+    // 左滑动作配置
+    swipeActions: [
+      { text: '编辑', type: 'primary', icon: '✏️' },
+      { text: '删除', type: 'danger', icon: '🗑️' }
+    ],
+
     // 表单相关
     showTaskForm: false,
     formMode: 'add', // add | edit
@@ -257,6 +263,21 @@ Page({
       },
       durationUnitIndex: durationUnitIndex >= 0 ? durationUnitIndex : 0
     });
+  },
+
+  /**
+   * 处理滑动动作
+   */
+  handleSwipeAction (e) {
+    const { action, index } = e.detail;
+    const { id } = e.currentTarget.dataset;
+    const task = this.data.tasks[index];
+
+    if (action.text === '编辑') {
+      this.handleEditTask({ currentTarget: { dataset: { id } } });
+    } else if (action.text === '删除') {
+      this.handleDeleteTask({ currentTarget: { dataset: { id } } });
+    }
   },
 
   /**
