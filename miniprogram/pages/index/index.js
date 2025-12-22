@@ -101,13 +101,13 @@ Page({
       'study': '学习'
     };
 
-    // 按维度分组
+    // 按维度分组（优化后的图标）
     const dimensionMap = {
-      '运动': { icon: '🏃', categoryClass: 'bg-sport', tasks: [] },
-      '饮食': { icon: '🍎', categoryClass: 'bg-diet', tasks: [] },
-      '睡眠': { icon: '🌙', categoryClass: 'bg-sleep', tasks: [] },
-      '阅读': { icon: '📖', categoryClass: 'bg-reading', tasks: [] },
-      '学习': { icon: '📝', categoryClass: 'bg-study', tasks: [] }
+      '运动': { icon: '💪', categoryClass: 'bg-sport', tasks: [] },
+      '饮食': { icon: '🥗', categoryClass: 'bg-diet', tasks: [] },
+      '睡眠': { icon: '😴', categoryClass: 'bg-sleep', tasks: [] },
+      '阅读': { icon: '📚', categoryClass: 'bg-reading', tasks: [] },
+      '学习': { icon: '✏️', categoryClass: 'bg-study', tasks: [] }
     }
 
     // 记录ID映射
