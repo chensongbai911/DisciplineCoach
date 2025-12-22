@@ -54,6 +54,13 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
+      <view class="menu-item" bindtap="handleExport">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="download" size="28" />
+          <text class="menu-text">数据导出</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
       <view class="menu-item" bindtap="navigateTo" data-url="/pages/user/achievements">
         <view class="menu-item-left">
           <app-icon class="menu-icon" type="trophy" size="28" />

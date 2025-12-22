@@ -228,3 +228,11 @@
   bind:save="onSharePosterSave"
   bind:share="onSharePosterShare"
 />
+
+<!-- 成就解锁动画 -->
+<achievement-unlock
+  show="{{showAchievementUnlock}}"
+  achievement="{{currentAchievement}}"
+  bind:close="handleAchievementClose"
+  bind:share="handleAchievementShare"
+/>

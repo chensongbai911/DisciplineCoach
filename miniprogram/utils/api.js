@@ -297,6 +297,50 @@ const messageAPI = {
   }
 }
 
+/**
+ * 导出相关API
+ */
+const exportAPI = {
+  // 导出为 Excel
+  exportToExcel (startDate, endDate, dimensions) {
+    return callFunction('export', {
+      action: 'exportExcel',
+      startDate,
+      endDate,
+      dimensions
+    })
+  },
+
+  // 导出为 PDF 报告
+  exportToPDF (startDate, endDate, reportType = 'weekly') {
+    return callFunction('export', {
+      action: 'exportPDF',
+      startDate,
+      endDate,
+      reportType
+    })
+  },
+
+  // 导出为图片
+  exportToImage (chartType, startDate, endDate) {
+    return callFunction('export', {
+      action: 'exportImage',
+      chartType,
+      startDate,
+      endDate
+    })
+  },
+
+  // 获取导出历史
+  getExportHistory (page = 1, pageSize = 20) {
+    return callFunction('export', {
+      action: 'getExportHistory',
+      page,
+      pageSize
+    })
+  }
+}
+
 module.exports = {
   callFunction,
   userAPI,
@@ -305,5 +349,6 @@ module.exports = {
   statisticsAPI,
   paymentAPI,
   feedbackAPI,
-  messageAPI
+  messageAPI,
+  exportAPI
 }

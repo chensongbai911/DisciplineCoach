@@ -1,0 +1,9 @@
+{
+  "name": "export",
+  "version": "1.0.0",
+  "description": "数据导出云函数 - 支持Excel、PDF、图片导出",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

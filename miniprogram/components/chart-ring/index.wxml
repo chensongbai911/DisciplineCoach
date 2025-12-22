@@ -1,0 +1,9 @@
+<!-- components/chart-ring/index.wxml -->
+<view class="chart-container">
+  <canvas
+    id="{{canvasId}}"
+    type="2d"
+    class="chart-canvas"
+    style="width: {{size}}rpx; height: {{size}}rpx;"
+  />
+</view>

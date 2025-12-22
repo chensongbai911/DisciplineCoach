@@ -36,6 +36,10 @@ Page({
     showSharePoster: false,
     shareData: null,
 
+    // 成就系统
+    showAchievementUnlock: false,
+    currentAchievement: null,
+
     // FAB菜单
     showFabMenu: false,
 
@@ -651,6 +655,9 @@ Page({
 
       console.log('打卡成功，已同步到云端')
 
+      // 检测成就解锁
+      this.checkAchievements();
+
       // 延迟刷新数据以获取最新的连续天数等统计
       setTimeout(() => {
         this.loadData()
@@ -936,5 +943,139 @@ Page({
     wx.switchTab({
       url: '/pages/statistics/index'
     })
+  },
+
+  /**
+   * 检测成就解锁
+   */
+  async checkAchievements () {
+    try {
+      const { streakDays, completedTasks } = this.data;
+      let unlockedAchievement = null;
+
+      // 成就规则检测
+      const achievementRules = [
+        {
+          id: 'first_checkin',
+          name: '初来乍到',
+          description: '完成第一次打卡',
+          icon: '🎯',
+          condition: completedTasks >= 1
+        },
+        {
+          id: 'streak_3',
+          name: '坚持3天',
+          description: '连续打卡3天',
+          icon: '🔥',
+          condition: streakDays >= 3
+        },
+        {
+          id: 'streak_7',
+          name: '一周达成',
+          description: '连续打卡7天',
+          icon: '⭐',
+          condition: streakDays >= 7
+        },
+        {
+          id: 'streak_30',
+          name: '月度冠军',
+          description: '连续打卡30天',
+          icon: '👑',
+          condition: streakDays >= 30
+        },
+        {
+          id: 'streak_100',
+          name: '百日筑基',
+          description: '连续打卡100天',
+          icon: '💯',
+          condition: streakDays >= 100
+        },
+        {
+          id: 'tasks_10',
+          name: '小试牛刀',
+          description: '累计完成10个任务',
+          icon: '🏅',
+          condition: completedTasks >= 10
+        },
+        {
+          id: 'tasks_50',
+          name: '渐入佳境',
+          description: '累计完成50个任务',
+          icon: '🎖️',
+          condition: completedTasks >= 50
+        },
+        {
+          id: 'tasks_100',
+          name: '百炼成钢',
+          description: '累计完成100个任务',
+          icon: '🏆',
+          condition: completedTasks >= 100
+        }
+      ];
+
+      // 获取已解锁的成就列表
+      const unlockedIds = wx.getStorageSync('unlockedAchievements') || [];
+
+      // 检查是否有新成就解锁
+      for (const rule of achievementRules) {
+        if (rule.condition && !unlockedIds.includes(rule.id)) {
+          unlockedAchievement = rule;
+          break;
+        }
+      }
+
+      // 如果有新成就解锁
+      if (unlockedAchievement) {
+        // 保存到本地存储
+        unlockedIds.push(unlockedAchievement.id);
+        wx.setStorageSync('unlockedAchievements', unlockedIds);
+
+        // 延迟显示成就动画（等待打卡成功动画结束）
+        setTimeout(() => {
+          this.showAchievementUnlock(unlockedAchievement);
+        }, 1500);
+      }
+
+    } catch (err) {
+      console.error('检测成就失败:', err);
+    }
+  },
+
+  /**
+   * 显示成就解锁动画
+   */
+  showAchievementUnlock (achievement) {
+    this.setData({
+      showAchievementUnlock: true,
+      currentAchievement: achievement
+    });
+  },
+
+  /**
+   * 关闭成就动画
+   */
+  handleAchievementClose () {
+    this.setData({
+      showAchievementUnlock: false,
+      currentAchievement: null
+    });
+  },
+
+  /**
+   * 分享成就
+   */
+  handleAchievementShare (e) {
+    const { achievement } = e.detail;
+
+    // 生成分享海报数据
+    this.setData({
+      showAchievementUnlock: false,
+      showSharePoster: true,
+      shareData: {
+        type: 'achievement',
+        achievement,
+        streakDays: this.data.streakDays
+      }
+    });
   }
 })

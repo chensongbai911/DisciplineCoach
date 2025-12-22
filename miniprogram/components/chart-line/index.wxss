@@ -1,0 +1,56 @@
+/* components/chart-line/index.wxss */
+
+.chart-container {
+  width: 100%;
+  position: relative;
+}
+
+.chart-canvas {
+  width: 100%;
+  display: block;
+}
+
+/* 数据提示框 */
+.tooltip {
+  position: absolute;
+  background: rgba(45, 55, 72, 0.9);
+  color: #FFFFFF;
+  padding: 12rpx 20rpx;
+  border-radius: 8rpx;
+  font-size: 24rpx;
+  transform: translate(-50%, -100%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
+}
+
+.tooltip.show {
+  opacity: 1;
+}
+
+.tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 10rpx solid transparent;
+  border-right: 10rpx solid transparent;
+  border-top: 10rpx solid rgba(45, 55, 72, 0.9);
+}
+
+.tooltip-label {
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-bottom: 4rpx;
+}
+
+.tooltip-value {
+  font-size: 28rpx;
+  font-weight: 700;
+}

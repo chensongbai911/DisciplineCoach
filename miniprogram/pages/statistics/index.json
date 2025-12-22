@@ -3,7 +3,9 @@
   "enablePullDownRefresh": true,
   "backgroundColor": "#f7f8fa",
   "usingComponents": {
-    "trend-chart": "../../components/trend-chart/index",
+    "chart-line": "../../components/chart-line/index",
+    "chart-bar": "../../components/chart-bar/index",
+    "chart-ring": "../../components/chart-ring/index",
     "share-poster": "../../components/share-poster/index"
   }
 }

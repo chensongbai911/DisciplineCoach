@@ -1,0 +1,19 @@
+<!-- components/chart-line/index.wxml -->
+<view class="chart-container">
+  <canvas
+    id="{{canvasId}}"
+    type="2d"
+    class="chart-canvas"
+    style="height: {{height}}rpx;"
+    bindtap="handleChartTap"
+  />
+
+  <!-- 数据提示框 -->
+  <view
+    class="tooltip {{showTooltip ? 'show' : ''}}"
+    style="left: {{tooltipPosition.x}}px; top: {{tooltipPosition.y}}px;"
+  >
+    <view class="tooltip-label">{{tooltipData.label}}</view>
+    <view class="tooltip-value">{{tooltipData.value}}%</view>
+  </view>
+</view>

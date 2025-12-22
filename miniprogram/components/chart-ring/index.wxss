@@ -1,0 +1,12 @@
+/* components/chart-ring/index.wxss */
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.chart-canvas {
+  display: block;
+}

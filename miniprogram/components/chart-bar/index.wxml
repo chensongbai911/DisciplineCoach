@@ -1,0 +1,9 @@
+<!-- components/chart-bar/index.wxml -->
+<view class="chart-container">
+  <canvas
+    id="{{canvasId}}"
+    type="2d"
+    class="chart-canvas"
+    style="height: {{height}}rpx;"
+  />
+</view>

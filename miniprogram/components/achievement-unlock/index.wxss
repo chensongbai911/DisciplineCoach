@@ -1,0 +1,198 @@
+/* components/achievement-unlock/index.wxss */
+
+.achievement-unlock {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+}
+
+/* 背景蒙层 */
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  animation: maskFadeIn 0.3s ease;
+}
+
+@keyframes maskFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* 烟花容器 */
+.fireworks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+/* 烟花粒子 */
+.firework {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 1;
+  pointer-events: none;
+}
+
+/* 动态生成烟花动画 */
+@keyframes firework-0 {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(var(--target-x) - 375rpx), calc(var(--target-y) - 667rpx)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* 成就卡片 */
+.achievement-card {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  width: 600rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 32rpx;
+  padding: 60rpx 40rpx 40rpx;
+  box-shadow: 0 20rpx 60rpx rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.achievement-card.show {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* 成就图标 */
+.achievement-icon {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+  margin: 0 auto 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-text {
+  font-size: 120rpx;
+  line-height: 1;
+  position: relative;
+  z-index: 2;
+  animation: iconBounce 0.6s ease 0.3s;
+}
+
+@keyframes iconBounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.icon-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200rpx;
+  height: 200rpx;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+}
+
+/* 成就信息 */
+.achievement-info {
+  text-align: center;
+  color: #fff;
+  margin-bottom: 40rpx;
+}
+
+.achievement-badge {
+  display: inline-block;
+  padding: 8rpx 24rpx;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  font-size: 24rpx;
+  margin-bottom: 20rpx;
+  backdrop-filter: blur(10rpx);
+}
+
+.achievement-name {
+  font-size: 48rpx;
+  font-weight: bold;
+  margin-bottom: 16rpx;
+  text-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.2);
+  animation: textSlideIn 0.5s ease 0.4s backwards;
+}
+
+@keyframes textSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.achievement-desc {
+  font-size: 28rpx;
+  opacity: 0.9;
+  line-height: 1.6;
+  animation: textSlideIn 0.5s ease 0.5s backwards;
+}
+
+/* 操作按钮 */
+.achievement-actions {
+  display: flex;
+  justify-content: center;
+  animation: textSlideIn 0.5s ease 0.6s backwards;
+}
+
+.btn-share {
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  border: none;
+  border-radius: 48rpx;
+  padding: 24rpx 60rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  box-shadow: 0 8rpx 16rpx rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.btn-share:active {
+  transform: scale(0.95);
+  box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.btn-text {
+  color: #667eea;
+}

@@ -99,14 +99,19 @@ Page({
       console.log('[统计页] 趋势数据:', trendData);
       console.log('[统计页] 维度数据:', dimensionData);
 
+      // 格式化图表数据
+      const trendChartData = this.formatTrendChartData(trendData || []);
+      const dimensionChartData = this.formatDimensionChartData(dimensionData || []);
+
       this.setData({
         totalDays: overviewData.totalDays || 0,
         completionRate: overviewData.completionRate || 0,
         currentStreak: overviewData.currentStreak || 0,
         bestStreak: overviewData.bestStreak || overviewData.maxStreak || 0,
         trendData: trendData || [],
-        trendChartData: this.formatTrendChartData(trendData || []),
-        dimensionData: dimensionData || []
+        trendChartData: trendChartData,
+        dimensionData: dimensionData || [],
+        dimensionChartData: dimensionChartData
       });
 
       this.processDimensionStats(dimensionData);
@@ -218,9 +223,42 @@ Page({
     if (!trendData || trendData.length === 0) return [];
 
     return trendData.map(item => ({
-      date: item.date,
-      value: item.rate || 0
+      label: this.formatDateLabel(item.date),
+      value: Math.round(item.rate || 0)
     }));
+  },
+
+  /**
+   * 格式化维度对比图数据
+   */
+  formatDimensionChartData (dimensionData) {
+    if (!dimensionData || dimensionData.length === 0) return [];
+
+    return dimensionData.map(item => {
+      const config = DIMENSIONS[item.category];
+      const completed = item.completed || item.completedTasks || 0;
+      const total = item.total || item.totalTasks || 0;
+      const rate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      return {
+        label: config?.name || item.category,
+        value: rate
+      };
+    });
+  },
+
+  /**
+   * 格式化日期标签
+   */
+  formatDateLabel (dateStr) {
+    if (!dateStr) return '';
+
+    // 格式: 2024-01-15 -> 01/15
+    const parts = dateStr.split('-');
+    if (parts.length === 3) {
+      return `${parts[1]}/${parts[2]}`;
+    }
+    return dateStr;
   },
 
   /**

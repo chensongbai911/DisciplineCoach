@@ -1,0 +1,47 @@
+<!-- components/achievement-unlock/index.wxml -->
+<view class="achievement-unlock" wx:if="{{show}}">
+  <!-- 背景蒙层 -->
+  <view class="mask" bindtap="handleMaskClick" />
+
+  <!-- 烟花粒子 -->
+  <view class="fireworks-container">
+    <view
+      wx:for="{{fireworks}}"
+      wx:key="id"
+      class="firework"
+      style="
+        left: {{item.x}}rpx;
+        top: {{item.y}}rpx;
+        width: {{item.size}}rpx;
+        height: {{item.size}}rpx;
+        background: {{item.color}};
+        animation: firework-{{item.id}} {{item.duration}}s ease-out {{item.delay}}s forwards;
+        --target-x: {{item.targetX}}rpx;
+        --target-y: {{item.targetY}}rpx;
+      "
+    />
+  </view>
+
+  <!-- 成就卡片 -->
+  <view class="achievement-card {{animating ? 'show' : ''}}" catchtap="preventBubble">
+    <!-- 成就图标 -->
+    <view class="achievement-icon">
+      <text class="icon-text">{{achievement.icon || '🏆'}}</text>
+      <view class="icon-glow" />
+    </view>
+
+    <!-- 成就信息 -->
+    <view class="achievement-info">
+      <view class="achievement-badge">成就解锁</view>
+      <view class="achievement-name">{{achievement.name}}</view>
+      <view class="achievement-desc">{{achievement.description}}</view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="achievement-actions">
+      <button class="btn-share" bindtap="handleShare">
+        <text class="btn-text">分享成就</text>
+      </button>
+    </view>
+  </view>
+</view>

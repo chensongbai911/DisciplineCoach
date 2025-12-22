@@ -1,0 +1,11 @@
+/* components/chart-bar/index.wxss */
+
+.chart-container {
+  width: 100%;
+  position: relative;
+}
+
+.chart-canvas {
+  width: 100%;
+  display: block;
+}

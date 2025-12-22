@@ -1,0 +1,106 @@
+<!-- pages/user/achievements/index.wxml -->
+<view class="achievements-page">
+  <!-- 顶部统计卡片 -->
+  <view class="stats-card">
+    <view class="stats-header">
+      <text class="stats-title">成就进度</text>
+      <text class="stats-subtitle">{{stats.unlocked}} / {{stats.total}}</text>
+    </view>
+
+    <!-- 进度环 -->
+    <view class="progress-ring">
+      <view class="progress-circle">
+        <view class="progress-fill" style="--progress: {{stats.progress}}%"></view>
+        <view class="progress-inner">
+          <text class="progress-text">{{stats.progress}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="stats-desc">
+      <text>继续努力，解锁更多成就！</text>
+    </view>
+  </view>
+
+  <!-- 成就列表 -->
+  <view class="achievements-list">
+    <view class="section-title">全部成就</view>
+
+    <view class="achievement-grid">
+      <view
+        wx:for="{{achievements}}"
+        wx:key="id"
+        class="achievement-item {{item.unlocked ? 'unlocked' : 'locked'}}"
+        bindtap="handleAchievementTap"
+        data-achievement="{{item}}"
+      >
+        <!-- 成就图标 -->
+        <view class="achievement-icon">
+          <text class="icon-emoji">{{item.icon || '🏆'}}</text>
+          <view class="lock-overlay" wx:if="{{!item.unlocked}}">
+            <text class="lock-icon">🔒</text>
+          </view>
+        </view>
+
+        <!-- 成就信息 -->
+        <view class="achievement-info">
+          <text class="achievement-name">{{item.name}}</text>
+          <text class="achievement-desc">{{item.description}}</text>
+        </view>
+
+        <!-- 解锁时间 -->
+        <view class="achievement-date" wx:if="{{item.unlocked && item.unlockedAt}}">
+          <text>{{item.unlockedAt}}</text>
+        </view>
+
+        <!-- 进度条（未解锁） -->
+        <view class="achievement-progress" wx:if="{{!item.unlocked && item.progress}}">
+          <view class="progress-bar">
+            <view class="progress-bar-fill" style="width: {{item.progress}}%"></view>
+          </view>
+          <text class="progress-label">{{item.progress}}%</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{!loading && achievements.length === 0}}">
+      <text class="empty-icon">🎯</text>
+      <text class="empty-text">暂无成就数据</text>
+      <text class="empty-hint">开始打卡解锁成就吧！</text>
+    </view>
+
+    <!-- 加载中 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <view class="loading-spinner"></view>
+      <text class="loading-text">加载中...</text>
+    </view>
+  </view>
+
+  <!-- 成就详情弹窗 -->
+  <view class="achievement-detail" wx:if="{{selectedAchievement}}">
+    <view class="detail-mask" bindtap="handleCloseDetail"></view>
+    <view class="detail-card">
+      <view class="detail-icon">
+        <text class="icon-large">{{selectedAchievement.icon || '🏆'}}</text>
+      </view>
+      <view class="detail-name">{{selectedAchievement.name}}</view>
+      <view class="detail-desc">{{selectedAchievement.description}}</view>
+      <view class="detail-date" wx:if="{{selectedAchievement.unlockedAt}}">
+        解锁于 {{selectedAchievement.unlockedAt}}
+      </view>
+      <view class="detail-actions">
+        <button class="btn-share" bindtap="handleShare">分享成就</button>
+        <button class="btn-close" bindtap="handleCloseDetail">关闭</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 分享海报 -->
+  <achievement-poster
+    show="{{showPoster}}"
+    achievement="{{selectedAchievement || achievements[0]}}"
+    userInfo="{{userInfo}}"
+    bind:close="handleClosePoster"
+  />
+</view>

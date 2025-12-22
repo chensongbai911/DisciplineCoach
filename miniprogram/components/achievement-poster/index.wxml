@@ -1,0 +1,40 @@
+<!-- components/achievement-poster/index.wxml -->
+<view class="achievement-poster" wx:if="{{show}}">
+  <!-- 背景蒙层 -->
+  <view class="mask" bindtap="handleClose" />
+
+  <!-- 海报容器 -->
+  <view class="poster-container">
+    <!-- 加载状态 -->
+    <view class="loading" wx:if="{{generating}}">
+      <view class="loading-spinner" />
+      <text class="loading-text">生成中...</text>
+    </view>
+
+    <!-- 海报预览 -->
+    <view class="poster-preview" wx:else>
+      <image
+        class="poster-image"
+        src="{{posterPath}}"
+        mode="widthFix"
+      />
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="poster-actions">
+      <button class="btn btn-save" bindtap="handleSave">
+        <text class="btn-text">保存到相册</text>
+      </button>
+      <button class="btn btn-close" bindtap="handleClose">
+        <text class="btn-text">关闭</text>
+      </button>
+    </view>
+  </view>
+
+  <!-- Canvas画布（隐藏） -->
+  <canvas
+    id="posterCanvas"
+    type="2d"
+    class="poster-canvas"
+  />
+</view>
