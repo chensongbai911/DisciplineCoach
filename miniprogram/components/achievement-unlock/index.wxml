@@ -9,16 +9,7 @@
       wx:for="{{fireworks}}"
       wx:key="id"
       class="firework"
-      style="
-        left: {{item.x}}rpx;
-        top: {{item.y}}rpx;
-        width: {{item.size}}rpx;
-        height: {{item.size}}rpx;
-        background: {{item.color}};
-        animation: firework-{{item.id}} {{item.duration}}s ease-out {{item.delay}}s forwards;
-        --target-x: {{item.targetX}}rpx;
-        --target-y: {{item.targetY}}rpx;
-      "
+      style="left: {{item.x}}rpx; top: {{item.y}}rpx; width: {{item.size}}rpx; height: {{item.size}}rpx; background: {{item.color}}; animation: firework-{{item.id}} {{item.duration}}s ease-out {{item.delay}}s forwards; --target-x: {{item.targetX}}rpx; --target-y: {{item.targetY}}rpx;"
     />
   </view>
 

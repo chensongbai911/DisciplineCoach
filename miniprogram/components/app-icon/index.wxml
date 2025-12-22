@@ -1,13 +1,6 @@
 <view class="app-icon" style="width: {{size}}rpx; height: {{size}}rpx; {{customStyle}}">
-  <!-- 优先：iconfont 字体 -->
+  <!-- 优先：iconfont 字体图标 -->
   <text wx:if="{{glyph}}" class="iconfont" style="font-size: {{size}}rpx; line-height: {{size}}rpx;">{{glyph}}</text>
-  <!-- 其次：本地 PNG 图标（若存在），最终：emoji 兜底 -->
-  <app-image
-    wx:else
-    src="/assets/icons/{{type}}.png"
-    size="{{size}}"
-    radius="{{radius}}"
-    mode="{{mode}}"
-    fallbackText="{{fallback}}"
-  />
+  <!-- 兜底：emoji 文本 -->
+  <text wx:else style="font-size: {{size}}rpx; line-height: {{size}}rpx;">{{fallback}}</text>
 </view>
