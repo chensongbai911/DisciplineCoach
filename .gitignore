@@ -1,0 +1,87 @@
+# Git Ignore Rules for DisciplineCoach WeChat Mini Program
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-workspace
+*.sublime-project
+*.iml
+
+# Node
+node_modules/
+npm-debug.log
+npm-error.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# WeChat DevTools
+miniprogram_npm/
+.wxml
+.wxss
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Temporary files
+*.tmp
+temp/
+tmp/
+
+# Build artifacts
+dist/
+build/
+
+# Private configs (but keep template)
+project.private.config.json
+
+# VS Code settings (but keep workspace recommendations)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+
+# Mac
+.AppleDouble
+.LSOverride
+.TemporaryItems
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+[Dd]esktop.ini
+$RECYCLE.BIN/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Asset files (keep originals, ignore generated)
+# Uncomment if you have generated icon sets
+# *.@2x.png
+
+# Cloud Functions node_modules
+cloudfunctions/*/node_modules/
+
+# Backup files
+*.bak
+*.backup
+*~
