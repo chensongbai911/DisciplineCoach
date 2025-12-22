@@ -1,0 +1,308 @@
+<!-- 会员权益对比弹窗 -->
+<view class="modal-mask" wx:if="{{showMemberModal}}" bindtap="closeMemberModal" catchtouchmove="preventScroll"></view>
+
+<view class="member-modal" wx:if="{{showMemberModal}}">
+  <view class="member-modal-content">
+    <!-- 关闭按钮 -->
+    <view class="close-btn" bindtap="closeMemberModal">
+      <text>✕</text>
+    </view>
+
+    <!-- 标题 -->
+    <view class="member-header">
+      <text class="member-icon">👑</text>
+      <text class="member-title">升级会员解锁更多权益</text>
+      <text class="member-subtitle">让自律更轻松</text>
+    </view>
+
+    <!-- 权益对比表 -->
+    <view class="benefits-table">
+      <view class="table-header">
+        <view class="cell feature-cell">功能特权</view>
+        <view class="cell free-cell">普通用户</view>
+        <view class="cell vip-cell">会员用户</view>
+      </view>
+
+      <view class="table-row" wx:for="{{memberBenefits}}" wx:key="feature">
+        <view class="cell feature-cell">
+          <text>{{item.feature}}</text>
+        </view>
+        <view class="cell free-cell">
+          <text class="value {{item.freeClass}}">{{item.free}}</text>
+        </view>
+        <view class="cell vip-cell highlight">
+          <text class="value {{item.vipClass}}">{{item.vip}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 价格区域 -->
+    <view class="price-section">
+      <view class="price-tag">
+        <text class="price-symbol">¥</text>
+        <text class="price-value">19.9</text>
+        <text class="price-unit">/月</text>
+      </view>
+      <view class="price-desc">首月特惠，次月恢复原价 ¥29.9/月</view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="modal-actions">
+      <button class="btn-secondary" bindtap="closeMemberModal">
+        <text>稍后再说</text>
+      </button>
+      <button class="btn-primary-gradient" bindtap="goToVip">
+        <text>立即升级</text>
+      </button>
+    </view>
+  </view>
+</view>
+
+<style>
+/* 会员弹窗遮罩 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+  backdrop-filter: blur(4rpx);
+}
+
+/* 会员弹窗 */
+.member-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 640rpx;
+  max-height: 85vh;
+  background: #FFFFFF;
+  border-radius: 32rpx;
+  z-index: 1000;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -45%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.member-modal-content {
+  padding: 48rpx 32rpx 32rpx;
+  overflow-y: auto;
+  max-height: 85vh;
+}
+
+/* 关闭按钮 */
+.close-btn {
+  position: absolute;
+  top: 24rpx;
+  right: 24rpx;
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  background: #F7FAFC;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36rpx;
+  color: #718096;
+  transition: all 0.3s ease;
+}
+
+.close-btn:active {
+  background: #E2E8F0;
+  transform: scale(0.95);
+}
+
+/* 头部 */
+.member-header {
+  text-align: center;
+  margin-bottom: 40rpx;
+}
+
+.member-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.member-title {
+  display: block;
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #2D3748;
+  margin-bottom: 12rpx;
+  background: linear-gradient(135deg, #F6AD55 0%, #FC8181 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.member-subtitle {
+  display: block;
+  font-size: 26rpx;
+  color: #718096;
+}
+
+/* 权益对比表 */
+.benefits-table {
+  background: #F7FAFC;
+  border-radius: 20rpx;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+
+.table-header,
+.table-row {
+  display: flex;
+  align-items: center;
+}
+
+.table-header {
+  background: linear-gradient(135deg, #4FD1C5 0%, #3182CE 100%);
+  padding: 20rpx 0;
+}
+
+.table-header .cell {
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 26rpx;
+}
+
+.table-row {
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid #E2E8F0;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.cell {
+  flex: 1;
+  text-align: center;
+  font-size: 24rpx;
+  color: #4A5568;
+}
+
+.feature-cell {
+  flex: 1.2;
+  text-align: left;
+  padding-left: 24rpx;
+  font-weight: 600;
+}
+
+.free-cell {
+  color: #A0AEC0;
+}
+
+.vip-cell.highlight {
+  background: linear-gradient(135deg, rgba(246, 173, 85, 0.1) 0%, rgba(252, 129, 129, 0.1) 100%);
+}
+
+.value {
+  font-weight: 700;
+  font-size: 28rpx;
+}
+
+.value.limited {
+  color: #FC8181;
+}
+
+.value.unlimited {
+  color: #48BB78;
+}
+
+/* 价格区域 */
+.price-section {
+  text-align: center;
+  margin-bottom: 32rpx;
+  padding: 24rpx;
+  background: linear-gradient(135deg, #FFF5F5 0%, #FFF7ED 100%);
+  border-radius: 16rpx;
+}
+
+.price-tag {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  margin-bottom: 12rpx;
+}
+
+.price-symbol {
+  font-size: 32rpx;
+  color: #F6AD55;
+  font-weight: 700;
+  margin-right: 4rpx;
+}
+
+.price-value {
+  font-size: 72rpx;
+  font-weight: 900;
+  color: #FC8181;
+  line-height: 1;
+}
+
+.price-unit {
+  font-size: 28rpx;
+  color: #F6AD55;
+  margin-left: 8rpx;
+}
+
+.price-desc {
+  font-size: 22rpx;
+  color: #718096;
+}
+
+/* 操作按钮 */
+.modal-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.btn-secondary,
+.btn-primary-gradient {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary {
+  background: #F7FAFC;
+  color: #718096;
+}
+
+.btn-secondary:active {
+  background: #E2E8F0;
+  transform: scale(0.98);
+}
+
+.btn-primary-gradient {
+  background: linear-gradient(135deg, #F6AD55 0%, #FC8181 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8rpx 24rpx rgba(252, 129, 129, 0.4);
+}
+
+.btn-primary-gradient:active {
+  transform: scale(0.98);
+  box-shadow: 0 6rpx 20rpx rgba(252, 129, 129, 0.3);
+}
+
+.btn-secondary::after,
+.btn-primary-gradient::after {
+  border: none;
+}
+</style>

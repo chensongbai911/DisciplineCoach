@@ -18,6 +18,7 @@
       wx:for="{{dimensions}}"
       wx:key="id"
       data-category="{{item.category}}"
+      data-enabled="{{item.enabled}}"
       bindtap="handleDimensionTap"
     >
       <view class="dimension-header">

@@ -27,6 +27,10 @@ Page({
     progressColor: '#07C160',
     evaluation: '',
 
+    // 日历数据
+    calendarRecords: {},
+    maxRetroactiveDays: 7,
+
     showEditModal: false,
     editData: {
       recordId: '',
@@ -62,11 +66,75 @@ Page({
 
       this.processData(plans, records);
 
+      // 加载日历数据（近30天）
+      this.loadCalendarData();
+
     } catch (error) {
       console.error('加载数据失败:', error);
       showToast('加载失败，请重试');
     } finally {
       hideLoading();
+    }
+  },
+
+  /**
+   * 加载日历数据
+   */
+  async loadCalendarData () {
+    try {
+      const today = formatDate(new Date());
+      const thirtyDaysAgo = formatDate(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+
+      // 获取近30天的所有记录
+      const allRecords = await recordAPI.getByRange(thirtyDaysAgo, today);
+
+      // 按日期分组统计
+      const recordsByDate = {};
+      allRecords.forEach(record => {
+        const date = formatDate(new Date(record.check_date));
+
+        if (!recordsByDate[date]) {
+          recordsByDate[date] = {
+            total: 0,
+            completed: 0,
+            records: []
+          };
+        }
+
+        recordsByDate[date].total++;
+        if (record.actual_value) {
+          recordsByDate[date].completed++;
+        }
+        recordsByDate[date].records.push(record);
+      });
+
+      // 转换为日历组件需要的格式
+      const calendarRecords = {};
+      Object.keys(recordsByDate).forEach(date => {
+        const dayData = recordsByDate[date];
+        const rate = dayData.completed / dayData.total;
+
+        let status;
+        if (rate === 1) {
+          status = 'completed';
+        } else if (rate > 0) {
+          status = 'partial';
+        } else {
+          status = 'missed';
+        }
+
+        calendarRecords[date] = {
+          status,
+          total: dayData.total,
+          completed: dayData.completed,
+          records: dayData.records
+        };
+      });
+
+      this.setData({ calendarRecords });
+
+    } catch (error) {
+      console.error('加载日历数据失败:', error);
     }
   },
 
@@ -291,6 +359,18 @@ Page({
     } finally {
       hideLoading();
     }
+  },
+
+  /**
+   * 处理日历打卡
+   */
+  handleCalendarCheckin (e) {
+    const { date, isRetroactive } = e.detail;
+
+    // 跳转到对应日期的打卡页面
+    wx.navigateTo({
+      url: `/pages/record/day-detail?date=${date}`
+    });
   },
 
   /**

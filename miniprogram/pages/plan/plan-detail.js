@@ -7,11 +7,11 @@ const { validatePlanData } = require('../../utils/validator');
 
 // 维度配置
 const DIMENSIONS = {
-  '运动': { name: '运动健身', icon: '🏃', color: '#FF6B6B', description: '保持身体健康，提升活力' },
-  '饮食': { name: '健康饮食', icon: '🥗', color: '#4ECDC4', description: '合理膳食，营养均衡' },
-  '睡眠': { name: '规律作息', icon: '😴', color: '#9B59B6', description: '早睡早起，精力充沛' },
-  '阅读': { name: '阅读学习', icon: '📚', color: '#F39C12', description: '拓宽视野，丰富内心' },
-  '学习': { name: '技能提升', icon: '💻', color: '#3498DB', description: '持续学习，不断进步' }
+  'exercise': { name: '运动健身', icon: '🏃', color: '#FF6B6B', description: '保持身体健康，提升活力' },
+  'diet': { name: '健康饮食', icon: '🥗', color: '#4ECDC4', description: '合理膳食，营养均衡' },
+  'sleep': { name: '规律作息', icon: '😴', color: '#9B59B6', description: '早睡早起，精力充沛' },
+  'reading': { name: '阅读学习', icon: '📚', color: '#F39C12', description: '拓宽视野，丰富内心' },
+  'study': { name: '技能提升', icon: '💻', color: '#3498DB', description: '持续学习，不断进步' }
 };
 
 Page({
@@ -45,7 +45,11 @@ Page({
       { value: 'minute', label: '分钟' },
       { value: 'hour', label: '小时' }
     ],
-    durationUnitIndex: 0
+    durationUnitIndex: 0,
+
+    // 会员弹窗
+    showMemberModal: false,
+    memberBenefits: []
   },
 
   onLoad (options) {
@@ -69,15 +73,8 @@ Page({
   async loadTasks () {
     try {
       showLoading('加载中');
-      // 后端分类代码映射
-      const categoryMap = {
-        '运动': 'exercise',
-        '饮食': 'diet',
-        '睡眠': 'sleep',
-        '阅读': 'reading',
-        '学习': 'study'
-      };
-      const categoryCode = categoryMap[this.data.category] || this.data.category;
+      // category 已经是英文格式，直接使用
+      const categoryCode = this.data.category;
 
       const tasks = await planAPI.list({
         category: categoryCode,
@@ -150,6 +147,52 @@ Page({
    * 添加任务
    */
   handleAddTask () {
+    // 检查会员限制
+    const app = getApp();
+    const memberStatus = app.checkMemberStatus();
+    const isMember = memberStatus.isVip;
+
+    const currentTaskCount = this.data.tasks.length;
+    const maxTasks = isMember ? 5 : 1;
+
+    if (currentTaskCount >= maxTasks) {
+      // 显示会员权益对比弹窗
+      this.setData({
+        showMemberModal: true,
+        memberBenefits: [
+          {
+            feature: '每维度任务数',
+            free: '1个',
+            vip: '5个',
+            freeClass: 'limited',
+            vipClass: 'unlimited'
+          },
+          {
+            feature: '统计数据查看',
+            free: '7天',
+            vip: '90天',
+            freeClass: 'limited',
+            vipClass: 'unlimited'
+          },
+          {
+            feature: '数据导出',
+            free: '❌',
+            vip: '✅',
+            freeClass: 'limited',
+            vipClass: 'unlimited'
+          },
+          {
+            feature: '专属徽章',
+            free: '❌',
+            vip: '✅',
+            freeClass: 'limited',
+            vipClass: 'unlimited'
+          }
+        ]
+      });
+      return;
+    }
+
     this.setData({
       showTaskForm: true,
       formMode: 'add',
@@ -171,6 +214,20 @@ Page({
       },
       durationUnitIndex: 0
     });
+  },
+
+  /**
+   * 关闭会员弹窗
+   */
+  closeMemberModal () {
+    this.setData({ showMemberModal: false });
+  },
+
+  /**
+   * 跳转到会员页面
+   */
+  goToVip () {
+    wx.navigateTo({ url: '/pages/vip/index' });
   },
 
   /**
@@ -299,9 +356,45 @@ Page({
   },
 
   handleReminderToggle (e) {
-    this.setData({
-      'formData.reminder.enabled': e.detail.value
-    });
+    const enabled = e.detail.value;
+
+    // 如果开启提醒，请求订阅消息权限
+    if (enabled) {
+      wx.requestSubscribeMessage({
+        tmplIds: ['YOUR_TEMPLATE_ID'], // TODO: 在微信公众平台申请订阅消息模板后替换此ID
+        success: (res) => {
+          console.log('订阅消息授权成功', res);
+          // 检查是否授权成功
+          if (res['YOUR_TEMPLATE_ID'] === 'accept') {
+            this.setData({
+              'formData.reminder.enabled': true
+            });
+            wx.showToast({
+              title: '已开启提醒',
+              icon: 'success'
+            });
+          } else {
+            wx.showModal({
+              title: '提示',
+              content: '需要授权订阅消息才能开启提醒功能',
+              showCancel: false
+            });
+          }
+        },
+        fail: (err) => {
+          console.error('订阅消息授权失败', err);
+          wx.showModal({
+            title: '提示',
+            content: '订阅消息授权失败，无法开启提醒功能',
+            showCancel: false
+          });
+        }
+      });
+    } else {
+      this.setData({
+        'formData.reminder.enabled': false
+      });
+    }
   },
 
   handleReminderTimeChange (e) {
@@ -340,17 +433,10 @@ Page({
 
     try {
       showLoading(formMode === 'add' ? '添加中' : '保存中');
-      // 将表单数据映射为云函数需要的字段
-      const categoryMap = {
-        '运动': 'exercise',
-        '饮食': 'diet',
-        '睡眠': 'sleep',
-        '阅读': 'reading',
-        '学习': 'study'
-      };
 
+      // category 已经是英文格式，直接使用
       const payload = {
-        category: categoryMap[category] || category,
+        category: category, // 已经是 exercise/diet/sleep/reading/study
         title: formData.title,
         targetType: formData.type,
         targetValue: formData.target?.value || null,

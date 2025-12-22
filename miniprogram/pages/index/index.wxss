@@ -1,4 +1,6 @@
 /* index.wxss */
+@import "../../styles/skeleton.wxss";
+
 page {
   background: linear-gradient(180deg, #4FD1C5 0%, #63B3ED 100%);
   min-height: 100vh;
@@ -9,6 +11,46 @@ page {
   min-height: 100vh;
   padding-bottom: 120rpx;
 }
+
+/* 离线提示横幅 */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: #ffffff;
+  padding: 20rpx 32rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 500;
+  z-index: 1000;
+  box-shadow: 0 4rpx 12rpx rgba(255, 107, 107, 0.2);
+  animation: slideDown 0.3s ease-out;
+}
+
+.icon-offline {
+  font-size: 32rpx;
+  margin-right: 12rpx;
+}
+
+.offline-text {
+  opacity: 0.95;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
 
 .page-container::before {
   content: '';
@@ -449,13 +491,87 @@ page {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  padding: 20rpx 32rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(30rpx);
   box-shadow: 0 -8rpx 32rpx rgba(79, 209, 197, 0.1);
   border-top: 2rpx solid rgba(79, 209, 197, 0.15);
   z-index: 100;
+  display: flex;
+  gap: 16rpx;
+}
+
+.bottom-action button {
+  flex: 1;
+  height: 88rpx;
+  border-radius: 16rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.btn-outline {
+  background: #FFFFFF;
+  color: #4FD1C5;
+  border: 2rpx solid #4FD1C5;
+}
+
+.btn-outline::after {
+  border: none;
+}
+
+.btn-outline:active {
+  background: rgba(79, 209, 197, 0.1);
+  transform: scale(0.98);
+}
+
+.btn-icon {
+  font-size: 36rpx;
+  margin-right: 8rpx;
+  font-weight: 400;
+}
+
+/* 浮动添加按钮 */
+.fab {
+  position: fixed;
+  right: 32rpx;
+  bottom: calc(140rpx + env(safe-area-inset-bottom));
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 56rpx;
+  background: linear-gradient(135deg, #4FD1C5 0%, #3182CE 100%);
+  box-shadow: 0 12rpx 32rpx rgba(79, 209, 197, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fabPulse 2s ease-in-out infinite;
+}
+
+.fab:active {
+  transform: scale(0.92);
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.35);
+}
+
+.fab-icon {
+  font-size: 56rpx;
+  color: #FFFFFF;
+  font-weight: 300;
+  line-height: 1;
+}
+
+@keyframes fabPulse {
+  0%, 100% {
+    box-shadow: 0 12rpx 32rpx rgba(79, 209, 197, 0.4);
+  }
+  50% {
+    box-shadow: 0 12rpx 40rpx rgba(79, 209, 197, 0.6), 0 0 0 8rpx rgba(79, 209, 197, 0.1);
+  }
 }
 
 /* 弹窗样式 */

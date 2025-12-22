@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "欢迎",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "app-image": "/components/app-image/index"
+  }
+}

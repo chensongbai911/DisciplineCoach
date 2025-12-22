@@ -8,11 +8,11 @@
 .tip-card {
   display: flex;
   align-items: center;
-  padding: 24rpx 32rpx;
+  padding: 28rpx 32rpx;
   margin: 32rpx 32rpx 24rpx;
-  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
-  border-radius: 24rpx;
-  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+  background: linear-gradient(135deg, #4FD1C5 0%, #3182CE 100%);
+  border-radius: 28rpx;
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.3);
 }
 
 .tip-icon {
@@ -27,16 +27,18 @@
 
 .tip-text {
   display: block;
-  font-size: 28rpx;
-  font-weight: 700;
+  font-size: 30rpx;
+  font-weight: 800;
   color: #FFFFFF;
   margin-bottom: 8rpx;
+  letter-spacing: 0.5rpx;
 }
 
 .tip-sub {
   display: block;
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 600;
 }
 
 /* 维度列表 */
@@ -46,11 +48,19 @@
 
 .dimension-card {
   background: #FFFFFF;
-  border-radius: 24rpx;
+  border-radius: 28rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
   transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 未开启状态 */
+.dimension-card[data-enabled="false"] {
+  opacity: 0.6;
+  background: #F7FAFC;
 }
 
 .dimension-card:active {
@@ -86,15 +96,17 @@
 }
 
 .dimension-title {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #333333;
+  font-size: 34rpx;
+  font-weight: 800;
+  color: #2D3748;
   margin-bottom: 8rpx;
+  letter-spacing: 0.5rpx;
 }
 
 .dimension-desc {
-  font-size: 24rpx;
-  color: #999999;
+  font-size: 26rpx;
+  color: #718096;
+  font-weight: 500;
 }
 
 .dimension-right {
@@ -103,17 +115,17 @@
 
 /* 任务预览 */
 .task-preview {
-  margin-top: 24rpx;
-  padding-top: 24rpx;
-  border-top: 2rpx solid #EEEEEE;
+  margin-top: 28rpx;
+  padding-top: 28rpx;
+  border-top: 2rpx solid rgba(226, 232, 240, 0.8);
 }
 
 .task-preview-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16rpx 0;
-  border-bottom: 2rpx solid #F7F8FA;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid rgba(247, 250, 252, 0.8);
 }
 
 .task-preview-item:last-child {
@@ -121,15 +133,17 @@
 }
 
 .task-preview-title {
-  font-size: 28rpx;
-  color: #333333;
+  font-size: 30rpx;
+  color: #2D3748;
   flex: 1;
+  font-weight: 600;
 }
 
 .task-preview-target {
-  font-size: 24rpx;
-  color: #07C160;
+  font-size: 26rpx;
+  color: #4FD1C5;
   margin-left: 16rpx;
+  font-weight: 700;
 }
 
 /* 空状态 */
@@ -138,23 +152,30 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48rpx 0;
+  padding: 56rpx 0;
   margin-top: 24rpx;
-  border-top: 2rpx solid #EEEEEE;
-  border: 2rpx dashed #DDDDDD;
-  border-radius: 16rpx;
-  background: #F7F8FA;
+  border: 3rpx dashed #CBD5E0;
+  border-radius: 20rpx;
+  background: linear-gradient(135deg, #F7FAFC 0%, #EDF2F7 100%);
+  transition: all 0.3s ease;
+}
+
+.empty-task:active {
+  background: linear-gradient(135deg, rgba(79, 209, 197, 0.08) 0%, rgba(49, 130, 206, 0.08) 100%);
+  border-color: #4FD1C5;
 }
 
 .icon-add {
-  font-size: 64rpx;
-  color: #CCCCCC;
+  font-size: 72rpx;
+  color: #4FD1C5;
   margin-bottom: 16rpx;
+  font-weight: 300;
 }
 
 .empty-text {
-  font-size: 24rpx;
-  color: #999999;
+  font-size: 26rpx;
+  color: #718096;
+  font-weight: 600;
 }
 
 /* 维度底部操作区 */
@@ -168,14 +189,21 @@
 
 .btn-text {
   background: transparent;
-  color: #07C160;
-  font-size: 26rpx;
+  color: #4FD1C5;
+  font-size: 28rpx;
   padding: 0;
   height: auto;
   line-height: 1;
   border: none;
   display: flex;
   align-items: center;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.btn-text:active {
+  color: #3182CE;
+  transform: scale(0.95);
 }
 
 .btn-text::after {
@@ -194,14 +222,17 @@
   right: 0;
   padding: 24rpx 32rpx;
   padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
-  background: #FFFFFF;
-  border-top: 2rpx solid #EEEEEE;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20rpx);
+  border-top: 2rpx solid rgba(226, 232, 240, 0.8);
   text-align: center;
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.04);
 }
 
 .stats-text {
-  font-size: 24rpx;
-  color: #999999;
+  font-size: 26rpx;
+  color: #718096;
+  font-weight: 600;
 }
 
 /* 快速入门引导 */

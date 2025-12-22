@@ -1,0 +1,159 @@
+<!--pages/onboarding/index.wxml-->
+<!-- 新手引导页面 -->
+
+<view class="container">
+  <!-- 顶部进度指示器 -->
+  <view class="progress-indicator">
+    <view class="progress-dot {{currentStep >= 0 ? 'active' : ''}}"></view>
+    <view class="progress-line {{currentStep >= 1 ? 'active' : ''}}"></view>
+    <view class="progress-dot {{currentStep >= 1 ? 'active' : ''}}"></view>
+    <view class="progress-line {{currentStep >= 2 ? 'active' : ''}}"></view>
+    <view class="progress-dot {{currentStep >= 2 ? 'active' : ''}}"></view>
+  </view>
+
+  <!-- 第一步：欢迎页 -->
+  <view class="step-container" wx:if="{{currentStep === 0}}">
+    <view class="welcome-section">
+      <app-image
+        class="logo-image"
+        src="/assets/images/logo.png"
+        size="200"
+        radius="40"
+        fallbackText="🎯"
+      />
+      <text class="welcome-title">欢迎来到自律教练</text>
+      <text class="welcome-subtitle">让我们一起养成好习惯，成就更好的自己</text>
+
+      <view class="feature-list">
+        <view class="feature-item">
+          <text class="feature-icon">🏃</text>
+          <view class="feature-info">
+            <text class="feature-title">运动健身</text>
+            <text class="feature-desc">保持身体健康，提升活力</text>
+          </view>
+        </view>
+
+        <view class="feature-item">
+          <text class="feature-icon">🥗</text>
+          <view class="feature-info">
+            <text class="feature-title">健康饮食</text>
+            <text class="feature-desc">合理膳食，营养均衡</text>
+          </view>
+        </view>
+
+        <view class="feature-item">
+          <text class="feature-icon">😴</text>
+          <view class="feature-info">
+            <text class="feature-title">规律作息</text>
+            <text class="feature-desc">早睡早起，精力充沛</text>
+          </view>
+        </view>
+
+        <view class="feature-item">
+          <text class="feature-icon">📚</text>
+          <view class="feature-info">
+            <text class="feature-title">阅读学习</text>
+            <text class="feature-desc">拓宽视野，丰富内心</text>
+          </view>
+        </view>
+
+        <view class="feature-item">
+          <text class="feature-icon">💻</text>
+          <view class="feature-info">
+            <text class="feature-title">技能提升</text>
+            <text class="feature-desc">持续学习，不断进步</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 第二步：选择维度 -->
+  <view class="step-container" wx:if="{{currentStep === 1}}">
+    <view class="dimension-section">
+      <app-image
+        class="coach-avatar"
+        src="/assets/images/coach-happy.png"
+        size="120"
+        radius="9999"
+        fallbackText="🤖"
+      />
+      <text class="section-title">选择你想培养的维度</text>
+      <text class="section-subtitle">建议从 1-2 个维度开始，循序渐进</text>
+
+      <view class="dimension-list">
+        <view
+          class="dimension-card {{item.selected ? 'selected' : ''}}"
+          wx:for="{{dimensions}}"
+          wx:key="id"
+          bindtap="toggleDimension"
+          data-id="{{item.id}}"
+        >
+          <view class="dimension-checkbox">
+            <text class="check-icon" wx:if="{{item.selected}}">✓</text>
+          </view>
+          <text class="dimension-icon">{{item.icon}}</text>
+          <view class="dimension-info">
+            <text class="dimension-name">{{item.name}}</text>
+            <text class="dimension-desc">{{item.description}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="tip-box">
+        <text class="tip-icon">💡</text>
+        <text class="tip-text">已选择 {{selectedCount}} 个维度</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 第三步：创建默认计划 -->
+  <view class="step-container" wx:if="{{currentStep === 2}}">
+    <view class="plan-section">
+      <text class="section-title">太棒了！</text>
+      <text class="section-subtitle">我们已为你准备了默认计划</text>
+
+      <view class="plan-preview-list">
+        <view class="plan-preview-card" wx:for="{{selectedDimensions}}" wx:key="id">
+          <view class="plan-icon-wrapper" style="background: {{item.color}}20;">
+            <text class="plan-icon" style="color: {{item.color}};">{{item.icon}}</text>
+          </view>
+          <view class="plan-details">
+            <text class="plan-name">{{item.name}}</text>
+            <text class="plan-target">{{item.defaultPlan}}</text>
+          </view>
+          <text class="plan-status">✓</text>
+        </view>
+      </view>
+
+      <view class="info-box">
+        <text class="info-icon">ℹ️</text>
+        <text class="info-text">你可以在"我的计划"中随时修改这些目标</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-actions">
+    <button
+      class="btn-secondary"
+      wx:if="{{currentStep > 0}}"
+      bindtap="prevStep"
+    >
+      上一步
+    </button>
+
+    <button
+      class="btn-primary flex-1"
+      bindtap="nextStep"
+      disabled="{{currentStep === 1 && selectedCount === 0}}"
+    >
+      {{currentStep === 2 ? '开始使用' : '下一步'}}
+    </button>
+  </view>
+
+  <!-- 跳过按钮 -->
+  <view class="skip-btn" wx:if="{{currentStep < 2}}" bindtap="skipOnboarding">
+    <text>跳过引导</text>
+  </view>
+</view>

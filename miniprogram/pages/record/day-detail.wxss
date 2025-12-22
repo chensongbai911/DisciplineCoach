@@ -7,6 +7,11 @@
   padding-bottom: 120rpx;
 }
 
+/* 日历区域 */
+.calendar-section {
+  margin-bottom: 32rpx;
+}
+
 /* 日期头部 */
 .date-header {
   display: flex;

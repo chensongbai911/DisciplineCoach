@@ -118,6 +118,11 @@ Page({
    * 获取日期范围
    */
   getDateRange (range) {
+    // 检查会员限制
+    const app = getApp();
+    const memberStatus = app.checkMemberStatus();
+    const isMember = memberStatus.isVip;
+
     const today = new Date();
     let startDate, endDate = formatDate(today);
 
@@ -127,12 +132,24 @@ Page({
         startDate = formatDate(weekAgo);
         break;
       case 'month':
-        const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-        startDate = formatDate(monthAgo);
+        // 非会员最多查看7天
+        if (!isMember) {
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+          startDate = formatDate(weekAgo);
+        } else {
+          const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+          startDate = formatDate(monthAgo);
+        }
         break;
       case 'year':
-        const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-        startDate = formatDate(yearAgo);
+        // 非会员最多查看7天
+        if (!isMember) {
+          const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+          startDate = formatDate(weekAgo);
+        } else {
+          const yearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+          startDate = formatDate(yearAgo);
+        }
         break;
     }
 
@@ -193,6 +210,27 @@ Page({
    */
   handleTimeRangeChange (e) {
     const { range } = e.currentTarget.dataset;
+
+    // 检查会员限制
+    if (range !== 'week') {
+      const app = getApp();
+      const memberStatus = app.checkMemberStatus();
+
+      if (!memberStatus.isVip) {
+        wx.showModal({
+          title: '会员专属',
+          content: '普通用户仅支持查看7天数据，升级会员可查看90天完整统计',
+          confirmText: '升级会员',
+          success: (res) => {
+            if (res.confirm) {
+              wx.navigateTo({ url: '/pages/vip/index' });
+            }
+          }
+        });
+        return;
+      }
+    }
+
     this.setData({ timeRange: range });
     this.loadStatistics();
   },

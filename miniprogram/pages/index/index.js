@@ -2,6 +2,7 @@
 const app = getApp()
 const { recordAPI, planAPI } = require('../../utils/api.js')
 const { formatDateChinese, getToday, getWeekday } = require('../../utils/date.js')
+const { handleAPIError, wrapAPICall } = require('../../utils/errorHandler.js')
 
 Page({
   data: {
@@ -28,16 +29,41 @@ Page({
 
     // 成功反馈
     showSuccessFeedback: false,
-    successMessage: ''
+    successMessage: '',
+
+    // 加载状态
+    isLoading: true,
+    lastRefreshTime: 0,
+    cacheTimeout: 30000, // 30秒缓存
+
+    // 网络状态
+    isOnline: true,
+    networkType: 'unknown'
   },
 
   onLoad () {
     this.initPage()
+    this.updateNetworkStatus()
+    // 首次加载数据
+    this.loadData()
   },
 
   onShow () {
-    // 每次显示页面都刷新数据
-    this.loadData()
+    // 更新网络状态
+    this.updateNetworkStatus();
+
+    // 智能刷新：30秒内不重复加载(跳过首次加载)
+    if (this.data.lastRefreshTime === 0) {
+      return; // 首次加载已在 onLoad 中完成
+    }
+
+    const now = Date.now();
+    const shouldRefresh = now - this.data.lastRefreshTime > this.data.cacheTimeout;
+
+    if (shouldRefresh) {
+      this.loadData();
+      this.setData({ lastRefreshTime: now });
+    }
   },
 
   // 初始化页面
@@ -51,6 +77,19 @@ Page({
 
   // 加载数据
   async loadData () {
+    // 检查网络状态
+    const app = getApp();
+    if (!app.globalData.isOnline) {
+      wx.showToast({
+        title: '当前离线，显示缓存',
+        icon: 'none',
+        duration: 2000
+      });
+      // 尝试从缓存加载
+      this.loadFromCache();
+      return;
+    }
+
     wx.showLoading({ title: '加载中...' })
 
     try {
@@ -79,18 +118,26 @@ Page({
       this.updateCoachMessage()
 
       wx.hideLoading()
+
+      // 关闭骨架屏并记录刷新时间
+      this.setData({
+        isLoading: false,
+        lastRefreshTime: Date.now()
+      })
     } catch (err) {
       wx.hideLoading()
       console.error('加载数据失败:', err)
+
+      // 关闭骨架屏
+      this.setData({ isLoading: false })
+
       wx.showToast({
         title: '数据加载失败，请先完成云函数和数据库部署',
         icon: 'none',
         duration: 3000
       })
     }
-  },
-
-  // 处理计划和记录数据
+  },  // 处理计划和记录数据
   processData (plans, records) {
     // 后端分类代码映射
     const categoryCodeMap = {
@@ -179,7 +226,58 @@ Page({
       totalTasks,
       completedTasks,
       progressPercent
-    })
+    });
+
+    // 缓存数据到本地
+    this.cacheData(dimensions, totalTasks, completedTasks, progressPercent);
+  },
+
+  /**
+   * 缓存数据到本地存储
+   */
+  cacheData (dimensions, totalTasks, completedTasks, progressPercent) {
+    try {
+      wx.setStorageSync('cache_home_data', {
+        dimensions,
+        totalTasks,
+        completedTasks,
+        progressPercent,
+        timestamp: Date.now()
+      });
+    } catch (e) {
+      console.error('缓存数据失败:', e);
+    }
+  },
+
+  /**
+   * 从缓存加载数据
+   */
+  loadFromCache () {
+    try {
+      const cachedData = wx.getStorageSync('cache_home_data');
+      if (cachedData) {
+        this.setData({
+          dimensions: cachedData.dimensions || [],
+          totalTasks: cachedData.totalTasks || 0,
+          completedTasks: cachedData.completedTasks || 0,
+          progressPercent: cachedData.progressPercent || 0,
+          isLoading: false
+        });
+        console.log('[离线模式] 从缓存加载数据');
+      } else {
+        // 没有缓存数据
+        this.setData({
+          dimensions: [],
+          totalTasks: 0,
+          completedTasks: 0,
+          progressPercent: 0,
+          isLoading: false
+        });
+      }
+    } catch (e) {
+      console.error('从缓存加载失败:', e);
+      this.setData({ isLoading: false });
+    }
   },
 
   // 获取目标文本
@@ -215,13 +313,58 @@ Page({
 
   // 更新教练消息
   updateCoachMessage () {
-    const { completedTasks, totalTasks } = this.data
+    const { completedTasks, totalTasks, isOnline } = this.data;
+
+    // 离线状态提示
+    if (!isOnline) {
+      this.setData({
+        coachMessage: '当前离线，显示为缓存数据'
+      });
+      return;
+    }
+
     const messages = this.getCoachMessages(completedTasks, totalTasks)
     const randomIndex = Math.floor(Math.random() * messages.length)
 
     this.setData({
       coachMessage: messages[randomIndex]
     })
+  },
+
+  /**
+   * 更新网络状态
+   */
+  updateNetworkStatus () {
+    const app = getApp();
+    const isOnline = app.globalData.isOnline;
+    const networkType = app.globalData.networkType;
+
+    this.setData({
+      isOnline,
+      networkType
+    });
+
+    // 如果刚恢复在线，刷新数据
+    if (isOnline && !this.data.isOnline && this.data.dimensions.length > 0) {
+      this.loadData();
+    }
+  },
+
+  /**
+   * 网络状态变化回调（由app.js调用）
+   */
+  onNetworkChange (isOnline, networkType) {
+    this.setData({
+      isOnline,
+      networkType
+    });
+
+    this.updateCoachMessage();
+
+    // 恢复在线时刷新数据
+    if (isOnline) {
+      this.loadData();
+    }
   },
 
   // 获取教练消息列表
@@ -318,7 +461,17 @@ Page({
 
   // 确认打卡
   async confirmCheckin () {
-    const { currentTask, checkinValue, checkinRemark } = this.data
+    const { currentTask, checkinValue, checkinRemark, isOnline } = this.data
+
+    // 检查网络状态
+    if (!isOnline) {
+      wx.showToast({
+        title: '当前离线，无法打卡',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
+    }
 
     console.log('确认打卡 - 当前任务:', currentTask)
     console.log('确认打卡 - 输入值:', checkinValue)
@@ -341,8 +494,18 @@ Page({
       return
     }
 
-    wx.showLoading({ title: '打卡中...' })
+    // 1️⃣ 乐观更新：立即更新本地UI
+    this.updateTaskStatusLocally(currentTask.id, {
+      completed: true,
+      actualValue: Number(checkinValue),
+      remark: checkinRemark
+    });
 
+    // 关闭弹窗并显示成功动画（立即响应）
+    this.closeCheckinModal();
+    this.showSuccessAnimation();
+
+    // 2️⃣ 异步保存到云端
     try {
       console.log('发送打卡请求，参数:', {
         planId: currentTask.id,
@@ -358,28 +521,86 @@ Page({
         remark: checkinRemark
       })
 
-      console.log('打卡成功')
-      wx.hideLoading()
+      console.log('打卡成功，已同步到云端')
 
-      // 关闭弹窗
-      this.closeCheckinModal()
-
-      // 显示成功反馈
-      this.showSuccessAnimation()
-
-      // 延迟刷新数据
+      // 延迟刷新数据以获取最新的连续天数等统计
       setTimeout(() => {
         this.loadData()
-      }, 1500)
+      }, 1000)
 
     } catch (err) {
-      wx.hideLoading()
       console.error('打卡失败:', err)
+
+      // 3️⃣ 失败回滚：恢复原状态
+      this.rollbackTaskStatus(currentTask.id);
+
       wx.showToast({
         title: '打卡失败: ' + (err.message || '未知错误'),
-        icon: 'none'
+        icon: 'none',
+        duration: 2000
       })
     }
+  },
+
+  /**
+   * 本地更新任务状态（乐观更新）
+   */
+  updateTaskStatusLocally (taskId, recordData) {
+    const { dimensions } = this.data;
+    let updated = false;
+
+    // 查找并更新任务状态
+    const newDimensions = dimensions.map(dim => {
+      const tasks = dim.tasks.map(task => {
+        if (task.id === taskId) {
+          updated = true;
+          return {
+            ...task,
+            completed: true,
+            record: recordData
+          };
+        }
+        return task;
+      });
+      return { ...dim, tasks };
+    });
+
+    if (!updated) {
+      console.warn('未找到要更新的任务:', taskId);
+      return;
+    }
+
+    // 重新计算统计数据
+    let completedTasks = 0;
+    let totalTasks = 0;
+
+    newDimensions.forEach(dim => {
+      totalTasks += dim.tasks.length;
+      completedTasks += dim.tasks.filter(t => t.completed).length;
+    });
+
+    const progressPercent = totalTasks > 0
+      ? Math.round((completedTasks / totalTasks) * 100)
+      : 0;
+
+    // 更新状态
+    this.setData({
+      dimensions: newDimensions,
+      completedTasks,
+      totalTasks,
+      progressPercent
+    });
+
+    // 更新小教练消息
+    this.updateCoachMessage();
+  },
+
+  /**
+   * 回滚任务状态（失败时恢复）
+   */
+  rollbackTaskStatus (taskId) {
+    // 重新加载数据
+    this.loadData();
   },
 
   // 显示成功动画

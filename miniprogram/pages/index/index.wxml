@@ -1,15 +1,47 @@
 <!--index.wxml-->
 <view class="page-container">
-  <!-- 小教练区域 -->
-  <view class="coach-section">
-    <app-image class="coach-avatar" src="/assets/images/coach-happy.png" size="120" radius="9999" fallbackText="🤖" />
-    <view class="coach-bubble">
-      <text class="coach-message">{{coachMessage}}</text>
+  <!-- 离线提示横幅 -->
+  <view class="offline-banner" wx:if="{{!isOnline}}">
+    <text class="icon-offline">📡</text>
+    <text class="offline-text">当前离线，显示为缓存数据</text>
+  </view>
+
+  <!-- 骨架屏加载状态 -->
+  <view class="skeleton-container" wx:if="{{isLoading}}">
+    <!-- 小教练区域骨架 -->
+    <view class="skeleton-coach">
+      <view class="skeleton-avatar skeleton-shimmer"></view>
+      <view class="skeleton-bubble skeleton-shimmer"></view>
+    </view>
+
+    <!-- 概览卡片骨架 -->
+    <view class="skeleton-card skeleton-shimmer">
+      <view class="skeleton-title"></view>
+      <view class="skeleton-stats">
+        <view class="skeleton-stat" wx:for="{{[1,2,3]}}" wx:key="*this"></view>
+      </view>
+      <view class="skeleton-progress"></view>
+    </view>
+
+    <!-- 任务卡片骨架 -->
+    <view class="skeleton-task-card skeleton-shimmer" wx:for="{{[1,2,3]}}" wx:key="*this">
+      <view class="skeleton-task-header"></view>
+      <view class="skeleton-task-content"></view>
     </view>
   </view>
 
-  <!-- 今日概览卡片 -->
-  <view class="overview-card card">
+  <!-- 实际内容 -->
+  <view class="content-container" wx:else>
+    <!-- 小教练区域 -->
+    <view class="coach-section">
+      <app-image class="coach-avatar" src="/assets/images/coach-happy.png" size="120" radius="9999" fallbackText="🤖" />
+      <view class="coach-bubble">
+        <text class="coach-message">{{coachMessage}}</text>
+      </view>
+    </view>
+
+    <!-- 今日概览卡片 -->
+    <view class="overview-card card">
     <view class="overview-header">
       <text class="overview-title">今日概览</text>
       <text class="overview-date">{{currentDate}}</text>
@@ -39,10 +71,10 @@
       </view>
       <text class="progress-text">完成度 {{progressPercent}}%</text>
     </view>
-  </view>
+    </view>
 
-  <!-- 任务列表 -->
-  <view class="task-list">
+    <!-- 任务列表 -->
+    <view class="task-list">
     <block wx:for="{{dimensions}}" wx:key="category">
       <view class="task-card" data-category="{{item.category}}">
         <!-- 卡片头部 -->
@@ -92,20 +124,30 @@
         </view>
       </view>
     </block>
-  </view>
+    </view>
 
-  <!-- 无任务空状态 -->
-  <view wx:if="{{dimensions.length === 0}}" class="empty-state">
-    <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📝" />
-    <text class="empty-text">还没有创建计划哦</text>
-    <button class="btn-primary mt-md" bindtap="goToPlan">创建计划</button>
-  </view>
+    <!-- 无任务空状态 -->
+    <view wx:if="{{dimensions.length === 0}}" class="empty-state">
+      <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📝" />
+      <text class="empty-text">还没有创建计划哦</text>
+      <button class="btn-primary mt-md" bindtap="goToPlan">创建计划</button>
+    </view>
 
-  <!-- 查看数据按钮 -->
-  <view wx:if="{{totalTasks > 0}}" class="bottom-action">
-    <button class="btn-secondary" bindtap="goToStatistics">查看数据统计</button>
-  </view>
-</view>
+    <!-- 底部操作区 - 有任务时显示 -->
+    <view wx:if="{{totalTasks > 0}}" class="bottom-action">
+      <button class="btn-outline" bindtap="goToPlan">
+        <text class="btn-icon">+</text>
+        <text>添加计划</text>
+      </button>
+      <button class="btn-primary" bindtap="goToStatistics">查看数据</button>
+    </view>
+
+    <!-- 快速添加浮动按钮 -->
+    <view wx:if="{{totalTasks > 0}}" class="fab" bindtap="goToPlan">
+      <text class="fab-icon">+</text>
+    </view>
+  </view> <!-- content-container 结束 -->
+</view> <!-- page-container 结束 -->
 
 <!-- 打卡弹窗 -->
 <view wx:if="{{showCheckinModal}}" class="modal-mask" bindtap="closeCheckinModal"></view>

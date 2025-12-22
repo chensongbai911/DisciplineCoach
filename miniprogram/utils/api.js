@@ -100,7 +100,7 @@ const planAPI = {
   list (params = {}) {
     return callFunction('plan', {
       action: 'list',
-      ...params
+      params  // 云函数期望 event.params
     })
   },
 

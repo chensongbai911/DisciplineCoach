@@ -1,5 +1,6 @@
 {
   "pages": [
+    "pages/onboarding/index",
     "pages/index/index",
     "pages/plan/index",
     "pages/plan/plan-detail",

@@ -1,0 +1,138 @@
+/* 骨架屏通用样式 */
+
+/* 骨架屏容器 */
+.skeleton-container {
+  padding: 32rpx;
+  background: #F7FAFC;
+  min-height: 100vh;
+}
+
+/* 闪烁动画 */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #E2E8F0 25%,
+    #F7FAFC 50%,
+    #E2E8F0 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* 小教练区域骨架 */
+.skeleton-coach {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.skeleton-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 9999rpx;
+  background: #E2E8F0;
+}
+
+.skeleton-bubble {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 16rpx;
+  background: #E2E8F0;
+}
+
+/* 概览卡片骨架 */
+.skeleton-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.skeleton-title {
+  width: 200rpx;
+  height: 40rpx;
+  background: #E2E8F0;
+  border-radius: 8rpx;
+  margin-bottom: 24rpx;
+}
+
+.skeleton-stats {
+  display: flex;
+  justify-content: space-around;
+  gap: 24rpx;
+  margin-bottom: 24rpx;
+}
+
+.skeleton-stat {
+  flex: 1;
+  height: 100rpx;
+  background: #E2E8F0;
+  border-radius: 12rpx;
+}
+
+.skeleton-progress {
+  width: 100%;
+  height: 20rpx;
+  background: #E2E8F0;
+  border-radius: 10rpx;
+}
+
+/* 任务卡片骨架 */
+.skeleton-task-card {
+  background: #FFFFFF;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.skeleton-task-header {
+  width: 60%;
+  height: 40rpx;
+  background: #E2E8F0;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+}
+
+.skeleton-task-content {
+  width: 100%;
+  height: 60rpx;
+  background: #E2E8F0;
+  border-radius: 8rpx;
+}
+
+/* 响应式调整 */
+@media (prefers-color-scheme: dark) {
+  .skeleton-shimmer {
+    background: linear-gradient(
+      90deg,
+      #2D3748 25%,
+      #1A202C 50%,
+      #2D3748 75%
+    );
+  }
+
+  .skeleton-avatar,
+  .skeleton-bubble,
+  .skeleton-title,
+  .skeleton-stat,
+  .skeleton-progress,
+  .skeleton-task-header,
+  .skeleton-task-content {
+    background: #2D3748;
+  }
+
+  .skeleton-card,
+  .skeleton-task-card {
+    background: #1A202C;
+  }
+}

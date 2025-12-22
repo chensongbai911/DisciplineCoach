@@ -2,6 +2,15 @@
 <!-- 某日打卡详情页 -->
 
 <view class="container">
+  <!-- 日历视图 -->
+  <view class="calendar-section">
+    <calendar
+      records="{{calendarRecords}}"
+      maxRetroactiveDays="{{maxRetroactiveDays}}"
+      bind:checkin="handleCalendarCheckin"
+    />
+  </view>
+
   <!-- 日期头部 -->
   <view class="date-header">
     <view class="date-info">

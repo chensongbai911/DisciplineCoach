@@ -10,7 +10,8 @@ Page({
     dimensions: [
       {
         id: 1,
-        category: '运动',
+        category: 'exercise',
+        categoryName: '运动',
         name: '运动健身',
         description: '保持身体健康，提升活力',
         icon: '🏃',
@@ -20,7 +21,8 @@ Page({
       },
       {
         id: 2,
-        category: '饮食',
+        category: 'diet',
+        categoryName: '饮食',
         name: '健康饮食',
         description: '合理膳食，营养均衡',
         icon: '🥗',
@@ -30,7 +32,8 @@ Page({
       },
       {
         id: 3,
-        category: '睡眠',
+        category: 'sleep',
+        categoryName: '睡眠',
         name: '规律作息',
         description: '早睡早起，精力充沛',
         icon: '😴',
@@ -40,7 +43,8 @@ Page({
       },
       {
         id: 4,
-        category: '阅读',
+        category: 'reading',
+        categoryName: '阅读',
         name: '阅读学习',
         description: '拓宽视野，丰富内心',
         icon: '📚',
@@ -50,7 +54,8 @@ Page({
       },
       {
         id: 5,
-        category: '学习',
+        category: 'study',
+        categoryName: '学习',
         name: '技能提升',
         description: '持续学习，不断进步',
         icon: '💻',
@@ -66,12 +71,37 @@ Page({
 
   onLoad (options) {
     this.loadPlans();
+    this.loadDimensionSettings();
     this.checkGuideStatus();
   },
 
   onShow () {
     // 从详情页返回时刷新数据
     this.loadPlans();
+    this.loadDimensionSettings();
+  },
+
+  /**
+   * 加载维度开启状态
+   */
+  loadDimensionSettings () {
+    const settings = wx.getStorageSync('dimensionSettings') || {};
+    const dimensions = this.data.dimensions.map(dim => ({
+      ...dim,
+      enabled: settings[dim.category] !== false // 默认可以开启
+    }));
+    this.setData({ dimensions });
+  },
+
+  /**
+   * 保存维度开启状态
+   */
+  saveDimensionSettings () {
+    const settings = {};
+    this.data.dimensions.forEach(dim => {
+      settings[dim.category] = dim.enabled;
+    });
+    wx.setStorageSync('dimensionSettings', settings);
   },
 
   /**
@@ -98,7 +128,7 @@ Page({
       const categoryPlans = plans.filter(p => p.category === dim.category);
       return {
         ...dim,
-        enabled: categoryPlans.length > 0,
+        // enabled 状态不从任务数量判断，而是从本地存储读取
         tasks: categoryPlans.map(plan => ({
           id: plan._id,
           title: plan.title,
@@ -163,19 +193,14 @@ Page({
     const dimension = this.data.dimensions.find(d => d.category === category);
 
     if (dimension.enabled) {
-      // 已开启，进入编辑页
+      // 已开启，进入管理页
       this.navigateToDetail(category);
     } else {
-      // 未开启，提示开启
+      // 未开启，提示先开启
       showModal({
-        title: `开启${dimension.name}`,
-        content: `开启后可以为${dimension.name}添加具体任务`,
-        confirmText: '去设置',
-        success: (res) => {
-          if (res.confirm) {
-            this.navigateToDetail(category);
-          }
-        }
+        title: '提示',
+        content: `请先打开右侧开关启用${dimension.name}`,
+        showCancel: false
       });
     }
   },
@@ -189,27 +214,50 @@ Page({
     const dimension = this.data.dimensions.find(d => d.category === category);
 
     if (value) {
-      // 开启维度 - 跳转到详情页添加任务
-      this.navigateToDetail(category);
+      // 开启维度
+      const dimensions = this.data.dimensions.map(d =>
+        d.category === category ? { ...d, enabled: true } : d
+      );
+      const enabledCount = dimensions.filter(d => d.enabled).length;
+
+      this.setData({
+        dimensions,
+        enabledCount
+      });
+      this.saveDimensionSettings();
+
+      showToast(`已开启${dimension.name}，快去添加任务吧~`, 'success');
     } else {
-      // 关闭维度 - 确认删除所有任务
+      // 关闭维度
       if (dimension.tasks.length > 0) {
+        // 有任务，需要确认
         showModal({
           title: '确认关闭',
-          content: `关闭后将删除${dimension.name}下的所有任务，是否继续？`,
+          content: `关闭后将删除${dimension.name}下的所有任务（${dimension.tasks.length}个），是否继续？`,
           confirmColor: '#FF6B6B',
           success: async (res) => {
             if (res.confirm) {
               await this.disableDimension(category);
             } else {
-              // 用户取消，保持开关状态
+              // 用户取消，保持开关状态不变
               this.loadPlans();
             }
           }
         });
       } else {
         // 没有任务，直接关闭
-        await this.disableDimension(category);
+        const dimensions = this.data.dimensions.map(d =>
+          d.category === category ? { ...d, enabled: false } : d
+        );
+        const enabledCount = dimensions.filter(d => d.enabled).length;
+
+        this.setData({
+          dimensions,
+          enabledCount
+        });
+        this.saveDimensionSettings();
+
+        showToast(`已关闭${dimension.name}`);
       }
     }
   },
@@ -234,11 +282,26 @@ Page({
         await planAPI.delete(task.id);
       }
 
+      // 更新状态
+      const dimensions = this.data.dimensions.map(d =>
+        d.category === category ? { ...d, enabled: false, tasks: [] } : d
+      );
+      const enabledCount = dimensions.filter(d => d.enabled).length;
+      const totalTasks = dimensions.reduce((sum, d) => sum + d.tasks.length, 0);
+
+      this.setData({
+        dimensions,
+        enabledCount,
+        totalTasks
+      });
+      this.saveDimensionSettings();
+
       showToast('已关闭');
-      this.loadPlans();
     } catch (error) {
       console.error('关闭维度失败:', error);
       showToast('操作失败，请重试');
+      // 恢复数据
+      this.loadPlans();
     } finally {
       hideLoading();
     }

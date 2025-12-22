@@ -6,7 +6,9 @@ App({
     userInfo: null,
     openid: null,
     isMember: false,
-    memberExpireAt: null
+    memberExpireAt: null,
+    isOnline: true, // 网络状态
+    networkType: 'unknown' // 网络类型
   },
 
   onLaunch: function () {
@@ -22,23 +24,94 @@ App({
       })
     }
 
-    // 加载 iconfont 字体（使用阿里 CDN WOFF2 格式，失败则忽略，保持 PNG/emoji 兜底）
-    try {
-      const fontUrl = 'https://at.alicdn.com/t/c/font_5094872_60e7nx4r6mr.woff2?t=1766394531251'
-      wx.loadFontFace({
-        family: 'iconfont',
-        source: `url("${fontUrl}")`,
-        global: true,
-        success: () => console.log('[iconfont] 字体加载成功'),
-        fail: (e) => console.warn('[iconfont] 字体加载失败，使用兜底', e)
-      })
-    } catch (e) {
-      console.warn('[iconfont] 加载异常，使用兜底', e)
-    }
+    // 监听网络状态变化
+    this.initNetworkMonitor();
+
+    // 延迟加载字体,避免阻塞启动
+    setTimeout(() => {
+      this.loadIconFont();
+    }, 500);
 
     // 检查登录状态
     console.log('[app.js] 检查登录状态')
     this.checkLogin()
+  },
+
+  /**
+   * 加载 iconfont 字体
+   */
+  loadIconFont () {
+    // 检查网络状态
+    if (!this.globalData.isOnline) {
+      console.log('[iconfont] 离线状态，跳过字体加载');
+      return;
+    }
+
+    // 加载 iconfont 字体（使用阿里 CDN WOFF2 格式，失败则忽略，保持 PNG/emoji 兜底）
+    try {
+      const fontUrl = '/assets/fonts/iconfont.woff2';
+
+      wx.loadFontFace({
+        family: 'iconfont',
+        source: `url("${fontUrl}")`,
+        global: true,
+        success: () => {
+          console.log('[iconfont] 本地字体加载成功');
+        },
+        fail: (err) => {
+          console.warn('[iconfont] 本地字体加载失败，使用兜底图标', err.errMsg);
+          // 字体加载失败不影响功能，组件会自动降级到 PNG/emoji
+        }
+      });
+    } catch (e) {
+      console.warn('[iconfont] 加载异常，使用兜底图标', e);
+    }
+  },
+
+  /**
+   * 初始化网络监听
+   */
+  initNetworkMonitor () {
+    // 获取当前网络状态
+    wx.getNetworkType({
+      success: (res) => {
+        const isOnline = res.networkType !== 'none';
+        this.globalData.isOnline = isOnline;
+        this.globalData.networkType = res.networkType;
+        console.log('[网络监听] 当前网络状态:', res.networkType, isOnline ? '在线' : '离线');
+      }
+    });
+
+    // 监听网络状态变化
+    wx.onNetworkStatusChange((res) => {
+      const isOnline = res.isConnected;
+      this.globalData.isOnline = isOnline;
+      this.globalData.networkType = res.networkType;
+
+      console.log('[网络监听] 网络状态变化:', res.networkType, isOnline ? '在线' : '离线');
+
+      // 显示提示
+      if (isOnline) {
+        wx.showToast({
+          title: '网络已恢复',
+          icon: 'success',
+          duration: 2000
+        });
+      } else {
+        wx.showToast({
+          title: '网络已断开',
+          icon: 'error',
+          duration: 2000
+        });
+      }
+
+      // 通知所有页面刷新网络状态
+      const pages = getCurrentPages();
+      const currentPage = pages[pages.length - 1];
+      if (currentPage && typeof currentPage.onNetworkChange === 'function') {
+        currentPage.onNetworkChange(isOnline, res.networkType);
+      }
+    });
   },
 
   // 检查登录状态
