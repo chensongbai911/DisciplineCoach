@@ -1,0 +1,111 @@
+<!--pages/feedback/index.wxml-->
+<!-- 意见反馈页 -->
+
+<view class="container">
+  <!-- 反馈类型选择 -->
+  <view class="type-section">
+    <text class="section-label">反馈类型</text>
+    <view class="type-options">
+      <view
+        class="type-option {{feedbackType === 'bug' ? 'active' : ''}}"
+        bindtap="handleTypeChange"
+        data-type="bug"
+      >
+        <text class="type-icon">🐛</text>
+        <text class="type-text">问题反馈</text>
+      </view>
+      <view
+        class="type-option {{feedbackType === 'feature' ? 'active' : ''}}"
+        bindtap="handleTypeChange"
+        data-type="feature"
+      >
+        <text class="type-icon">💡</text>
+        <text class="type-text">功能建议</text>
+      </view>
+      <view
+        class="type-option {{feedbackType === 'other' ? 'active' : ''}}"
+        bindtap="handleTypeChange"
+        data-type="other"
+      >
+        <text class="type-icon">💬</text>
+        <text class="type-text">其他</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 反馈内容 -->
+  <view class="content-section">
+    <text class="section-label">详细描述 <text class="required">*</text></text>
+    <textarea
+      class="textarea-input"
+      placeholder="请详细描述您遇到的问题或建议（至少10个字）"
+      value="{{content}}"
+      bindinput="handleContentInput"
+      maxlength="500"
+    />
+    <text class="char-count">{{content.length}}/500</text>
+  </view>
+
+  <!-- 图片上传 -->
+  <view class="images-section">
+    <text class="section-label">截图上传（选填）</text>
+    <view class="images-list">
+      <view class="image-item" wx:for="{{images}}" wx:key="index">
+        <image class="image-preview" src="{{item}}" mode="aspectFill"></image>
+        <view class="image-delete" bindtap="handleDeleteImage" data-index="{{index}}">✕</view>
+      </view>
+      <view class="image-add" wx:if="{{images.length < 3}}" bindtap="handleChooseImage">
+        <text class="add-icon">+</text>
+        <text class="add-text">添加图片</text>
+      </view>
+    </view>
+    <text class="images-hint">最多上传3张图片</text>
+  </view>
+
+  <!-- 联系方式 -->
+  <view class="contact-section">
+    <text class="section-label">联系方式（选填）</text>
+    <input
+      class="input-field"
+      placeholder="留下您的微信号或手机号，方便我们联系您"
+      value="{{contact}}"
+      bindinput="handleContactInput"
+      maxlength="50"
+    />
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-section">
+    <button class="btn-submit" bindtap="handleSubmit">提交反馈</button>
+  </view>
+
+  <!-- 历史反馈 -->
+  <view class="history-section" wx:if="{{historyList.length > 0}}">
+    <view class="history-header">
+      <text class="history-title">我的反馈</text>
+      <text class="history-count">共{{historyList.length}}条</text>
+    </view>
+    <view class="history-list">
+      <view
+        class="history-item"
+        wx:for="{{historyList}}"
+        wx:key="_id"
+        bindtap="viewFeedbackDetail"
+        data-id="{{item._id}}"
+      >
+        <view class="history-item-header">
+          <view class="history-type">
+            <text class="type-badge {{item.type}}">{{item.typeName}}</text>
+            <text class="history-date">{{item.createTime}}</text>
+          </view>
+          <text class="history-status {{item.status}}">{{item.statusName}}</text>
+        </view>
+        <text class="history-content">{{item.content}}</text>
+        <view class="history-reply" wx:if="{{item.reply}}">
+          <text class="reply-label">回复：</text>
+          <text class="reply-content">{{item.reply}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

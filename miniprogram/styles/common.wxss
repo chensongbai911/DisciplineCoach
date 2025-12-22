@@ -1,0 +1,467 @@
+/* common.wxss - 通用样式工具类 */
+
+/* ========== 颜色工具类 ========== */
+.text-primary { color: #333333; }
+.text-secondary { color: #666666; }
+.text-tertiary { color: #999999; }
+.text-placeholder { color: #CCCCCC; }
+.text-white { color: #FFFFFF; }
+.text-success { color: #07C160; }
+.text-warning { color: #FF9500; }
+.text-error { color: #FA5151; }
+.text-info { color: #10AEFF; }
+
+.bg-primary { background: #07C160; }
+.bg-white { background: #FFFFFF; }
+.bg-gray { background: #F7F8FA; }
+.bg-success { background: #07C160; }
+.bg-warning { background: #FF9500; }
+.bg-error { background: #FA5151; }
+
+/* 维度配色 */
+.text-sport { color: #FF6B6B; }
+.text-diet { color: #4ECDC4; }
+.text-sleep { color: #9B59B6; }
+.text-reading { color: #F39C12; }
+.text-study { color: #3498DB; }
+
+.bg-sport { background: #FF6B6B; }
+.bg-diet { background: #4ECDC4; }
+.bg-sleep { background: #9B59B6; }
+.bg-reading { background: #F39C12; }
+.bg-study { background: #3498DB; }
+
+/* ========== 字体工具类 ========== */
+.text-h1 { font-size: 40rpx; font-weight: 700; line-height: 56rpx; }
+.text-h2 { font-size: 36rpx; font-weight: 700; line-height: 52rpx; }
+.text-h3 { font-size: 32rpx; font-weight: 500; line-height: 48rpx; }
+.text-body1 { font-size: 32rpx; font-weight: 400; line-height: 48rpx; }
+.text-body2 { font-size: 28rpx; font-weight: 400; line-height: 44rpx; }
+.text-caption { font-size: 24rpx; font-weight: 400; line-height: 40rpx; }
+.text-number-lg { font-size: 64rpx; font-weight: 700; line-height: 80rpx; }
+.text-number-md { font-size: 48rpx; font-weight: 500; line-height: 64rpx; }
+
+.text-bold { font-weight: 700; }
+.text-medium { font-weight: 500; }
+.text-regular { font-weight: 400; }
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-ellipsis-2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* ========== 间距工具类 ========== */
+.m-0 { margin: 0; }
+.m-xs { margin: 8rpx; }
+.m-sm { margin: 16rpx; }
+.m-md { margin: 32rpx; }
+.m-lg { margin: 48rpx; }
+.m-xl { margin: 64rpx; }
+
+.mt-0 { margin-top: 0; }
+.mt-xs { margin-top: 8rpx; }
+.mt-sm { margin-top: 16rpx; }
+.mt-md { margin-top: 32rpx; }
+.mt-lg { margin-top: 48rpx; }
+.mt-xl { margin-top: 64rpx; }
+
+.mr-0 { margin-right: 0; }
+.mr-xs { margin-right: 8rpx; }
+.mr-sm { margin-right: 16rpx; }
+.mr-md { margin-right: 32rpx; }
+.mr-lg { margin-right: 48rpx; }
+.mr-xl { margin-right: 64rpx; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-xs { margin-bottom: 8rpx; }
+.mb-sm { margin-bottom: 16rpx; }
+.mb-md { margin-bottom: 32rpx; }
+.mb-lg { margin-bottom: 48rpx; }
+.mb-xl { margin-bottom: 64rpx; }
+
+.ml-0 { margin-left: 0; }
+.ml-xs { margin-left: 8rpx; }
+.ml-sm { margin-left: 16rpx; }
+.ml-md { margin-left: 32rpx; }
+.ml-lg { margin-left: 48rpx; }
+.ml-xl { margin-left: 64rpx; }
+
+.p-0 { padding: 0; }
+.p-xs { padding: 8rpx; }
+.p-sm { padding: 16rpx; }
+.p-md { padding: 32rpx; }
+.p-lg { padding: 48rpx; }
+.p-xl { padding: 64rpx; }
+
+.pt-0 { padding-top: 0; }
+.pt-xs { padding-top: 8rpx; }
+.pt-sm { padding-top: 16rpx; }
+.pt-md { padding-top: 32rpx; }
+.pt-lg { padding-top: 48rpx; }
+.pt-xl { padding-top: 64rpx; }
+
+.pr-0 { padding-right: 0; }
+.pr-xs { padding-right: 8rpx; }
+.pr-sm { padding-right: 16rpx; }
+.pr-md { padding-right: 32rpx; }
+.pr-lg { padding-right: 48rpx; }
+.pr-xl { padding-right: 64rpx; }
+
+.pb-0 { padding-bottom: 0; }
+.pb-xs { padding-bottom: 8rpx; }
+.pb-sm { padding-bottom: 16rpx; }
+.pb-md { padding-bottom: 32rpx; }
+.pb-lg { padding-bottom: 48rpx; }
+.pb-xl { padding-bottom: 64rpx; }
+
+.pl-0 { padding-left: 0; }
+.pl-xs { padding-left: 8rpx; }
+.pl-sm { padding-left: 16rpx; }
+.pl-md { padding-left: 32rpx; }
+.pl-lg { padding-left: 48rpx; }
+.pl-xl { padding-left: 64rpx; }
+
+/* ========== 布局工具类 ========== */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-row { flex-direction: row; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-around {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.flex-start { justify-content: flex-start; }
+.flex-end { justify-content: flex-end; }
+.flex-align-start { align-items: flex-start; }
+.flex-align-center { align-items: center; }
+.flex-align-end { align-items: flex-end; }
+
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+.flex-3 { flex: 3; }
+
+/* ========== 圆角工具类 ========== */
+.radius-none { border-radius: 0; }
+.radius-sm { border-radius: 8rpx; }
+.radius-md { border-radius: 16rpx; }
+.radius-lg { border-radius: 24rpx; }
+.radius-xl { border-radius: 32rpx; }
+.radius-round { border-radius: 50%; }
+.radius-circle { border-radius: 50%; }
+
+/* ========== 阴影工具类 ========== */
+.shadow-none { box-shadow: none; }
+.shadow-sm { box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08); }
+.shadow-md { box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08); }
+.shadow-lg { box-shadow: 0 8rpx 32rpx rgba(0,0,0,0.12); }
+
+/* ========== 边框工具类 ========== */
+.border { border: 2rpx solid #EEEEEE; }
+.border-top { border-top: 2rpx solid #EEEEEE; }
+.border-right { border-right: 2rpx solid #EEEEEE; }
+.border-bottom { border-bottom: 2rpx solid #EEEEEE; }
+.border-left { border-left: 2rpx solid #EEEEEE; }
+
+.border-none { border: none; }
+.border-primary { border-color: #07C160; }
+.border-error { border-color: #FA5151; }
+
+/* ========== 宽高工具类 ========== */
+.w-100 { width: 100%; }
+.h-100 { height: 100%; }
+.w-50 { width: 50%; }
+.h-50 { height: 50%; }
+
+/* ========== 定位工具类 ========== */
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+
+/* ========== 显示隐藏 ========== */
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+.hidden { display: none; }
+.invisible { visibility: hidden; }
+
+/* ========== 卡片样式 ========== */
+.card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+  margin-bottom: 24rpx;
+}
+
+.card-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 16rpx;
+}
+
+.card-content {
+  font-size: 28rpx;
+  color: #666666;
+  line-height: 1.6;
+}
+
+/* ========== 按钮样式 ========== */
+.btn {
+  width: 100%;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  border-radius: 16rpx;
+  border: none;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+  border-radius: 24rpx;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary[disabled] {
+  background: #EEEEEE;
+  color: #CCCCCC;
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.95);
+  color: #667eea;
+  border: 2rpx solid rgba(102, 126, 234, 0.3);
+  backdrop-filter: blur(10rpx);
+  border-radius: 24rpx;
+  font-weight: 600;
+}
+
+.btn-secondary:active {
+  background: rgba(102, 126, 234, 0.1);
+  border-color: #667eea;
+}
+
+.btn-text {
+  background: transparent;
+  color: #576B95;
+  font-size: 28rpx;
+  padding: 0;
+  height: auto;
+}
+
+.btn-text:active {
+  color: #07C160;
+}
+
+.btn-small {
+  height: 64rpx;
+  padding: 0 32rpx;
+  font-size: 28rpx;
+  border-radius: 12rpx;
+  width: auto;
+  display: inline-flex;
+}
+
+/* ========== 输入框样式 ========== */
+.input-base {
+  width: 100%;
+  height: 88rpx;
+  padding: 0 32rpx;
+  background: #FFFFFF;
+  border: 2rpx solid #E5E5E5;
+  border-radius: 16rpx;
+  font-size: 32rpx;
+  color: #333333;
+}
+
+.input-base:focus {
+  border-color: #07C160;
+}
+
+.input-error {
+  border-color: #FA5151;
+}
+
+/* ========== 标签样式 ========== */
+.tag {
+  display: inline-flex;
+  height: 48rpx;
+  padding: 0 16rpx;
+  background: #F0F0F0;
+  color: #666666;
+  font-size: 24rpx;
+  border-radius: 8rpx;
+  align-items: center;
+  justify-content: center;
+}
+
+.tag-primary {
+  background: #E6F7ED;
+  color: #07C160;
+}
+
+.tag-warning {
+  background: #FFF7E6;
+  color: #FF9500;
+}
+
+.tag-error {
+  background: #FFEDED;
+  color: #FA5151;
+}
+
+/* ========== 进度条样式 ========== */
+.progress-bar {
+  width: 100%;
+  height: 16rpx;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 8rpx;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8rpx;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: 0 2rpx 8rpx rgba(102, 126, 234, 0.4);
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40rpx;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3));
+  border-radius: 8rpx;
+}
+
+/* ========== 空状态样式 ========== */
+.empty-state {
+  padding: 80rpx 32rpx;
+  text-align: center;
+}
+
+.empty-icon {
+  width: 200rpx;
+  height: 200rpx;
+  margin: 0 auto 32rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 28rpx;
+  color: #999999;
+}
+
+/* ========== 加载状态 ========== */
+.loading {
+  padding: 40rpx;
+  text-align: center;
+  color: #999999;
+  font-size: 28rpx;
+}
+
+/* ========== 动画类 ========== */
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.slide-in-up {
+  animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(40rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.scale-in {
+  animation: scaleIn 0.3s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

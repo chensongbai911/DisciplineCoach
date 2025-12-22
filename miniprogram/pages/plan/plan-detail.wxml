@@ -1,0 +1,232 @@
+<!--pages/plan/plan-detail.wxml-->
+<!-- 计划详情页 - 配置某个维度的具体任务 -->
+
+<view class="container">
+  <!-- 头部信息 -->
+  <view class="header-card">
+    <view class="dimension-icon" style="background: {{dimension.color}}20;">
+      <text style="color: {{dimension.color}};">{{dimension.icon}}</text>
+    </view>
+    <view class="header-info">
+      <text class="header-title">{{dimension.name}}</text>
+      <text class="header-desc">{{dimension.description}}</text>
+    </view>
+  </view>
+
+  <!-- 任务列表 -->
+  <view class="task-list" wx:if="{{tasks.length > 0}}">
+    <view
+      class="task-item-card"
+      wx:for="{{tasks}}"
+      wx:key="_id"
+      bindtap="handleEditTask"
+      data-id="{{item._id}}"
+    >
+      <view class="task-item-header">
+        <text class="task-item-title">{{item.title}}</text>
+        <view class="task-item-actions">
+          <text
+            class="action-icon"
+            bindtap="handleDeleteTask"
+            data-id="{{item._id}}"
+            catchtap="handleActionTap"
+          >🗑️</text>
+        </view>
+      </view>
+      <view class="task-item-body">
+        <view class="task-meta">
+          <text class="meta-label">目标：</text>
+          <text class="meta-value">{{item.targetDesc}}</text>
+        </view>
+        <view class="task-meta" wx:if="{{item.reminder}}">
+          <text class="meta-label">提醒：</text>
+          <text class="meta-value">{{item.reminder.time}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{tasks.length === 0}}">
+    <app-image class="empty-image" src="/assets/images/empty-task.png" size="200" radius="24" fallbackText="🗒️" />
+    <text class="empty-text">还没有添加任务</text>
+    <text class="empty-hint">点击下方按钮添加你的第一个任务</text>
+  </view>
+
+  <!-- 添加按钮 -->
+  <view class="bottom-action">
+    <button class="btn-primary btn-block" bindtap="handleAddTask">
+      <text class="icon-add">+</text> 添加任务
+    </button>
+  </view>
+</view>
+
+<!-- 任务表单弹窗 -->
+<view class="modal-mask" wx:if="{{showTaskForm}}" bindtap="closeTaskForm"></view>
+<view class="modal-form" wx:if="{{showTaskForm}}">
+  <view class="modal-header">
+    <text class="modal-title">{{formMode === 'add' ? '添加' : '编辑'}}任务</text>
+    <text class="modal-close" bindtap="closeTaskForm">✕</text>
+  </view>
+
+  <scroll-view class="modal-body" scroll-y>
+    <!-- 任务标题 -->
+    <view class="form-group">
+      <text class="form-label">任务名称 <text class="required">*</text></text>
+      <input
+        class="input-base"
+        placeholder="例如：晨跑30分钟"
+        value="{{formData.title}}"
+        bindinput="handleTitleInput"
+        maxlength="30"
+      />
+    </view>
+
+    <!-- 目标类型 -->
+    <view class="form-group">
+      <text class="form-label">目标类型 <text class="required">*</text></text>
+      <view class="type-options">
+        <view
+          class="type-option {{formData.type === 'duration' ? 'active' : ''}}"
+          bindtap="handleTypeChange"
+          data-type="duration"
+        >
+          <text class="type-icon">⏱</text>
+          <text class="type-text">时长</text>
+        </view>
+        <view
+          class="type-option {{formData.type === 'count' ? 'active' : ''}}"
+          bindtap="handleTypeChange"
+          data-type="count"
+        >
+          <text class="type-icon">🔢</text>
+          <text class="type-text">数量</text>
+        </view>
+        <view
+          class="type-option {{formData.type === 'boolean' ? 'active' : ''}}"
+          bindtap="handleTypeChange"
+          data-type="boolean"
+        >
+          <text class="type-icon">✓</text>
+          <text class="type-text">完成</text>
+        </view>
+        <view
+          class="type-option {{formData.type === 'time' ? 'active' : ''}}"
+          bindtap="handleTypeChange"
+          data-type="time"
+        >
+          <text class="type-icon">🕐</text>
+          <text class="type-text">时间</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 目标值 - 时长类型 -->
+    <view class="form-group" wx:if="{{formData.type === 'duration'}}">
+      <text class="form-label">目标时长 <text class="required">*</text></text>
+      <view class="input-group">
+        <input
+          class="input-base flex-1"
+          type="number"
+          placeholder="请输入时长"
+          value="{{formData.target.value}}"
+          bindinput="handleTargetValueInput"
+        />
+        <picker
+          class="picker-unit"
+          mode="selector"
+          range="{{durationUnits}}"
+          range-key="label"
+          value="{{durationUnitIndex}}"
+          bindchange="handleDurationUnitChange"
+        >
+          <view class="picker-text">{{durationUnits[durationUnitIndex].label}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 目标值 - 数量类型 -->
+    <view class="form-group" wx:if="{{formData.type === 'count'}}">
+      <text class="form-label">目标数量 <text class="required">*</text></text>
+      <view class="input-group">
+        <input
+          class="input-base flex-1"
+          type="number"
+          placeholder="请输入数量"
+          value="{{formData.target.value}}"
+          bindinput="handleTargetValueInput"
+        />
+        <input
+          class="input-base unit-input"
+          placeholder="单位"
+          value="{{formData.target.unit}}"
+          bindinput="handleTargetUnitInput"
+          maxlength="4"
+        />
+      </view>
+    </view>
+
+    <!-- 目标值 - 时间类型 -->
+    <view class="form-group" wx:if="{{formData.type === 'time'}}">
+      <text class="form-label">目标时间段 <text class="required">*</text></text>
+      <view class="time-range">
+        <picker
+          mode="time"
+          value="{{formData.target.startTime}}"
+          bindchange="handleStartTimeChange"
+        >
+          <view class="time-picker">{{formData.target.startTime || '选择开始时间'}}</view>
+        </picker>
+        <text class="time-divider">至</text>
+        <picker
+          mode="time"
+          value="{{formData.target.endTime}}"
+          bindchange="handleEndTimeChange"
+        >
+          <view class="time-picker">{{formData.target.endTime || '选择结束时间'}}</view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 提醒设置 -->
+    <view class="form-group">
+      <view class="form-label-row">
+        <text class="form-label">每日提醒</text>
+        <switch
+          checked="{{formData.reminder.enabled}}"
+          color="#07C160"
+          bindchange="handleReminderToggle"
+        />
+      </view>
+      <view class="reminder-time" wx:if="{{formData.reminder.enabled}}">
+        <picker
+          mode="time"
+          value="{{formData.reminder.time}}"
+          bindchange="handleReminderTimeChange"
+        >
+          <view class="time-picker-full">
+            <text class="picker-label">提醒时间</text>
+            <text class="picker-value">{{formData.reminder.time}}</text>
+          </view>
+        </picker>
+      </view>
+    </view>
+
+    <!-- 备注说明 -->
+    <view class="form-group">
+      <text class="form-label">备注说明</text>
+      <textarea
+        class="textarea-base"
+        placeholder="添加一些备注信息（选填）"
+        value="{{formData.description}}"
+        bindinput="handleDescriptionInput"
+        maxlength="200"
+      />
+    </view>
+  </scroll-view>
+
+  <view class="modal-footer">
+    <button class="btn-secondary flex-1" bindtap="closeTaskForm">取消</button>
+    <button class="btn-primary flex-1 ml-2" bindtap="handleSubmitTask">保存</button>
+  </view>
+</view>

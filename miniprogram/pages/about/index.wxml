@@ -1,0 +1,87 @@
+<!--pages/about/index.wxml-->
+<!-- 关于我们页面 -->
+
+<view class="container">
+  <!-- Logo区域 -->
+  <view class="logo-section">
+    <app-image class="app-logo" src="/assets/images/logo.png" size="160" radius="24" fallbackText="🎯" />
+    <text class="app-name">自律教练</text>
+    <text class="app-slogan">让自律成为习惯</text>
+    <text class="app-version">v{{version}}</text>
+  </view>
+
+  <!-- 应用介绍 -->
+  <view class="intro-section">
+    <text class="intro-text">
+      自律教练是一款专注于培养良好习惯的应用，通过科学的打卡系统、
+      数据统计分析和智能提醒，帮助你在运动、饮食、睡眠、阅读、学习等
+      五大维度建立自律的生活方式。
+    </text>
+  </view>
+
+  <!-- 功能亮点 -->
+  <view class="features-section">
+    <text class="section-title">核心功能</text>
+    <view class="feature-list">
+      <view class="feature-item" wx:for="{{features}}" wx:key="id">
+        <text class="feature-icon">{{item.icon}}</text>
+        <view class="feature-info">
+          <text class="feature-name">{{item.name}}</text>
+          <text class="feature-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 联系我们 -->
+  <view class="contact-section">
+    <text class="section-title">联系我们</text>
+    <view class="contact-list">
+      <view class="contact-item" bindtap="copyWechat">
+        <view class="contact-left">
+          <text class="contact-icon">💬</text>
+          <text class="contact-label">客服微信</text>
+        </view>
+        <view class="contact-right">
+          <text class="contact-value">discipline_coach</text>
+          <text class="contact-action">复制</text>
+        </view>
+      </view>
+      <view class="contact-item" bindtap="copyEmail">
+        <view class="contact-left">
+          <text class="contact-icon">📧</text>
+          <text class="contact-label">客服邮箱</text>
+        </view>
+        <view class="contact-right">
+          <text class="contact-value">service@discipline.com</text>
+          <text class="contact-action">复制</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 相关链接 -->
+  <view class="links-section">
+    <text class="section-title">相关协议</text>
+    <view class="link-list">
+      <view class="link-item" bindtap="viewAgreement" data-type="user">
+        <text class="link-text">用户协议</text>
+        <text class="link-arrow">›</text>
+      </view>
+      <view class="link-item" bindtap="viewAgreement" data-type="privacy">
+        <text class="link-text">隐私政策</text>
+        <text class="link-arrow">›</text>
+      </view>
+      <view class="link-item" bindtap="viewAgreement" data-type="vip">
+        <text class="link-text">会员服务协议</text>
+        <text class="link-arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 版权信息 -->
+  <view class="copyright-section">
+    <text class="copyright-text">© 2024 自律教练团队</text>
+    <text class="copyright-text">All Rights Reserved</text>
+  </view>
+</view>

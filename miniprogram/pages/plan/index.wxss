@@ -1,0 +1,268 @@
+/* pages/plan/index.wxss */
+
+.container {
+  padding-bottom: 120rpx;
+}
+
+/* 头部提示卡片 */
+.tip-card {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 32rpx;
+  margin: 32rpx 32rpx 24rpx;
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  border-radius: 24rpx;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+}
+
+.tip-icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin-right: 24rpx;
+}
+
+.tip-content {
+  flex: 1;
+}
+
+.tip-text {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8rpx;
+}
+
+.tip-sub {
+  display: block;
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* 维度列表 */
+.dimension-list {
+  padding: 0 32rpx;
+}
+
+.dimension-card {
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+}
+
+.dimension-card:active {
+  transform: scale(0.98);
+}
+
+.dimension-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dimension-left {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.dimension-icon {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48rpx;
+  margin-right: 24rpx;
+}
+
+.dimension-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.dimension-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.dimension-desc {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.dimension-right {
+  margin-left: 16rpx;
+}
+
+/* 任务预览 */
+.task-preview {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #EEEEEE;
+}
+
+.task-preview-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 2rpx solid #F7F8FA;
+}
+
+.task-preview-item:last-child {
+  border-bottom: none;
+}
+
+.task-preview-title {
+  font-size: 28rpx;
+  color: #333333;
+  flex: 1;
+}
+
+.task-preview-target {
+  font-size: 24rpx;
+  color: #07C160;
+  margin-left: 16rpx;
+}
+
+/* 空状态 */
+.empty-task {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48rpx 0;
+  margin-top: 24rpx;
+  border-top: 2rpx solid #EEEEEE;
+  border: 2rpx dashed #DDDDDD;
+  border-radius: 16rpx;
+  background: #F7F8FA;
+}
+
+.icon-add {
+  font-size: 64rpx;
+  color: #CCCCCC;
+  margin-bottom: 16rpx;
+}
+
+.empty-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 维度底部操作区 */
+.dimension-footer {
+  margin-top: 24rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx solid #EEEEEE;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-text {
+  background: transparent;
+  color: #07C160;
+  font-size: 26rpx;
+  padding: 0;
+  height: auto;
+  line-height: 1;
+  border: none;
+  display: flex;
+  align-items: center;
+}
+
+.btn-text::after {
+  border: none;
+}
+
+.icon-edit {
+  margin-right: 8rpx;
+}
+
+/* 底部统计 */
+.bottom-stats {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24rpx 32rpx;
+  padding-bottom: calc(24rpx + env(safe-area-inset-bottom));
+  background: #FFFFFF;
+  border-top: 2rpx solid #EEEEEE;
+  text-align: center;
+}
+
+.stats-text {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+/* 快速入门引导 */
+.guide-card {
+  margin: 24rpx 32rpx;
+  padding: 32rpx;
+  background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+  border-radius: 24rpx;
+  border: 2rpx solid #FFB74D;
+}
+
+.guide-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24rpx;
+}
+
+.guide-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #F57C00;
+}
+
+.guide-close {
+  font-size: 32rpx;
+  color: #F57C00;
+  padding: 8rpx;
+}
+
+.guide-steps {
+  padding-left: 16rpx;
+}
+
+.guide-step {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.guide-step:last-child {
+  margin-bottom: 0;
+}
+
+.step-num {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: #F57C00;
+  color: #FFFFFF;
+  font-size: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16rpx;
+  flex-shrink: 0;
+}
+
+.step-text {
+  flex: 1;
+  font-size: 26rpx;
+  color: #E65100;
+  line-height: 40rpx;
+}

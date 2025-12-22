@@ -1,0 +1,51 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/plan/index",
+    "pages/plan/plan-detail",
+    "pages/record/day-detail",
+    "pages/statistics/index",
+    "pages/vip/index",
+    "pages/user/index",
+    "pages/feedback/index",
+    "pages/about/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "自律教练",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f8fa",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#07c160",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "今日"
+      },
+      {
+        "pagePath": "pages/statistics/index",
+        "text": "数据"
+      },
+      {
+        "pagePath": "pages/user/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于记录运动轨迹"
+    }
+  },
+  "requiredBackgroundModes": [],
+  "plugins": {},
+  "usingComponents": {},
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}

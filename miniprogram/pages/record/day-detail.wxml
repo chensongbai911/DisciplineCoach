@@ -1,0 +1,137 @@
+<!--pages/record/day-detail.wxml-->
+<!-- 某日打卡详情页 -->
+
+<view class="container">
+  <!-- 日期头部 -->
+  <view class="date-header">
+    <view class="date-info">
+      <text class="date-main">{{dateDisplay}}</text>
+      <text class="date-weekday">{{weekday}}</text>
+    </view>
+    <view class="date-summary">
+      <text class="summary-text">完成 {{completedCount}}/{{totalCount}} 个任务</text>
+    </view>
+  </view>
+
+  <!-- 完成度进度 -->
+  <view class="progress-card">
+    <view class="progress-header">
+      <text class="progress-title">完成度</text>
+      <text class="progress-percent">{{completionRate}}%</text>
+    </view>
+    <view class="progress-bar">
+      <view class="progress-fill" style="width: {{completionRate}}%; background: {{progressColor}};"></view>
+    </view>
+  </view>
+
+  <!-- 打卡记录列表 -->
+  <view class="record-list">
+    <view class="record-group" wx:for="{{dimensions}}" wx:key="category" wx:if="{{item.records.length > 0}}">
+      <view class="group-header">
+        <view class="group-icon" style="background: {{item.color}}20;">
+          <text style="color: {{item.color}};">{{item.icon}}</text>
+        </view>
+        <text class="group-name">{{item.name}}</text>
+        <text class="group-count">{{item.completedCount}}/{{item.totalCount}}</text>
+      </view>
+
+      <view class="record-item" wx:for="{{item.records}}" wx:for-item="record" wx:key="id">
+        <view class="record-main">
+          <view class="record-info">
+            <text class="record-title">{{record.title}}</text>
+            <text class="record-detail">
+              目标: {{record.targetText}}
+              <text wx:if="{{record.completed}}" class="record-actual"> | 实际: {{record.actualText}}</text>
+            </text>
+          </view>
+          <view class="record-status {{record.completed ? 'completed' : 'incomplete'}}">
+            <text class="status-icon">{{record.completed ? '✓' : '○'}}</text>
+            <text class="status-text">{{record.completed ? '已完成' : '未完成'}}</text>
+          </view>
+        </view>
+
+        <!-- 备注 -->
+        <view class="record-remark" wx:if="{{record.remark}}">
+          <text class="remark-label">备注：</text>
+          <text class="remark-text">{{record.remark}}</text>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="record-actions" wx:if="{{record.completed}}">
+          <button
+            class="btn-text-small"
+            bindtap="handleEdit"
+            data-record="{{record}}"
+          >
+            编辑
+          </button>
+          <button
+            class="btn-text-small text-danger"
+            bindtap="handleDelete"
+            data-id="{{record.id}}"
+          >
+            删除
+          </button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{totalCount === 0}}">
+    <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📭" />
+    <text class="empty-text">这一天还没有打卡记录</text>
+  </view>
+
+  <!-- 底部总结 -->
+  <view class="summary-card" wx:if="{{totalCount > 0}}">
+    <view class="summary-item">
+      <text class="summary-label">完成任务</text>
+      <text class="summary-value">{{completedCount}} 个</text>
+    </view>
+    <view class="summary-item">
+      <text class="summary-label">完成率</text>
+      <text class="summary-value">{{completionRate}}%</text>
+    </view>
+    <view class="summary-item">
+      <text class="summary-label">评价</text>
+      <text class="summary-value">{{evaluation}}</text>
+    </view>
+  </view>
+</view>
+
+<!-- 编辑打卡弹窗 -->
+<view class="modal-mask" wx:if="{{showEditModal}}" bindtap="closeEditModal"></view>
+<view class="modal-bottom" wx:if="{{showEditModal}}">
+  <view class="modal-header">
+    <text class="modal-title">编辑打卡</text>
+  </view>
+
+  <view class="modal-body">
+    <view class="input-group">
+      <text class="input-label">实际完成</text>
+      <input
+        class="input-base"
+        type="number"
+        placeholder="请输入实际完成值"
+        value="{{editData.actualValue}}"
+        bindinput="onActualValueInput"/>
+    </view>
+
+    <view class="input-group">
+      <text class="input-label">备注</text>
+      <textarea
+        class="textarea-base"
+        placeholder="记录一下今天的感受..."
+        maxlength="200"
+        value="{{editData.remark}}"
+        bindinput="onRemarkInput">
+      </textarea>
+    </view>
+  </view>
+
+  <view class="modal-footer">
+    <button class="btn-secondary mr-sm" bindtap="closeEditModal">取消</button>
+    <button class="btn-primary flex-1" bindtap="confirmEdit">保存</button>
+  </view>
+</view>

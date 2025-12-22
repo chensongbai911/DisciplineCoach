@@ -1,0 +1,180 @@
+<!--pages/statistics/index.wxml-->
+<!-- 数据统计页 - 展示用户的完成数据和趋势分析 -->
+
+<view class="container">
+  <!-- 时间选择器 -->
+  <view class="time-selector">
+    <view
+      class="time-option {{timeRange === 'week' ? 'active' : ''}}"
+      bindtap="handleTimeRangeChange"
+      data-range="week"
+    >
+      本周
+    </view>
+    <view
+      class="time-option {{timeRange === 'month' ? 'active' : ''}}"
+      bindtap="handleTimeRangeChange"
+      data-range="month"
+    >
+      本月
+    </view>
+    <view
+      class="time-option {{timeRange === 'year' ? 'active' : ''}}"
+      bindtap="handleTimeRangeChange"
+      data-range="year"
+    >
+      本年
+    </view>
+  </view>
+
+  <!-- 核心数据卡片 -->
+  <view class="stats-cards">
+    <view class="stat-card">
+      <text class="stat-value primary">{{totalDays}}</text>
+      <text class="stat-label">累计天数</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value success">{{completionRate}}%</text>
+      <text class="stat-label">完成率</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value warning">{{currentStreak}}</text>
+      <text class="stat-label">连续打卡</text>
+    </view>
+    <view class="stat-card">
+      <text class="stat-value info">{{bestStreak}}</text>
+      <text class="stat-label">最长连续</text>
+    </view>
+  </view>
+
+  <!-- 完成度趋势图 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">完成度趋势</text>
+      <text class="section-hint">{{trendData.length > 0 ? '← 左右滑动查看更多 →' : '最近'+(timeRange === 'week' ? '7天' : timeRange === 'month' ? '30天' : '12个月')}}</text>
+    </view>
+    <view class="chart-container">
+      <scroll-view class="trend-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}" wx:if="{{trendData.length > 0}}">
+        <view class="trend-chart">
+          <view class="trend-item" wx:for="{{trendData}}" wx:key="date">
+            <view class="trend-bar-wrapper">
+              <view class="trend-bar" style="height: {{item.rate}}%;">
+                <text class="trend-value">{{item.rate}}%</text>
+              </view>
+            </view>
+            <text class="trend-label">{{item.date.slice(5)}}</text>
+          </view>
+        </view>
+      </scroll-view>
+      <view class="empty-hint" wx:else>
+        <text>暂无数据</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 维度分布 -->
+  <view class="chart-section">
+    <view class="section-header">
+      <text class="section-title">维度分布</text>
+      <text class="section-hint">各维度任务完成情况</text>
+    </view>
+    <view class="dimension-chart" wx:if="{{dimensionStats.length > 0}}">
+      <view class="dimension-chart-item" wx:for="{{dimensionStats}}" wx:key="category">
+        <view class="dimension-chart-header">
+          <text class="dimension-icon" style="color: {{item.color}};">{{item.icon}}</text>
+          <text class="dimension-name">{{item.name}}</text>
+        </view>
+        <view class="dimension-chart-body">
+          <view class="dimension-bar">
+            <view class="dimension-bar-fill" style="width: {{item.completionRate}}%; background: {{item.color}};"></view>
+          </view>
+          <text class="dimension-rate">{{item.completionRate}}%</text>
+        </view>
+        <text class="dimension-count">{{item.completedTasks}}/{{item.totalTasks}}</text>
+      </view>
+    </view>
+    <view class="empty-hint" wx:else>
+      <text>暂无数据</text>
+    </view>
+  </view>
+
+  <!-- 维度详情列表 -->
+  <view class="dimension-details">
+    <view class="dimension-detail-item" wx:for="{{dimensionStats}}" wx:key="category">
+      <view class="dimension-detail-header">
+        <view class="dimension-icon" style="background: {{item.color}}20;">
+          <text style="color: {{item.color}};">{{item.icon}}</text>
+        </view>
+        <view class="dimension-detail-info">
+          <text class="dimension-name">{{item.name}}</text>
+          <text class="dimension-count">{{item.completedTasks}}/{{item.totalTasks}} 个任务</text>
+        </view>
+      </view>
+      <view class="dimension-detail-body">
+        <view class="progress-bar-wrapper">
+          <view class="progress-bar">
+            <view
+              class="progress-fill"
+              style="width: {{item.completionRate}}%; background: {{item.color}};"
+            ></view>
+          </view>
+          <text class="progress-text">{{item.completionRate}}%</text>
+        </view>
+        <view class="dimension-metrics">
+          <view class="metric-item">
+            <text class="metric-label">连续</text>
+            <text class="metric-value">{{item.streak}}天</text>
+          </view>
+          <view class="metric-item">
+            <text class="metric-label">总计</text>
+            <text class="metric-value">{{item.totalDays}}天</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成就徽章 -->
+  <view class="achievement-section">
+    <view class="section-header">
+      <text class="section-title">🏆 成就徽章</text>
+      <text class="section-hint">已获得 {{unlockedBadges}}/{{totalBadges}} 个</text>
+    </view>
+    <view class="badge-grid">
+      <view
+        class="badge-item {{item.unlocked ? 'unlocked' : 'locked'}}"
+        wx:for="{{badges}}"
+        wx:key="id"
+        bindtap="handleBadgeTap"
+        data-badge="{{item}}"
+      >
+        <view class="badge-icon">{{item.icon}}</view>
+        <text class="badge-name">{{item.name}}</text>
+        <text class="badge-desc" wx:if="{{item.unlocked}}">{{item.unlockedDate}}</text>
+        <text class="badge-desc" wx:else>{{item.requirement}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录入口 -->
+  <view class="history-entry" bindtap="navigateToHistory">
+    <view class="entry-left">
+      <text class="entry-icon">📅</text>
+      <text class="entry-text">查看完整历史记录</text>
+    </view>
+    <text class="entry-arrow">›</text>
+  </view>
+</view>
+
+<!-- 徽章详情弹窗 -->
+<view class="modal-mask" wx:if="{{showBadgeDetail}}" bindtap="closeBadgeDetail"></view>
+<view class="badge-modal" wx:if="{{showBadgeDetail}}">
+  <view class="badge-modal-icon">{{selectedBadge.icon}}</view>
+  <text class="badge-modal-name">{{selectedBadge.name}}</text>
+  <text class="badge-modal-desc">{{selectedBadge.description}}</text>
+  <text class="badge-modal-requirement">获得条件：{{selectedBadge.requirement}}</text>
+  <text class="badge-modal-date" wx:if="{{selectedBadge.unlocked}}">
+    获得时间：{{selectedBadge.unlockedDate}}
+  </text>
+  <button class="btn-primary btn-block mt-4" bindtap="closeBadgeDetail">知道了</button>
+</view>

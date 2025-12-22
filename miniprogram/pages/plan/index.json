@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "我的计划",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#f7f8fa",
+  "usingComponents": {
+    "app-image": "/components/app-image/index"
+  }
+}

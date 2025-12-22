@@ -1,0 +1,155 @@
+<!--index.wxml-->
+<view class="page-container">
+  <!-- 小教练区域 -->
+  <view class="coach-section">
+    <app-image class="coach-avatar" src="/assets/images/coach-happy.png" size="120" radius="9999" fallbackText="🤖" />
+    <view class="coach-bubble">
+      <text class="coach-message">{{coachMessage}}</text>
+    </view>
+  </view>
+
+  <!-- 今日概览卡片 -->
+  <view class="overview-card card">
+    <view class="overview-header">
+      <text class="overview-title">今日概览</text>
+      <text class="overview-date">{{currentDate}}</text>
+    </view>
+
+    <view class="overview-stats">
+      <view class="stat-item">
+        <text class="stat-value text-number-md text-success">{{completedTasks}}</text>
+        <text class="stat-label">已完成</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value text-number-md">{{totalTasks}}</text>
+        <text class="stat-label">总任务</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item">
+        <text class="stat-value text-number-md text-warning">{{streakDays}}</text>
+        <text class="stat-label">连续天数</text>
+      </view>
+    </view>
+
+    <!-- 进度条 -->
+    <view class="progress-section">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width: {{progressPercent}}%"></view>
+      </view>
+      <text class="progress-text">完成度 {{progressPercent}}%</text>
+    </view>
+  </view>
+
+  <!-- 任务列表 -->
+  <view class="task-list">
+    <block wx:for="{{dimensions}}" wx:key="category">
+      <view class="task-card" data-category="{{item.category}}">
+        <!-- 卡片头部 -->
+        <view class="task-card-header" bindtap="toggleCard" data-index="{{index}}">
+          <view class="task-card-left">
+            <view class="task-icon {{item.categoryClass}}">{{item.icon}}</view>
+            <text class="task-title">{{item.name}}</text>
+          </view>
+          <view class="task-card-right">
+            <text class="task-status">{{item.completedCount}}/{{item.totalCount}}</text>
+            <app-icon class="icon-arrow {{item.expanded ? 'expanded' : ''}}" type="arrow-down" size="20" />
+          </view>
+        </view>
+
+        <!-- 卡片内容 -->
+        <view class="task-card-body" wx:if="{{item.expanded}}">
+          <block wx:for="{{item.tasks}}" wx:for-item="task" wx:key="id">
+            <view class="task-item">
+              <view class="task-item-left">
+                <text class="task-item-title">{{task.title}}</text>
+                <text class="task-item-desc">目标: {{task.targetText}}</text>
+              </view>
+              <view class="task-item-right">
+                <view
+                  wx:if="{{!task.completed}}"
+                  class="checkin-btn"
+                  bindtap="handleCheckin"
+                  data-task-id="{{task.id}}"
+                  data-task-title="{{task.title}}"
+                  data-task-type="{{task.type}}"
+                  data-task-unit="{{task.unit}}"
+                  data-task-target-value="{{task.targetValue}}">
+                  打卡
+                </view>
+                <view wx:else class="task-completed">
+                  <app-icon class="icon-check" type="check" size="32" />
+                  <text class="completed-text">已完成</text>
+                </view>
+              </view>
+            </view>
+          </block>
+
+          <!-- 空状态 -->
+          <view wx:if="{{item.tasks.length === 0}}" class="empty-tasks">
+            <text class="empty-text">暂无任务，去创建计划吧~</text>
+          </view>
+        </view>
+      </view>
+    </block>
+  </view>
+
+  <!-- 无任务空状态 -->
+  <view wx:if="{{dimensions.length === 0}}" class="empty-state">
+    <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📝" />
+    <text class="empty-text">还没有创建计划哦</text>
+    <button class="btn-primary mt-md" bindtap="goToPlan">创建计划</button>
+  </view>
+
+  <!-- 查看数据按钮 -->
+  <view wx:if="{{totalTasks > 0}}" class="bottom-action">
+    <button class="btn-secondary" bindtap="goToStatistics">查看数据统计</button>
+  </view>
+</view>
+
+<!-- 打卡弹窗 -->
+<view wx:if="{{showCheckinModal}}" class="modal-mask" bindtap="closeCheckinModal"></view>
+<view wx:if="{{showCheckinModal}}" class="modal-bottom">
+  <view class="modal-header">
+    <text class="modal-title">打卡：{{currentTask.title}}</text>
+    <button class="btn-close" bindtap="closeCheckinModal">×</button>
+  </view>
+
+  <view class="modal-body">
+    <!-- 数值输入 -->
+    <view wx:if="{{currentTask.type !== 'boolean'}}" class="input-group">
+      <text class="input-label">完成情况</text>
+      <input
+        class="input-base"
+        type="number"
+        placeholder="请输入{{currentTask.unit}}"
+        value="{{checkinValue}}"
+        bindinput="onCheckinValueInput"/>
+    </view>
+
+    <!-- 备注输入 -->
+    <view class="input-group">
+      <text class="input-label">备注（选填）</text>
+      <textarea
+        class="textarea-base"
+        placeholder="记录一下今天的感受..."
+        maxlength="200"
+        value="{{checkinRemark}}"
+        bindinput="onCheckinRemarkInput">
+      </textarea>
+    </view>
+  </view>
+
+  <view class="modal-footer">
+    <button class="btn-secondary modal-btn" bindtap="closeCheckinModal">取消</button>
+    <button class="btn-primary modal-btn" bindtap="confirmCheckin">保存</button>
+  </view>
+</view>
+
+<!-- 打卡成功反馈 -->
+<view wx:if="{{showSuccessFeedback}}" class="success-feedback">
+  <app-image class="coach-avatar-large" src="/assets/images/coach-happy.png" size="160" radius="24" fallbackText="🎉" />
+  <view class="bubble">
+    <text>{{successMessage}}</text>
+  </view>
+</view>

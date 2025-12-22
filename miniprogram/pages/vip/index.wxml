@@ -1,0 +1,114 @@
+<!--pages/vip/index.wxml-->
+<!-- 会员中心页 - VIP权益和购买 -->
+
+<view class="container">
+  <!-- 会员状态卡片 -->
+  <view class="vip-status-card {{memberStatus.isVip ? 'vip-active' : ''}}">
+    <view class="status-header">
+      <view class="status-left">
+        <text class="status-icon">{{memberStatus.isVip ? '👑' : '💎'}}</text>
+        <view class="status-info">
+          <text class="status-title">{{memberStatus.isVip ? 'VIP会员' : '开通VIP'}}</text>
+          <text class="status-desc" wx:if="{{memberStatus.isVip}}">
+            有效期至 {{memberStatus.expireDate}}
+          </text>
+          <text class="status-desc" wx:else>解锁全部功能，享受专属服务</text>
+        </view>
+      </view>
+      <button
+        class="btn-renew {{memberStatus.isVip ? 'btn-secondary-small' : 'btn-primary-small'}}"
+        bindtap="handlePurchase"
+      >
+        {{memberStatus.isVip ? '续费' : '开通'}}
+      </button>
+    </view>
+  </view>
+
+  <!-- 会员权益 -->
+  <view class="benefits-section">
+    <text class="section-title">会员权益</text>
+    <view class="benefits-grid">
+      <view class="benefit-item" wx:for="{{benefits}}" wx:key="id">
+        <text class="benefit-icon">{{item.icon}}</text>
+        <text class="benefit-name">{{item.name}}</text>
+        <text class="benefit-desc">{{item.description}}</text>
+        <view class="benefit-badge" wx:if="{{!memberStatus.isVip}}">
+          <text class="badge-text">VIP</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 套餐选择 -->
+  <view class="plans-section">
+    <text class="section-title">选择套餐</text>
+    <view class="plans-list">
+      <view
+        class="plan-card {{selectedPlan === item.id ? 'selected' : ''}}"
+        wx:for="{{plans}}"
+        wx:key="id"
+        bindtap="handleSelectPlan"
+        data-id="{{item.id}}"
+      >
+        <view class="plan-tag" wx:if="{{item.recommended}}">推荐</view>
+        <view class="plan-header">
+          <text class="plan-duration">{{item.duration}}</text>
+          <view class="plan-pricing">
+            <text class="plan-price">¥{{item.price}}</text>
+            <text class="plan-original" wx:if="{{item.originalPrice}}">¥{{item.originalPrice}}</text>
+          </view>
+        </view>
+        <view class="plan-features">
+          <text class="feature-item" wx:for="{{item.features}}" wx:for-item="feature" wx:key="index">
+            ✓ {{feature}}
+          </text>
+        </view>
+        <text class="plan-daily">约 ¥{{item.dailyPrice}}/天</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 购买按钮 -->
+  <view class="purchase-section" wx:if="{{!memberStatus.isVip}}">
+    <view class="purchase-info">
+      <view class="purchase-price">
+        <text class="price-label">支付金额</text>
+        <text class="price-value">¥{{currentPlanPrice}}</text>
+      </view>
+      <button class="btn-purchase" bindtap="handleConfirmPurchase">
+        立即开通
+      </button>
+    </view>
+    <view class="purchase-terms">
+      <checkbox-group bindchange="handleAgreeChange">
+        <label class="terms-label">
+          <checkbox checked="{{agreedTerms}}" color="#07C160" />
+          <text class="terms-text">我已阅读并同意</text>
+          <text class="terms-link" bindtap="viewTerms">《会员服务协议》</text>
+        </label>
+      </checkbox-group>
+    </view>
+  </view>
+
+  <!-- 常见问题 -->
+  <view class="faq-section">
+    <text class="section-title">常见问题</text>
+    <view class="faq-list">
+      <view
+        class="faq-item"
+        wx:for="{{faqs}}"
+        wx:key="id"
+        bindtap="toggleFaq"
+        data-id="{{item.id}}"
+      >
+        <view class="faq-question">
+          <text class="question-text">{{item.question}}</text>
+          <text class="question-icon {{item.expanded ? 'expanded' : ''}}">›</text>
+        </view>
+        <view class="faq-answer" wx:if="{{item.expanded}}">
+          <text class="answer-text">{{item.answer}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
