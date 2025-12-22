@@ -1,0 +1,145 @@
+/* components/empty-state/index.wxss */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 64rpx;
+  min-height: 500rpx;
+}
+
+/* 插画区域 */
+.empty-illustration {
+  position: relative;
+  margin-bottom: 48rpx;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20rpx);
+  }
+}
+
+.empty-emoji {
+  font-size: 160rpx;
+  line-height: 1;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+/* 装饰圆圈 */
+.empty-decoration {
+  position: absolute;
+  inset: -40rpx;
+  z-index: 1;
+}
+
+.decoration-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(79, 209, 197, 0.1), rgba(79, 209, 197, 0.05));
+  animation: pulse-circle 2s ease-in-out infinite;
+}
+
+.circle-1 {
+  width: 120rpx;
+  height: 120rpx;
+  top: 0;
+  left: 0;
+  animation-delay: 0s;
+}
+
+.circle-2 {
+  width: 80rpx;
+  height: 80rpx;
+  bottom: 0;
+  right: 0;
+  animation-delay: 0.5s;
+}
+
+.circle-3 {
+  width: 60rpx;
+  height: 60rpx;
+  top: 50%;
+  right: -20rpx;
+  animation-delay: 1s;
+}
+
+@keyframes pulse-circle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.1;
+  }
+}
+
+/* 文案区域 */
+.empty-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 48rpx;
+}
+
+.empty-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2D3748;
+  text-align: center;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #718096;
+  text-align: center;
+  line-height: 1.6;
+  max-width: 500rpx;
+}
+
+/* 操作按钮 */
+.empty-action {
+  background: linear-gradient(135deg, #4FD1C5, #38B2AC);
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 600;
+  border: none;
+  border-radius: 48rpx;
+  padding: 24rpx 64rpx;
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.3);
+  transition: all 0.3s;
+}
+
+.empty-action::after {
+  border: none;
+}
+
+.empty-action-hover {
+  transform: translateY(-4rpx);
+  box-shadow: 0 12rpx 32rpx rgba(79, 209, 197, 0.4);
+}
+
+/* 淡入动画 */
+.empty-state {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(40rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

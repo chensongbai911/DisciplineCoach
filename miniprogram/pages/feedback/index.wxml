@@ -35,15 +35,16 @@
 
   <!-- 反馈内容 -->
   <view class="content-section">
-    <text class="section-label">详细描述 <text class="required">*</text></text>
-    <textarea
-      class="textarea-input"
+    <form-input
+      type="textarea"
+      name="content"
+      label="详细描述"
       placeholder="请详细描述您遇到的问题或建议（至少10个字）"
       value="{{content}}"
-      bindinput="handleContentInput"
-      maxlength="500"
+      maxlength="{{500}}"
+      rules="{{contentRules}}"
+      bind:input="handleContentChange"
     />
-    <text class="char-count">{{content.length}}/500</text>
   </view>
 
   <!-- 图片上传 -->
@@ -64,13 +65,14 @@
 
   <!-- 联系方式 -->
   <view class="contact-section">
-    <text class="section-label">联系方式（选填）</text>
-    <input
-      class="input-field"
+    <form-input
+      type="text"
+      name="contact"
+      label="联系方式（选填）"
       placeholder="留下您的微信号或手机号，方便我们联系您"
       value="{{contact}}"
-      bindinput="handleContactInput"
-      maxlength="50"
+      maxlength="{{50}}"
+      bind:input="handleContactChange"
     />
   </view>
 

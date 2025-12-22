@@ -58,9 +58,11 @@
       chart-data="{{trendChartData}}"
       height="400"
     />
-    <view class="empty-hint" wx:else>
-      <text>暂无趋势数据</text>
-    </view>
+    <empty-state
+      wx:else
+      type="no-statistics"
+      show-action="{{false}}"
+    />
   </view>
 
   <!-- 完成率环形图 -->
@@ -87,9 +89,11 @@
       chart-data="{{dimensionChartData}}"
       height="400"
     />
-    <view class="empty-hint" wx:else>
-      <text>暂无维度数据</text>
-    </view>
+    <empty-state
+      wx:else
+      type="no-statistics"
+      show-action="{{false}}"
+    />
   </view>
 
   <!-- 维度详情列表 -->

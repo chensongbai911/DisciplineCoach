@@ -64,11 +64,11 @@
     </view>
 
     <!-- 空状态 -->
-    <view class="empty-state" wx:if="{{!loading && achievements.length === 0}}">
-      <text class="empty-icon">🎯</text>
-      <text class="empty-text">暂无成就数据</text>
-      <text class="empty-hint">开始打卡解锁成就吧！</text>
-    </view>
+    <empty-state
+      wx:if="{{!loading && achievements.length === 0}}"
+      type="no-achievement"
+      bind:action="handleEmptyAction"
+    />
 
     <!-- 加载中 -->
     <view class="loading-state" wx:if="{{loading}}">

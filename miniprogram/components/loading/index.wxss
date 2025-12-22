@@ -1,0 +1,212 @@
+/* components/loading/index.wxss */
+
+.custom-loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* 遮罩 */
+.loading-mask {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4rpx);
+}
+
+/* 加载内容容器 */
+.loading-content {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 24rpx;
+  padding: 48rpx 64rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 300rpx;
+}
+
+/* 正常加载 */
+.loading-normal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32rpx;
+}
+
+/* 小教练动画 */
+.loading-coach {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.coach-avatar {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #4FD1C5, #38B2AC);
+  border-radius: 50%;
+  animation: bounce 1.5s ease-in-out infinite;
+  box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.4);
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20rpx) scale(1.05);
+  }
+}
+
+.coach-emoji {
+  font-size: 56rpx;
+  line-height: 1;
+  animation: wave 2s ease-in-out infinite;
+}
+
+@keyframes wave {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-15deg);
+  }
+  75% {
+    transform: rotate(15deg);
+  }
+}
+
+/* 脉冲圆环 */
+.coach-pulse {
+  position: absolute;
+  inset: -12rpx;
+  border: 4rpx solid #4FD1C5;
+  border-radius: 50%;
+  opacity: 0;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* 加载文案 */
+.loading-text-wrapper {
+  display: flex;
+  align-items: baseline;
+  gap: 4rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2D3748;
+}
+
+.loading-dots {
+  font-size: 28rpx;
+  color: #4FD1C5;
+  min-width: 40rpx;
+  text-align: left;
+}
+
+/* 超时提示 */
+.loading-timeout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.timeout-icon {
+  font-size: 80rpx;
+  line-height: 1;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-10rpx);
+  }
+  75% {
+    transform: translateX(10rpx);
+  }
+}
+
+.timeout-title {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2D3748;
+}
+
+.timeout-desc {
+  font-size: 26rpx;
+  color: #718096;
+  text-align: center;
+  line-height: 1.5;
+}
+
+.timeout-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 16rpx;
+}
+
+.btn-retry,
+.btn-cancel {
+  padding: 20rpx 48rpx;
+  font-size: 28rpx;
+  border-radius: 48rpx;
+  border: none;
+}
+
+.btn-retry {
+  background: linear-gradient(135deg, #4FD1C5, #38B2AC);
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+.btn-retry::after {
+  border: none;
+}
+
+.btn-cancel {
+  background: #F7FAFC;
+  color: #718096;
+}
+
+.btn-cancel::after {
+  border: none;
+}
+
+/* 无遮罩模式 */
+.custom-loading:not(.with-mask) .loading-content {
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}

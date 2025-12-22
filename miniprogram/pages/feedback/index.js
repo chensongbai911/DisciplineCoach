@@ -28,7 +28,15 @@ Page({
     content: '',
     images: [],
     contact: '',
-    historyList: []
+    historyList: [],
+
+    // 验证规则
+    contentRules: {
+      required: true,
+      minLength: 10,
+      maxLength: 500,
+      label: '反馈内容'
+    }
   },
 
   onLoad () {
@@ -69,14 +77,14 @@ Page({
   /**
    * 输入反馈内容
    */
-  handleContentInput (e) {
+  handleContentChange (e) {
     this.setData({ content: e.detail.value });
   },
 
   /**
    * 输入联系方式
    */
-  handleContactInput (e) {
+  handleContactChange (e) {
     this.setData({ contact: e.detail.value });
   },
 

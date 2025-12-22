@@ -171,12 +171,148 @@ function validateFeedback (content) {
   return { valid: true }
 }
 
+/**
+ * 通用字段验证器
+ * @param {string} field 字段名
+ * @param {*} value 字段值
+ * @param {object} rules 验证规则
+ * @returns {object} {valid, message}
+ */
+function validateField (field, value, rules = {}) {
+  // 必填验证
+  if (rules.required) {
+    if (isEmpty(value)) {
+      return {
+        valid: false,
+        message: rules.requiredMessage || `${rules.label || field}为必填项`
+      }
+    }
+  }
+
+  // 如果值为空且非必填，通过验证
+  if (isEmpty(value) && !rules.required) {
+    return { valid: true }
+  }
+
+  // 类型验证
+  if (rules.type) {
+    switch (rules.type) {
+      case 'number':
+        if (isNaN(Number(value))) {
+          return { valid: false, message: `${rules.label || field}必须是数字` }
+        }
+        break
+      case 'integer':
+        if (!Number.isInteger(Number(value))) {
+          return { valid: false, message: `${rules.label || field}必须是整数` }
+        }
+        break
+      case 'phone':
+        if (!isValidPhone(value)) {
+          return { valid: false, message: '请输入正确的手机号' }
+        }
+        break
+      case 'email':
+        if (!isValidEmail(value)) {
+          return { valid: false, message: '请输入正确的邮箱' }
+        }
+        break
+    }
+  }
+
+  // 长度验证
+  if (rules.minLength && String(value).length < rules.minLength) {
+    return {
+      valid: false,
+      message: `${rules.label || field}至少${rules.minLength}个字符`
+    }
+  }
+
+  if (rules.maxLength && String(value).length > rules.maxLength) {
+    return {
+      valid: false,
+      message: `${rules.label || field}不能超过${rules.maxLength}个字符`
+    }
+  }
+
+  // 数值范围验证
+  if (rules.min !== undefined) {
+    const num = Number(value)
+    if (num < rules.min) {
+      return {
+        valid: false,
+        message: `${rules.label || field}不能小于${rules.min}`
+      }
+    }
+  }
+
+  if (rules.max !== undefined) {
+    const num = Number(value)
+    if (num > rules.max) {
+      return {
+        valid: false,
+        message: `${rules.label || field}不能大于${rules.max}`
+      }
+    }
+  }
+
+  // 正则验证
+  if (rules.pattern) {
+    const regex = new RegExp(rules.pattern)
+    if (!regex.test(value)) {
+      return {
+        valid: false,
+        message: rules.patternMessage || `${rules.label || field}格式不正确`
+      }
+    }
+  }
+
+  // 自定义验证函数
+  if (rules.validator && typeof rules.validator === 'function') {
+    const result = rules.validator(value)
+    if (result !== true) {
+      return {
+        valid: false,
+        message: typeof result === 'string' ? result : `${rules.label || field}验证失败`
+      }
+    }
+  }
+
+  return { valid: true }
+}
+
+/**
+ * 批量验证多个字段
+ * @param {object} data 数据对象
+ * @param {object} rulesMap 规则映射 {field: rules}
+ * @returns {object} {valid, errors}
+ */
+function validateForm (data, rulesMap) {
+  const errors = {}
+  let isValid = true
+
+  for (const field in rulesMap) {
+    const value = data[field]
+    const rules = rulesMap[field]
+    const result = validateField(field, value, rules)
+
+    if (!result.valid) {
+      errors[field] = result.message
+      isValid = false
+    }
+  }
+
+  return { valid: isValid, errors }
+}
+
 module.exports = {
   isEmpty,
   isValidPhone,
   isValidEmail,
   isInRange,
   isPositiveInteger,
+  validateField,
+  validateForm,
   validatePlanData,
   validateRecordData,
   validateFeedback

@@ -171,8 +171,8 @@ function generateCheckinPoster (data) {
 
         // 5. 绘制主标题
         ctx.setFillStyle('#4FD1C5');
-        ctx.setFontSize(80);
-        ctx.setFontWeight('bold');
+        ctx.font = 'bold 80px sans-serif';
+        ctx.setTextAlign('center');
         ctx.fillText(`${completedCount}/${totalCount}`, width / 2, padding * 8);
 
         // 6. 绘制副标题
@@ -271,8 +271,7 @@ function generateStreakPoster (data) {
 
       // 主标题区域
       ctx.setFillStyle('#ffffff');
-      ctx.setFontSize(120);
-      ctx.setFontWeight('bold');
+      ctx.font = 'bold 120px sans-serif';
       ctx.setTextAlign('center');
       ctx.fillText(`${streakDays}`, width / 2, height / 3);
 
@@ -334,8 +333,8 @@ function generateAchievementPoster (data) {
 
       // 成就名称
       ctx.setFillStyle('#ffffff');
-      ctx.setFontSize(64);
-      ctx.setFontWeight('bold');
+      ctx.font = 'bold 64px sans-serif';
+      ctx.setTextAlign('center');
       ctx.fillText(achievementName, width / 2, height / 2);
 
       // 描述

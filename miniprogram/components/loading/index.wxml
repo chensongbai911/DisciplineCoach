@@ -1,0 +1,36 @@
+<!-- components/loading/index.wxml -->
+<view class="custom-loading {{mask ? 'with-mask' : ''}}" wx:if="{{show}}">
+  <!-- 遮罩 -->
+  <view class="loading-mask" wx:if="{{mask}}" />
+
+  <!-- 加载内容 -->
+  <view class="loading-content">
+    <!-- 正常加载 -->
+    <view class="loading-normal" wx:if="{{!isTimeout}}">
+      <!-- 小教练动画 -->
+      <view class="loading-coach">
+        <view class="coach-avatar">
+          <text class="coach-emoji">🤖</text>
+          <view class="coach-pulse"></view>
+        </view>
+      </view>
+
+      <!-- 加载文案 -->
+      <view class="loading-text-wrapper">
+        <text class="loading-text">{{loadingText}}</text>
+        <text class="loading-dots">{{dots}}</text>
+      </view>
+    </view>
+
+    <!-- 超时提示 -->
+    <view class="loading-timeout" wx:else>
+      <text class="timeout-icon">⏱️</text>
+      <text class="timeout-title">加载超时</text>
+      <text class="timeout-desc">请检查网络连接后重试</text>
+      <view class="timeout-actions">
+        <button class="btn-retry" bindtap="handleRetry">重试</button>
+        <button class="btn-cancel" bindtap="handleCancel">取消</button>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,28 @@
+<!-- components/empty-state/index.wxml -->
+<view class="empty-state" wx:if="{{show}}">
+  <!-- 插画区域 -->
+  <view class="empty-illustration">
+    <text class="empty-emoji">{{emoji}}</text>
+    <view class="empty-decoration">
+      <view class="decoration-circle circle-1"></view>
+      <view class="decoration-circle circle-2"></view>
+      <view class="decoration-circle circle-3"></view>
+    </view>
+  </view>
+
+  <!-- 文案区域 -->
+  <view class="empty-content">
+    <text class="empty-title">{{title}}</text>
+    <text class="empty-desc">{{desc}}</text>
+  </view>
+
+  <!-- 操作按钮 -->
+  <button
+    wx:if="{{showAction}}"
+    class="empty-action"
+    bindtap="handleAction"
+    hover-class="empty-action-hover"
+  >
+    {{actionText}}
+  </button>
+</view>

@@ -6,6 +6,7 @@
     "chart-line": "../../components/chart-line/index",
     "chart-bar": "../../components/chart-bar/index",
     "chart-ring": "../../components/chart-ring/index",
-    "share-poster": "../../components/share-poster/index"
+    "share-poster": "../../components/share-poster/index",
+    "empty-state": "../../components/empty-state/index"
   }
 }

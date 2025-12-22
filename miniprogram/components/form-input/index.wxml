@@ -1,0 +1,58 @@
+<!-- components/form-input/index.wxml -->
+<view class="form-input {{validateStatus ? 'has-status' : ''}} {{validateStatus}}">
+  <!-- 标签 -->
+  <view class="input-label" wx:if="{{label}}">
+    <text class="label-text">{{label}}</text>
+    <text class="label-required" wx:if="{{rules.required}}">*</text>
+  </view>
+
+  <!-- 输入框 -->
+  <view class="input-wrapper">
+    <!-- 普通输入框 -->
+    <input
+      wx:if="{{type !== 'textarea'}}"
+      class="input-control"
+      type="{{type}}"
+      value="{{value}}"
+      placeholder="{{placeholder}}"
+      disabled="{{disabled}}"
+      maxlength="{{maxlength}}"
+      bindinput="handleInput"
+      bindblur="handleBlur"
+      bindfocus="handleFocus"
+    />
+
+    <!-- 多行文本框 -->
+    <textarea
+      wx:else
+      class="textarea-control"
+      value="{{value}}"
+      placeholder="{{placeholder}}"
+      disabled="{{disabled}}"
+      maxlength="{{maxlength}}"
+      auto-height="{{true}}"
+      bindinput="handleInput"
+      bindblur="handleBlur"
+      bindfocus="handleFocus"
+    />
+
+    <!-- 验证状态图标 -->
+    <view class="status-icon" wx:if="{{validateStatus}}">
+      <text wx:if="{{validateStatus === 'validating'}}" class="icon-loading">⏳</text>
+      <text wx:if="{{validateStatus === 'success'}}" class="icon-success">✓</text>
+      <text wx:if="{{validateStatus === 'error'}}" class="icon-error">✕</text>
+    </view>
+  </view>
+
+  <!-- 字数统计 -->
+  <view class="input-count" wx:if="{{showCount}}">
+    <text class="count-text {{currentLength >= maxlength ? 'count-limit' : ''}}">
+      {{currentLength}}/{{maxlength}}
+    </text>
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-message" wx:if="{{validateStatus === 'error' && errorMessage}}">
+    <text class="error-text">{{errorMessage}}</text>
+  </view>
+</view>

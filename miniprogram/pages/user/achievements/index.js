@@ -128,6 +128,17 @@ Page({
   },
 
   /**
+   * 处理空状态操作
+   */
+  handleEmptyAction (e) {
+    const { type } = e.detail;
+    if (type === 'viewAchievements') {
+      // 跳转到首页开始打卡
+      wx.switchTab({ url: '/pages/index/index' });
+    }
+  },
+
+  /**
    * 下拉刷新
    */
   onPullDownRefresh () {

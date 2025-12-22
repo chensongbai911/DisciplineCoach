@@ -18,9 +18,34 @@ function showToast (title, icon = 'none', duration = 2000) {
 
 /**
  * 显示加载中
- * @param {string} title - 加载提示文本
+ * @param {string|object} options - 加载提示文本或配置对象
+ * 支持格式:
+ * 1. showLoading('加载中...')
+ * 2. showLoading({ type: 'saving', text: '保存中...' })
  */
-function showLoading (title = '加载中...') {
+function showLoading (options = '加载中...') {
+  // 场景化文案映射
+  const LOADING_TEXTS = {
+    'default': '加载中...',
+    'login': '登录中...',
+    'saving': '保存中...',
+    'uploading': '上传中...',
+    'deleting': '删除中...',
+    'submitting': '提交中...',
+    'loading-data': '加载数据中...',
+    'syncing': '同步中...',
+    'processing': '处理中...',
+    'generating': '生成中...'
+  };
+
+  let title = '加载中...';
+
+  if (typeof options === 'string') {
+    title = options;
+  } else if (typeof options === 'object') {
+    title = options.text || LOADING_TEXTS[options.type] || LOADING_TEXTS['default'];
+  }
+
   wx.showLoading({
     title,
     mask: true
