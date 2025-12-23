@@ -4,7 +4,7 @@
 <view class="container">
   <!-- 头部提示 -->
   <view class="tip-card">
-    <app-image class="tip-icon" src="/assets/images/coach-happy.png" size="80" radius="9999" fallbackText="🤖" />
+    <app-image class="tip-icon" src="/assets/images/coach-happy.webp" size="80" radius="9999" fallbackText="🤖" />
     <view class="tip-content">
       <text class="tip-text">合理设定目标，逐步养成好习惯</text>
       <text class="tip-sub">建议从1-2个维度开始</text>
@@ -79,6 +79,43 @@
   <!-- 底部统计 -->
   <view class="bottom-stats">
     <text class="stats-text">已开启 {{enabledCount}} 个维度 · 共 {{totalTasks}} 个任务</text>
+  </view>
+
+  <!-- 快速添加按钮 - 当有已开启的维度时显示 -->
+  <view class="quick-add-container" wx:if="{{enabledCount > 0}}">
+    <button class="btn-add-task" bindtap="showDimensionPicker">
+      <text class="btn-icon">🔹</text>
+      <text class="btn-text">添加任务</text>
+    </button>
+  </view>
+
+  <!-- 维度选择器 -->
+  <view class="dimension-picker-mask" wx:if="{{showPicker}}" bindtap="hideDimensionPicker">
+    <view class="dimension-picker" catchtap="stopPropagation">
+      <view class="picker-header">
+        <text class="picker-title">选择维度</text>
+        <text class="picker-close" bindtap="hideDimensionPicker">✕</text>
+      </view>
+      <view class="picker-list">
+        <view
+          class="picker-item {{!item.enabled ? 'disabled' : ''}}"
+          wx:for="{{dimensions}}"
+          wx:key="id"
+          data-category="{{item.category}}"
+          bindtap="handlePickerSelect"
+        >
+          <view class="picker-item-icon" style="background: {{item.color}}20;">
+            <text style="color: {{item.color}};">{{item.icon}}</text>
+          </view>
+          <view class="picker-item-info">
+            <text class="picker-item-name">{{item.name}}</text>
+            <text class="picker-item-count">{{item.tasks.length}} 个任务</text>
+          </view>
+          <text class="picker-item-arrow" wx:if="{{item.enabled}}">›</text>
+          <text class="picker-item-tip" wx:else>未开启</text>
+        </view>
+      </view>
+    </view>
   </view>
 
   <!-- 快速入门提示 -->

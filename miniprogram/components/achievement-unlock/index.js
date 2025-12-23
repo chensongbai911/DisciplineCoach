@@ -50,8 +50,13 @@ Component({
         return;
       }
 
-      // 重度震动反馈
+      // 重度震动反馈 + 成功双震组合
       vibrate.heavy();
+      setTimeout(() => {
+        try {
+          vibrate.success();
+        } catch (e) { }
+      }, 150);
 
       // 设置动画状态
       this.setData({

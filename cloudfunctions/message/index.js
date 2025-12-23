@@ -22,6 +22,8 @@ exports.main = async (event, context) => {
         return await sendDailyReminder(event, wxContext)
       case 'sendStreakCongrats':
         return await sendStreakCongrats(event, wxContext)
+      case 'sendWeeklySummary':
+        return await sendWeeklySummary(event, wxContext)
       case 'sendVipExpireNotice':
         return await sendVipExpireNotice(event, wxContext)
       case 'getCoachMessage':
@@ -42,6 +44,52 @@ exports.main = async (event, context) => {
     }
   }
 }
+/**
+ * 发送周总结
+ */
+async function sendWeeklySummary (event, wxContext) {
+  const openid = wxContext.OPENID
+
+  try {
+    const today = new Date()
+    const sevenDaysAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+    const startDate = formatDate(sevenDaysAgo)
+    const endDate = formatDate(today)
+
+    // 获取近7天记录
+    const recordsRes = await db.collection('records').where({
+      _openid: openid,
+      date: _.gte(startDate).and(_.lte(endDate))
+    }).get()
+
+    const records = recordsRes.data || []
+    const total = records.length
+    const completed = records.filter(r => r.isCompleted).length
+    const rate = total > 0 ? Math.round((completed / total) * 100) : 0
+
+    // 发送订阅消息
+    await cloud.openapi.subscribeMessage.send({
+      touser: openid,
+      page: 'pages/statistics/index',
+      data: {
+        thing1: { value: '本周总结' },
+        thing2: { value: `本周完成${completed}/${total}，完成率${rate}%` },
+        time3: { value: formatDateTime(new Date()) }
+      },
+      templateId: 'WEEKLY_SUMMARY_TEMPLATE_ID',
+      miniprogramState: 'formal'
+    })
+
+    return {
+      success: true,
+      data: { total, completed, rate, sentTime: new Date() }
+    }
+  } catch (err) {
+    console.error('[sendWeeklySummary] 发送周总结失败', err)
+    return { success: false, errMsg: '发送周总结失败' }
+  }
+}
+
 
 /**
  * 发送每日打卡提醒

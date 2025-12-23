@@ -3,6 +3,7 @@
 
 const app = getApp();
 const { showToast, showLoading, hideLoading } = require('../../utils/common');
+const { generateReportPoster, saveImageToAlbum } = require('../../utils/poster');
 
 Page({
   data: {
@@ -12,7 +13,8 @@ Page({
     dateRange: '',
     summary: {},
     charts: [],
-    achievements: []
+    achievements: [],
+    posterPath: '' // 生成的海报路径
   },
 
   onLoad (options) {
@@ -41,9 +43,51 @@ Page({
   /**
    * 保存为图片
    */
-  handleSaveImage () {
-    showToast('功能开发中');
-    // TODO: 实现Canvas绘制并保存
+  async handleSaveImage () {
+    showLoading('生成海报中...');
+
+    try {
+      // 生成海报
+      const posterPath = await generateReportPoster({
+        title: this.data.title,
+        dateRange: this.data.dateRange,
+        summary: this.data.summary,
+        reportType: this.data.reportType
+      }, this);
+
+      this.setData({ posterPath });
+      hideLoading();
+
+      // 保存到相册
+      showLoading('保存中...');
+      await saveImageToAlbum(posterPath);
+      hideLoading();
+
+      wx.showModal({
+        title: '保存成功',
+        content: '海报已保存到相册,快去分享吧!',
+        showCancel: false
+      });
+
+    } catch (error) {
+      hideLoading();
+      console.error('保存图片失败:', error);
+
+      if (error.errMsg && error.errMsg.includes('auth deny')) {
+        wx.showModal({
+          title: '需要相册权限',
+          content: '请在设置中开启相册权限',
+          confirmText: '去设置',
+          success: (res) => {
+            if (res.confirm) {
+              wx.openSetting();
+            }
+          }
+        });
+      } else {
+        showToast(error.message || '保存失败,请重试');
+      }
+    }
   },
 
   /**

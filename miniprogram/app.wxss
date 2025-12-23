@@ -1,8 +1,10 @@
 /* app.wxss - 全局样式 */
 
-/* 引入通用样式 */
+/* 引入颜色系统和通用样式 */
+@import "styles/colors.wxss";
 @import "styles/common.wxss";
 @import "styles/iconfont.wxss";
+@import "styles/interactions.wxss";
 
 /* 页面基础样式 */
 page {

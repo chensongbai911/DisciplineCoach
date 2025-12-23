@@ -30,20 +30,24 @@
 
     <!-- 操作按钮 -->
     <view class="actions" wx:if="{{showPoster}}">
-      <button class="action-btn secondary" bindtap="handleRegenerate">
-        <app-icon name="refresh" size="20" color="#666"></app-icon>
-        <text>重新生成</text>
-      </button>
-
-      <button class="action-btn secondary" bindtap="handleSave">
-        <app-icon name="download" size="20" color="#666"></app-icon>
-        <text>保存相册</text>
-      </button>
-
+      <!-- 主要操作：分享 -->
       <button class="action-btn primary" open-type="share" bindtap="handleShare">
-        <app-icon name="share" size="20" color="#fff"></app-icon>
+        <app-icon name="share" size="22" color="#fff"></app-icon>
         <text>分享好友</text>
       </button>
+
+      <!-- 次要操作 -->
+      <view class="secondary-actions">
+        <button class="action-btn secondary small" bindtap="handleSave">
+          <app-icon name="download" size="20" color="#666"></app-icon>
+          <text>保存相册</text>
+        </button>
+
+        <button class="action-btn secondary small" bindtap="handleRegenerate">
+          <app-icon name="refresh" size="20" color="#666"></app-icon>
+          <text>重新生成</text>
+        </button>
+      </view>
     </view>
 
     <!-- 关闭按钮 -->

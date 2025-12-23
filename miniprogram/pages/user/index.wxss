@@ -293,3 +293,132 @@
 .btn-copy::after {
   border: none;
 }
+
+/* 主题选择弹窗 */
+.theme-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #FFFFFF;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 0 0 env(safe-area-inset-bottom);
+  z-index: 1001;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.theme-list {
+  padding: 16rpx 32rpx 32rpx;
+}
+
+.theme-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+  background: #F7F8FA;
+  border-radius: 16rpx;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.theme-item.active {
+  background: linear-gradient(135deg, #E5F9F7 0%, #D9F0EE 100%);
+  border: 2rpx solid #07C160;
+}
+
+.theme-icon {
+  font-size: 48rpx;
+  margin-right: 20rpx;
+}
+
+.theme-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 8rpx;
+}
+
+.theme-desc {
+  font-size: 24rpx;
+  color: #999999;
+}
+
+.theme-check {
+  font-size: 32rpx;
+  color: #07C160;
+  font-weight: bold;
+  margin-left: 12rpx;
+}
+
+/* 深色模式适配 */
+@media (prefers-color-scheme: dark) {
+  .container {
+    background: var(--color-bg-secondary);
+  }
+
+  .user-card {
+    background: linear-gradient(135deg, #4A5A8A 0%, #5A3F7A 100%);
+  }
+
+  .menu-section,
+  .menu-group {
+    background: var(--color-bg-primary);
+  }
+
+  .menu-item {
+    border-bottom-color: var(--color-border-light);
+  }
+
+  .menu-text,
+  .contact-value {
+    color: var(--color-text-primary);
+  }
+
+  .menu-value,
+  .contact-label {
+    color: var(--color-text-secondary);
+  }
+
+  .theme-modal,
+  .contact-modal {
+    background: var(--color-bg-primary);
+  }
+
+  .theme-item {
+    background: var(--color-bg-secondary);
+  }
+
+  .theme-item.active {
+    background: linear-gradient(135deg, #1E5552 0%, #1A4A47 100%);
+    border-color: #1AC158;
+  }
+
+  .theme-name {
+    color: var(--color-text-primary);
+  }
+
+  .theme-desc {
+    color: var(--color-text-tertiary);
+  }
+
+  .version-text {
+    color: var(--color-text-tertiary);
+  }
+}
+

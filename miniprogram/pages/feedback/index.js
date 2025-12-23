@@ -127,6 +127,9 @@ Page({
    * 删除图片
    */
   handleDeleteImage (e) {
+    // 删除图片警告震动
+    vibrate.warning();
+
     const { index } = e.currentTarget.dataset;
     const images = this.data.images.filter((_, i) => i !== index);
     this.setData({ images });
@@ -136,6 +139,9 @@ Page({
    * 提交反馈
    */
   async handleSubmit () {
+    // 按钮点击轻微震动
+    vibrate.light();
+
     const { feedbackType, content, images, contact } = this.data;
 
     // 验证

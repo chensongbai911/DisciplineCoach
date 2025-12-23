@@ -52,24 +52,14 @@
   padding: 0 32rpx;
 }
 
-/* swipe-action容器样式 */
-.task-list swipe-action {
-  display: block;
-  margin-bottom: 24rpx;
-}
-
 .task-item-card {
   background: #FFFFFF;
   border-radius: 24rpx;
   padding: 32rpx;
+  margin-bottom: 24rpx;
   box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.08);
   transition: all 0.3s;
   position: relative;
-  z-index: 2;
-}
-
-.task-item-card:active {
-  transform: scale(0.98);
 }
 
 .task-item-header {
@@ -102,12 +92,51 @@
 }
 
 .task-item-actions {
-  margin-left: 16rpx;
+  display: flex;
+  gap: 12rpx;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #F7F8FA;
 }
 
-.action-icon {
-  font-size: 36rpx;
-  padding: 8rpx;
+.btn-action {
+  flex: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6rpx !important;
+  height: 48rpx !important;
+  line-height: 48rpx !important;
+  border-radius: 8rpx !important;
+  font-size: 26rpx !important;
+  font-weight: 400 !important;
+  border: none !important;
+  transition: all 0.2s !important;
+  min-width: 88rpx !important;
+  touch-action: manipulation !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+
+.btn-action::after {
+  border: none !important;
+}
+
+.btn-action:active {
+  opacity: 0.6 !important;
+}
+
+.btn-edit {
+  color: #666666 !important;
+}
+
+.btn-delete {
+  color: #FF6B6B !important;
+}
+
+.btn-action .iconfont {
+  font-size: 28rpx !important;
 }
 
 .task-item-body {

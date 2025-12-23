@@ -151,18 +151,20 @@ function generateCheckinPoster (data, component) {
 
     const canvasId = 'shareCanvas';
 
+    console.log('[poster] 开始生成打卡海报', data);
+
     // 验证Canvas是否存在
-    const query = wx.createSelectorQuery();
+    const query = component ? component.createSelectorQuery() : wx.createSelectorQuery();
     query.select(`#${canvasId}`).boundingClientRect();
     query.exec((res) => {
       if (!res || !res[0]) {
-        console.error('Canvas元素不存在');
+        console.error('[poster] Canvas元素不存在', res);
         reject(new Error('Canvas初始化失败，请重试'));
         return;
       }
 
       try {
-        const ctx = createCanvasContext(canvasId);
+        const ctx = wx.createCanvasContext(canvasId, component);
         const { width, height, padding } = POSTER_CONFIG;
 
         // 1. 绘制渐变背景
@@ -183,7 +185,7 @@ function generateCheckinPoster (data, component) {
 
           // 5. 绘制主标题
           ctx.setFillStyle('#4FD1C5');
-          ctx.font = 'bold 80px sans-serif';
+          ctx.setFontSize(80);
           ctx.setTextAlign('center');
           ctx.fillText(`${completedCount}/${totalCount}`, width / 2, padding * 8);
 
@@ -233,6 +235,7 @@ function generateCheckinPoster (data, component) {
               wx.canvasToTempFilePath({
                 canvasId,
                 success: (res) => {
+                  console.log('[poster] 打卡海报生成成功', res.tempFilePath);
                   if (res.tempFilePath) {
                     resolve(res.tempFilePath);
                   } else {
@@ -240,15 +243,15 @@ function generateCheckinPoster (data, component) {
                   }
                 },
                 fail: (err) => {
-                  console.error('canvasToTempFilePath失败:', err);
-                  reject(new Error('图片生成失败，请重试'));
+                  console.error('[poster] canvasToTempFilePath失败:', err);
+                  reject(new Error(`图片生成失败: ${err.errMsg || '请重试'}`));
                 }
-              });
+              }, component);
             }, 1000);
           });
         };
 
-        // 3. 绘制头像 (可选)
+        // 绘制头像
         if (avatarUrl) {
           drawCircleImage(ctx, avatarUrl, width / 2, padding * 4, 80)
             .then(drawContent)
@@ -296,16 +299,23 @@ function generateStreakPoster (data, component) {
       }
 
       try {
-        const ctx = createCanvasContext(canvasId);
+        const ctx = wx.createCanvasContext(canvasId, component);
         const { width, height, padding } = POSTER_CONFIG;
 
+        console.log('[poster] 开始绘制连续打卡海报', { streakDays, totalDays });
+
         // 绘制炫耀风格的连续打卡海报
-        drawGradientBackground(ctx, ['#FFD700', '#FFA500'], width, height);
+        // 渐变背景
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#FFD700');
+        gradient.addColorStop(1, '#FFA500');
+        ctx.setFillStyle(gradient);
+        ctx.fillRect(0, 0, width, height);
 
         // 主标题区域
         ctx.setFillStyle('#ffffff');
-        ctx.font = 'bold 120px sans-serif';
         ctx.setTextAlign('center');
+        ctx.setFontSize(120);
         ctx.fillText(`${streakDays}`, width / 2, height / 3);
 
         ctx.setFontSize(48);
@@ -326,6 +336,7 @@ function generateStreakPoster (data, component) {
             wx.canvasToTempFilePath({
               canvasId,
               success: (res) => {
+                console.log('[poster] 海报生成成功', res.tempFilePath);
                 if (res.tempFilePath) {
                   resolve(res.tempFilePath);
                 } else {
@@ -333,14 +344,14 @@ function generateStreakPoster (data, component) {
                 }
               },
               fail: (err) => {
-                console.error('canvasToTempFilePath失败:', err);
-                reject(new Error('图片生成失败，请重试'));
+                console.error('[poster] canvasToTempFilePath失败:', err);
+                reject(new Error(`图片生成失败: ${err.errMsg || '请重试'}`));
               }
-            });
-          }, 800); // 增加延迟时间
+            }, component);
+          }, 1000); // 增加延迟时间到1秒
         });
       } catch (error) {
-        console.error('生成连续打卡海报失败:', error);
+        console.error('[poster] 生成连续打卡海报失败:', error);
         reject(new Error('海报绘制失败，请重试'));
       }
     });
@@ -376,20 +387,27 @@ function generateAchievementPoster (data, component) {
       }
 
       try {
-        const ctx = createCanvasContext(canvasId);
+        const ctx = wx.createCanvasContext(canvasId, component);
         const { width, height } = POSTER_CONFIG;
 
-        // 绘制成就风格海报
-        drawGradientBackground(ctx, ['#9B59B6', '#8E44AD'], width, height);
+        console.log('[poster] 开始绘制成就海报', data);
+
+        // 绘制成就风格海报 - 渐变背景
+        const gradient = ctx.createLinearGradient(0, 0, 0, height);
+        gradient.addColorStop(0, '#9B59B6');
+        gradient.addColorStop(1, '#8E44AD');
+        ctx.setFillStyle(gradient);
+        ctx.fillRect(0, 0, width, height);
 
         // 图标
+        ctx.setFillStyle('#ffffff');
         ctx.setFontSize(200);
         ctx.setTextAlign('center');
         ctx.fillText(achievementIcon, width / 2, height / 3);
 
         // 成就名称
         ctx.setFillStyle('#ffffff');
-        ctx.font = 'bold 64px sans-serif';
+        ctx.setFontSize(64);
         ctx.setTextAlign('center');
         ctx.fillText(achievementName, width / 2, height / 2);
 
@@ -402,6 +420,7 @@ function generateAchievementPoster (data, component) {
             wx.canvasToTempFilePath({
               canvasId,
               success: (res) => {
+                console.log('[poster] 成就海报生成成功', res.tempFilePath);
                 if (res.tempFilePath) {
                   resolve(res.tempFilePath);
                 } else {
@@ -409,11 +428,11 @@ function generateAchievementPoster (data, component) {
                 }
               },
               fail: (err) => {
-                console.error('canvasToTempFilePath失败:', err);
-                reject(new Error('图片生成失败，请重试'));
+                console.error('[poster] canvasToTempFilePath失败:', err);
+                reject(new Error(`图片生成失败: ${err.errMsg || '请重试'}`));
               }
-            });
-          }, 800);
+            }, component);
+          }, 1000);
         });
       } catch (error) {
         console.error('生成成就海报失败:', error);
@@ -508,6 +527,189 @@ function shareImage (filePath) {
   });
 }
 
+/**
+ * 生成报告海报 (周报/月报)
+ * @param {Object} data - 报告数据
+ * @param {Component} component - 组件实例
+ * @returns {Promise<string>} 海报临时路径
+ */
+function generateReportPoster (data, component) {
+  return new Promise((resolve, reject) => {
+    const {
+      title = '打卡报告',
+      dateRange = '',
+      summary = {},
+      reportType = 'weekly'
+    } = data;
+
+    try {
+      const query = wx.createSelectorQuery().in(component);
+      query.select('#reportCanvas')
+        .fields({ node: true, size: true })
+        .exec((res) => {
+          if (!res || !res[0]) {
+            console.error('[poster] Canvas元素不存在');
+            reject(new Error('Canvas元素不存在'));
+            return;
+          }
+
+          const canvas = res[0].node;
+          const ctx = canvas.getContext('2d');
+          const dpr = wx.getSystemInfoSync().pixelRatio;
+          const { width, height, padding } = POSTER_CONFIG;
+
+          // 设置Canvas尺寸
+          canvas.width = width * dpr;
+          canvas.height = height * dpr;
+          ctx.scale(dpr, dpr);
+
+          console.log('[poster] 开始绘制报告海报', { title, dateRange });
+
+          // 1. 绘制渐变背景
+          const gradient = ctx.createLinearGradient(0, 0, 0, height);
+          gradient.addColorStop(0, '#4FD1C5');
+          gradient.addColorStop(1, '#63B3ED');
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, width, height);
+
+          // 2. 绘制白色内容卡片
+          const cardX = 40;
+          const cardY = 100;
+          const cardWidth = width - 80;
+          const cardHeight = height - 300;
+
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+          ctx.shadowBlur = 20;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 4;
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.roundRect(cardX, cardY, cardWidth, cardHeight, 20);
+          ctx.fill();
+          ctx.shadowColor = 'transparent';
+
+          // 3. 绘制标题
+          ctx.font = 'bold 48px sans-serif';
+          ctx.fillStyle = '#2D3748';
+          ctx.textAlign = 'center';
+          ctx.fillText(title, width / 2, cardY + 80);
+
+          // 4. 绘制日期范围
+          ctx.font = '28px sans-serif';
+          ctx.fillStyle = '#718096';
+          ctx.fillText(dateRange, width / 2, cardY + 140);
+
+          // 5. 绘制完成率圆环
+          let currentY = cardY + 220;
+          if (summary.completionRate !== undefined) {
+            const centerX = width / 2;
+            const centerY = currentY + 120;
+            const radius = 100;
+            const rate = summary.completionRate / 100;
+
+            // 底色圆环
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#E2E8F0';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // 进度圆环
+            ctx.lineWidth = 20;
+            ctx.strokeStyle = '#4FD1C5';
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * rate);
+            ctx.stroke();
+
+            // 完成率文字
+            ctx.font = 'bold 72px sans-serif';
+            ctx.fillStyle = '#2D3748';
+            ctx.textAlign = 'center';
+            ctx.fillText(`${summary.completionRate}%`, centerX, centerY + 20);
+
+            ctx.font = '28px sans-serif';
+            ctx.fillStyle = '#718096';
+            ctx.fillText('完成率', centerX, centerY + 60);
+
+            currentY += 280;
+          }
+
+          // 6. 绘制统计数据网格
+          const stats = [
+            { label: '完成任务', value: summary.completedTasks || 0, color: '#48BB78' },
+            { label: '总任务数', value: summary.totalTasks || 0, color: '#4299E1' },
+            { label: '连续天数', value: summary.streakDays || 0, color: '#F6AD55' },
+            { label: '活跃天数', value: summary.activeDays || 0, color: '#9F7AEA' }
+          ];
+
+          const statsPerRow = 2;
+          const statWidth = (cardWidth - 80) / statsPerRow;
+          const statHeight = 120;
+
+          stats.forEach((stat, index) => {
+            const col = index % statsPerRow;
+            const row = Math.floor(index / statsPerRow);
+            const statX = cardX + 40 + col * statWidth;
+            const statY = currentY + row * statHeight;
+
+            // 数值
+            ctx.font = 'bold 48px sans-serif';
+            ctx.fillStyle = stat.color;
+            ctx.textAlign = 'center';
+            ctx.fillText(String(stat.value), statX + statWidth / 2, statY + 40);
+
+            // 标签
+            ctx.font = '24px sans-serif';
+            ctx.fillStyle = '#718096';
+            ctx.fillText(stat.label, statX + statWidth / 2, statY + 75);
+          });
+
+          currentY += Math.ceil(stats.length / statsPerRow) * statHeight + 40;
+
+          // 7. 绘制激励语
+          const motivation = '坚持就是胜利！继续加油💪';
+          ctx.font = '28px sans-serif';
+          ctx.fillStyle = '#4A5568';
+          ctx.textAlign = 'center';
+          ctx.fillText(motivation, width / 2, currentY);
+
+          // 8. 绘制底部品牌信息
+          const footerY = cardY + cardHeight + 60;
+          ctx.font = '32px sans-serif';
+          ctx.fillStyle = '#FFFFFF';
+          ctx.textAlign = 'center';
+          ctx.fillText('自律教练小程序', width / 2, footerY);
+
+          ctx.font = '24px sans-serif';
+          ctx.fillText('让自律成为习惯', width / 2, footerY + 45);
+
+          // 9. 导出图片
+          wx.canvasToTempFilePath({
+            canvas,
+            width: width * dpr,
+            height: height * dpr,
+            destWidth: width * 2,
+            destHeight: height * 2,
+            fileType: 'png',
+            quality: 1,
+            success: (res) => {
+              console.log('[poster] 报告海报生成成功', res.tempFilePath);
+              resolve(res.tempFilePath);
+            },
+            fail: (err) => {
+              console.error('[poster] 导出图片失败:', err);
+              reject(err);
+            }
+          }, component);
+        });
+    } catch (error) {
+      console.error('[poster] 生成报告海报失败:', error);
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
   SHARE_TYPES,
   POSTER_CONFIG,
@@ -519,6 +721,7 @@ module.exports = {
   generateCheckinPoster,
   generateStreakPoster,
   generateAchievementPoster,
+  generateReportPoster,
   saveImageToAlbum,
   shareImage
 };

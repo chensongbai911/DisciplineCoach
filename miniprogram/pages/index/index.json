@@ -6,6 +6,7 @@
     "app-image": "/components/app-image/index",
     "app-icon": "/components/app-icon/index",
     "share-poster": "/components/share-poster/index",
-    "achievement-unlock": "/components/achievement-unlock/index"
+    "achievement-unlock": "/components/achievement-unlock/index",
+    "swipe-action": "/components/swipe-action/index"
   }
 }

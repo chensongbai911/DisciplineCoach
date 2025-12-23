@@ -5,7 +5,7 @@
   <!-- 用户信息卡片 -->
   <view class="user-card">
     <view class="user-header">
-      <app-image class="user-avatar" src="{{userInfo.avatarUrl || '/assets/images/default-avatar.png'}}" size="120" radius="9999" fallbackText="🙂" mode="aspectFill" />
+      <app-image class="user-avatar" src="{{userInfo.avatarUrl || '/assets/images/default-avatar.webp'}}" size="120" radius="9999" fallbackText="🙂" mode="aspectFill" />
       <view class="user-info">
         <text class="user-name">{{userInfo.nickName || '未登录'}}</text>
         <view class="user-stats">
@@ -81,6 +81,19 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
+
+      <!-- 主题设置 -->
+      <view class="menu-item" bindtap="handleThemeChange">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="theme" size="28" />
+          <text class="menu-text">主题设置</text>
+        </view>
+        <view class="menu-item-right">
+          <text class="menu-value">{{themeText}}</text>
+          <text class="menu-arrow">›</text>
+        </view>
+      </view>
+
       <view class="menu-item" bindtap="handleReminder">
         <view class="menu-item-left">
           <app-icon class="menu-icon" type="bell" size="28" />
@@ -89,6 +102,59 @@
         <view class="menu-item-right">
           <switch checked="{{reminderEnabled}}" color="#07C160" bindchange="handleReminderToggle" catchtap="stopPropagation" />
         </view>
+      </view>
+
+      <!-- 提醒时间选择 -->
+      <view class="menu-item">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="time" size="28" />
+          <text class="menu-text">提醒时间</text>
+        </view>
+        <view class="menu-item-right">
+          <picker mode="time" value="{{reminderTime}}" start="06:00" end="23:00" bindchange="handleReminderTimeChange">
+            <view class="menu-value">{{reminderTime}}</view>
+          </picker>
+        </view>
+      </view>
+
+      <!-- 测试提醒 -->
+      <view class="menu-item" bindtap="handleSendReminderTest">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="send" size="28" />
+          <text class="menu-text">测试提醒</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
+
+      <!-- 周总结订阅 -->
+      <view class="menu-item" bindtap="handleWeeklySummary">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="calendar" size="28" />
+          <text class="menu-text">每周总结推送</text>
+        </view>
+        <view class="menu-item-right">
+          <switch checked="{{weeklySummaryEnabled}}" color="#07C160" bindchange="handleWeeklySummaryToggle" catchtap="stopPropagation" />
+        </view>
+      </view>
+
+      <!-- 连续打卡警告 -->
+      <view class="menu-item" bindtap="handleStreakWarning">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="warning" size="28" />
+          <text class="menu-text">连续中断警告</text>
+        </view>
+        <view class="menu-item-right">
+          <switch checked="{{streakWarningEnabled}}" color="#07C160" bindchange="handleStreakWarningToggle" catchtap="stopPropagation" />
+        </view>
+      </view>
+
+      <!-- 测试周总结 -->
+      <view class="menu-item" bindtap="handleSendWeeklySummaryTest">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="send" size="28" />
+          <text class="menu-text">测试周总结</text>
+        </view>
+        <text class="menu-arrow">›</text>
       </view>
     </view>
 
@@ -114,12 +180,54 @@
         </view>
         <text class="menu-arrow">›</text>
       </view>
+      <view class="menu-item" bindtap="handleClearCache">
+        <view class="menu-item-left">
+          <app-icon class="menu-icon" type="delete" size="28" />
+          <text class="menu-text">清理缓存</text>
+        </view>
+        <text class="menu-arrow">›</text>
+      </view>
     </view>
   </view>
 
   <!-- 版本信息 -->
   <view class="version-info">
     <text class="version-text">自律教练 v{{version}}</text>
+  </view>
+</view>
+
+<!-- 主题选择弹窗 -->
+<view class="modal-mask" wx:if="{{showThemeModal}}" bindtap="closeThemeModal"></view>
+<view class="theme-modal" wx:if="{{showThemeModal}}">
+  <view class="modal-header">
+    <text class="modal-title">选择主题</text>
+    <text class="modal-close" bindtap="closeThemeModal">✕</text>
+  </view>
+  <view class="theme-list">
+    <view class="theme-item {{themePreference === 'auto' ? 'active' : ''}}" bindtap="selectTheme" data-theme="auto">
+      <view class="theme-icon">🌓</view>
+      <view class="theme-info">
+        <text class="theme-name">跟随系统</text>
+        <text class="theme-desc">根据系统设置自动切换</text>
+      </view>
+      <view class="theme-check" wx:if="{{themePreference === 'auto'}}">✓</view>
+    </view>
+    <view class="theme-item {{themePreference === 'light' ? 'active' : ''}}" bindtap="selectTheme" data-theme="light">
+      <view class="theme-icon">☀️</view>
+      <view class="theme-info">
+        <text class="theme-name">亮色模式</text>
+        <text class="theme-desc">白天使用更舒适</text>
+      </view>
+      <view class="theme-check" wx:if="{{themePreference === 'light'}}">✓</view>
+    </view>
+    <view class="theme-item {{themePreference === 'dark' ? 'active' : ''}}" bindtap="selectTheme" data-theme="dark">
+      <view class="theme-icon">🌙</view>
+      <view class="theme-info">
+        <text class="theme-name">深色模式</text>
+        <text class="theme-desc">夜间使用保护视力</text>
+      </view>
+      <view class="theme-check" wx:if="{{themePreference === 'dark'}}">✓</view>
+    </view>
   </view>
 </view>
 

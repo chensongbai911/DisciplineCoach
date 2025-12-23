@@ -204,7 +204,7 @@ async function updateUserInfo (event, wxContext) {
  * 更新用户设置
  */
 async function updateSettings (event, wxContext) {
-  const { dailyReminder, reminderTime, enableVibrate, enableSound } = event
+  const { dailyReminder, reminderTime, enableVibrate, enableSound, weeklySummary, streakWarning } = event
   const openid = wxContext.OPENID
 
   try {
@@ -214,6 +214,8 @@ async function updateSettings (event, wxContext) {
     if (reminderTime !== undefined) updateData['settings.reminderTime'] = reminderTime
     if (enableVibrate !== undefined) updateData['settings.enableVibrate'] = enableVibrate
     if (enableSound !== undefined) updateData['settings.enableSound'] = enableSound
+    if (weeklySummary !== undefined) updateData['settings.weeklySummary'] = weeklySummary
+    if (streakWarning !== undefined) updateData['settings.streakWarning'] = streakWarning
 
     if (Object.keys(updateData).length === 0) {
       return {

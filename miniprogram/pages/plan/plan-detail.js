@@ -4,6 +4,7 @@
 const { planAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading, showModal } = require('../../utils/common');
 const { validatePlanData } = require('../../utils/validator');
+const vibrate = require('../../utils/vibrate');
 
 // 维度配置
 const DIMENSIONS = {
@@ -19,12 +20,6 @@ Page({
     category: '',
     dimension: {},
     tasks: [],
-
-    // 左滑动作配置
-    swipeActions: [
-      { text: '编辑', type: 'primary', icon: '✏️' },
-      { text: '删除', type: 'danger', icon: '🗑️' }
-    ],
 
     // 表单相关
     showTaskForm: false,
@@ -153,6 +148,9 @@ Page({
    * 添加任务
    */
   handleAddTask () {
+    // 按钮点击轻微震动
+    vibrate.light();
+
     // 检查会员限制
     const app = getApp();
     const memberStatus = app.checkMemberStatus();
@@ -266,24 +264,12 @@ Page({
   },
 
   /**
-   * 处理滑动动作
-   */
-  handleSwipeAction (e) {
-    const { action, index } = e.detail;
-    const { id } = e.currentTarget.dataset;
-    const task = this.data.tasks[index];
-
-    if (action.text === '编辑') {
-      this.handleEditTask({ currentTarget: { dataset: { id } } });
-    } else if (action.text === '删除') {
-      this.handleDeleteTask({ currentTarget: { dataset: { id } } });
-    }
-  },
-
-  /**
    * 删除任务
    */
   async handleDeleteTask (e) {
+    // 删除操作警告震动
+    vibrate.warning();
+
     const { id } = e.currentTarget.dataset;
     const task = this.data.tasks.find(t => t._id === id);
 
@@ -306,13 +292,6 @@ Page({
         hideLoading();
       }
     }
-  },
-
-  /**
-   * 阻止事件冒泡
-   */
-  handleActionTap () {
-    // 阻止冒泡，避免触发编辑
   },
 
   /**
@@ -381,12 +360,28 @@ Page({
 
     // 如果开启提醒，请求订阅消息权限
     if (enabled) {
-      wx.requestSubscribeMessage({
-        tmplIds: ['YOUR_TEMPLATE_ID'], // TODO: 在微信公众平台申请订阅消息模板后替换此ID
-        success: (res) => {
-          console.log('订阅消息授权成功', res);
-          // 检查是否授权成功
-          if (res['YOUR_TEMPLATE_ID'] === 'accept') {
+      // 使用reminder工具类的统一方法
+      const reminder = require('../../utils/reminder.js');
+
+      reminder.requestSubscribe(['CHECKIN_REMINDER'])
+        .then((res) => {
+          console.log('[订阅消息] 授权结果:', res);
+
+          if (res.disabled) {
+            // 订阅消息功能未配置,使用本地提醒
+            this.setData({
+              'formData.reminder.enabled': true
+            });
+            wx.showToast({
+              title: '已开启本地提醒',
+              icon: 'success',
+              duration: 2000
+            });
+            return;
+          }
+
+          // 检查是否至少有一个模板授权成功
+          if (res.authorized && Object.keys(res.authorized).length > 0) {
             this.setData({
               'formData.reminder.enabled': true
             });
@@ -397,21 +392,45 @@ Page({
           } else {
             wx.showModal({
               title: '提示',
-              content: '需要授权订阅消息才能开启提醒功能',
-              showCancel: false
+              content: '需要授权订阅消息才能开启提醒功能,您也可以使用本地提醒',
+              confirmText: '使用本地提醒',
+              cancelText: '取消',
+              success: (modalRes) => {
+                if (modalRes.confirm) {
+                  this.setData({
+                    'formData.reminder.enabled': true
+                  });
+                  wx.showToast({
+                    title: '已开启本地提醒',
+                    icon: 'success'
+                  });
+                }
+              }
             });
           }
-        },
-        fail: (err) => {
-          console.error('订阅消息授权失败', err);
+        })
+        .catch((err) => {
+          console.error('[订阅消息] 授权失败:', err);
           wx.showModal({
             title: '提示',
-            content: '订阅消息授权失败，无法开启提醒功能',
-            showCancel: false
+            content: '订阅消息授权失败,是否使用本地提醒?',
+            confirmText: '使用本地提醒',
+            cancelText: '取消',
+            success: (modalRes) => {
+              if (modalRes.confirm) {
+                this.setData({
+                  'formData.reminder.enabled': true
+                });
+                wx.showToast({
+                  title: '已开启本地提醒',
+                  icon: 'success'
+                });
+              }
+            }
           });
-        }
-      });
+        });
     } else {
+      // 关闭提醒
       this.setData({
         'formData.reminder.enabled': false
       });

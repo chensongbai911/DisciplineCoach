@@ -2,9 +2,12 @@
 // 用户中心页 - 个人信息和设置
 
 const app = getApp();
-const { userAPI, statisticsAPI, exportAPI } = require('../../utils/api');
+const { userAPI, statisticsAPI, exportAPI, recordAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading, copyToClipboard } = require('../../utils/common');
-const { getStorage, setStorage } = require('../../utils/storage');
+const { getStorage, setStorage, CacheManager } = require('../../utils/storage');
+const reminder = require('../../utils/reminder');
+const vibrate = require('../../utils/vibrate');
+const theme = require('../../utils/theme');
 
 Page({
   data: {
@@ -17,12 +20,19 @@ Page({
     },
     achievementCount: 0,
     reminderEnabled: true,
+    weeklySummaryEnabled: false,
+    streakWarningEnabled: false,
+    reminderTime: '21:00',
     version: '1.0.0',
-    showContactModal: false
+    showContactModal: false,
+    showThemeModal: false,
+    themePreference: 'auto',
+    themeText: '跟随系统'
   },
 
   onLoad () {
     this.loadUserData();
+    this.loadThemeSettings();
   },
 
   onShow () {
@@ -55,14 +65,106 @@ Page({
         achievementCount: badges.filter(b => b.unlocked).length || 0
       });
 
-      // 加载提醒设置
-      const reminderEnabled = getStorage('reminderEnabled');
-      if (reminderEnabled !== null) {
-        this.setData({ reminderEnabled });
+      // 加载提醒设置（本地 + 云端）
+      const localSettings = reminder.getReminderSettings();
+      let reminderEnabled = !!localSettings.enabled;
+      let reminderTime = localSettings.time || '21:00';
+      let weeklySummaryEnabled = false;
+      let streakWarningEnabled = false;
+
+      try {
+        const cloudRes = await wx.cloud.callFunction({ name: 'user', data: { action: 'getUserInfo' } });
+        if (cloudRes?.result?.success) {
+          const settings = cloudRes.result.data.settings || {};
+          if (typeof settings.dailyReminder === 'boolean') reminderEnabled = settings.dailyReminder;
+          if (typeof settings.reminderTime === 'string') reminderTime = settings.reminderTime;
+          if (typeof settings.weeklySummary === 'boolean') weeklySummaryEnabled = settings.weeklySummary;
+          if (typeof settings.streakWarning === 'boolean') streakWarningEnabled = settings.streakWarning;
+        }
+      } catch (e) {
+        console.warn('加载云端提醒设置失败', e);
       }
+
+      this.setData({ reminderEnabled, reminderTime, weeklySummaryEnabled, streakWarningEnabled });
 
     } catch (error) {
       console.error('加载用户数据失败:', error);
+    }
+  },
+
+  /**
+   * 切换周总结订阅
+   */
+  async handleWeeklySummaryToggle (e) {
+    const { value } = e.detail;
+    vibrate.light();
+
+    try {
+      if (value) {
+        const result = await reminder.requestSubscribe(['WEEKLY_SUMMARY']);
+        if (result.success && result.authorized?.WEEKLY_SUMMARY) {
+          await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', weeklySummary: true } });
+          this.setData({ weeklySummaryEnabled: true });
+          showToast('周总结订阅已开启', 'success');
+        } else {
+          this.setData({ weeklySummaryEnabled: false });
+          showToast('未授权订阅', 'none');
+        }
+      } else {
+        await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', weeklySummary: false } });
+        this.setData({ weeklySummaryEnabled: false });
+        showToast('周总结订阅已关闭');
+      }
+    } catch (err) {
+      console.error('更新周总结订阅失败:', err);
+      this.setData({ weeklySummaryEnabled: !value });
+    }
+  },
+
+  /**
+   * 测试发送周总结
+   */
+  async handleSendWeeklySummaryTest () {
+    vibrate.light();
+    try {
+      const res = await wx.cloud.callFunction({ name: 'message', data: { action: 'sendWeeklySummary' } });
+      if (res?.result?.success) {
+        showToast('已发送周总结', 'success');
+      } else {
+        showToast(res?.result?.errMsg || '发送失败');
+      }
+    } catch (e) {
+      console.warn('云函数调用失败', e);
+      showToast('云函数调用失败');
+    }
+  },
+
+  /**
+   * 切换连续打卡警告订阅
+   */
+  async handleStreakWarningToggle (e) {
+    const { value } = e.detail;
+    vibrate.light();
+
+    try {
+      if (value) {
+        const result = await reminder.requestSubscribe(['STREAK_WARNING']);
+        if (result.success && result.authorized?.STREAK_WARNING) {
+          await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', streakWarning: true } });
+          this.setData({ streakWarningEnabled: true });
+          showToast('连续打卡警告已开启', 'success');
+        } else {
+          this.setData({ streakWarningEnabled: false });
+          showToast('未授权订阅', 'none');
+        }
+      } else {
+        await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', streakWarning: false } });
+        this.setData({ streakWarningEnabled: false });
+        showToast('连续打卡警告已关闭');
+      }
+    } catch (err) {
+      console.error('更新连续打卡警告订阅失败:', err);
+      this.setData({ streakWarningEnabled: !value });
     }
   },
 
@@ -107,46 +209,91 @@ Page({
    */
   async handleReminderToggle (e) {
     const { value } = e.detail;
+    vibrate.light();
 
     try {
       if (value) {
-        // 请求通知权限
-        const setting = await wx.getSetting();
+        // 推荐提醒时间（近30天）
+        let suggestTime = '21:00';
+        try {
+          const { getToday, getDateByOffset } = require('../../utils/date');
+          const since = getDateByOffset(getToday(), -30);
+          const rangeRes = await recordAPI.getByRange(since, getToday());
+          suggestTime = reminder.analyzeReminderTime(rangeRes || []);
+        } catch (_) { }
 
-        if (!setting.authSetting['scope.subscribeMessage']) {
-          // 请求订阅消息权限
-          wx.requestSubscribeMessage({
-            tmplIds: ['your_template_id'], // 替换为实际的模板ID
-            success: (res) => {
-              this.setData({ reminderEnabled: true });
-              setStorage('reminderEnabled', true);
-              showToast('提醒已开启', 'success');
-            },
-            fail: () => {
-              this.setData({ reminderEnabled: false });
-              showToast('请在设置中允许通知权限');
-            }
+        // 请求订阅打卡提醒
+        const result = await reminder.requestSubscribe(['CHECKIN_REMINDER']);
+        if (result.success && result.authorized?.CHECKIN_REMINDER) {
+          // 云端保存
+          await wx.cloud.callFunction({
+            name: 'user',
+            data: { action: 'updateSettings', dailyReminder: true, reminderTime: suggestTime }
           });
-        } else {
-          this.setData({ reminderEnabled: true });
+
+          // 本地保存
           setStorage('reminderEnabled', true);
+          reminder.saveReminderSettings({ enabled: true, time: suggestTime });
+
+          this.setData({ reminderEnabled: true, reminderTime: suggestTime });
           showToast('提醒已开启', 'success');
+        } else {
+          this.setData({ reminderEnabled: false });
+          showToast('未授权订阅', 'none');
         }
       } else {
-        this.setData({ reminderEnabled: false });
+        // 关闭提醒
+        await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', dailyReminder: false } });
         setStorage('reminderEnabled', false);
+        reminder.saveReminderSettings({ enabled: false });
+        this.setData({ reminderEnabled: false });
         showToast('提醒已关闭');
       }
-
-      // 同步到服务器
-      await userAPI.updateSettings({
-        reminderEnabled: value
-      });
-
     } catch (error) {
       console.error('更新提醒设置失败:', error);
       // 恢复原状态
       this.setData({ reminderEnabled: !value });
+    }
+  },
+
+  /**
+   * 修改提醒时间
+   */
+  async handleReminderTimeChange (e) {
+    const time = e.detail.value; // HH:mm
+    vibrate.light();
+
+    try {
+      // 云端保存
+      await wx.cloud.callFunction({ name: 'user', data: { action: 'updateSettings', reminderTime: time } });
+
+      // 本地保存
+      const current = reminder.getReminderSettings();
+      reminder.saveReminderSettings({ ...current, time });
+
+      this.setData({ reminderTime: time });
+      showToast('提醒时间已更新', 'success');
+    } catch (err) {
+      console.error('更新提醒时间失败:', err);
+      showToast('更新失败，请重试');
+    }
+  },
+
+  /**
+   * 测试发送提醒
+   */
+  async handleSendReminderTest () {
+    vibrate.light();
+    try {
+      const res = await wx.cloud.callFunction({ name: 'message', data: { action: 'sendDailyReminder' } });
+      if (res?.result?.success) {
+        showToast('已发送提醒', 'success');
+      } else {
+        showToast(res?.result?.errMsg || '发送失败');
+      }
+    } catch (e) {
+      console.warn('云函数调用失败', e);
+      showToast('云函数调用失败');
     }
   },
 
@@ -183,6 +330,38 @@ Page({
    */
   handleCopyEmail () {
     copyToClipboard('service@discipline.com');
+  },
+
+  /**
+   * 清理缓存
+   */
+  handleClearCache () {
+    vibrate.light();
+
+    wx.showModal({
+      title: '清理缓存',
+      content: '确定要清除所有缓存数据吗？这不会影响您的打卡记录。',
+      confirmText: '确定',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          try {
+            const info = CacheManager.getInfo();
+            CacheManager.clearAll();
+
+            // 同时清除 app.js 中的缓存
+            const app = getApp();
+            app.clearCache();
+
+            showToast(`已清理 ${info.count} 项缓存`, 'success');
+            vibrate.success();
+          } catch (err) {
+            console.error('清理缓存失败:', err);
+            showToast('清理失败');
+          }
+        }
+      }
+    });
   },
 
   /**
@@ -432,6 +611,66 @@ Page({
     ]).then(() => {
       wx.stopPullDownRefresh();
     });
+  },
+
+  /**
+   * 加载主题设置
+   */
+  loadThemeSettings () {
+    const preference = theme.getUserPreference();
+    const themeTextMap = {
+      auto: '跟随系统',
+      light: '亮色模式',
+      dark: '深色模式'
+    };
+
+    this.setData({
+      themePreference: preference,
+      themeText: themeTextMap[preference] || '跟随系统'
+    });
+  },
+
+  /**
+   * 打开主题选择弹窗
+   */
+  handleThemeChange () {
+    vibrate.light();
+    this.setData({ showThemeModal: true });
+  },
+
+  /**
+   * 关闭主题选择弹窗
+   */
+  closeThemeModal () {
+    this.setData({ showThemeModal: false });
+  },
+
+  /**
+   * 选择主题
+   */
+  selectTheme (e) {
+    const { theme: selectedTheme } = e.currentTarget.dataset;
+    vibrate.light();
+
+    // 设置主题
+    theme.setTheme(selectedTheme);
+
+    // 更新显示
+    this.loadThemeSettings();
+
+    // 关闭弹窗
+    this.closeThemeModal();
+
+    // 显示提示
+    const themeTextMap = {
+      auto: '跟随系统',
+      light: '亮色模式',
+      dark: '深色模式'
+    };
+    showToast(`已切换到${themeTextMap[selectedTheme]}`);
+
+    // 通知其他页面刷新（如果需要）
+    // 使用 getCurrentPages() 可以获取页面栈并通知刷新
   },
 
   /**

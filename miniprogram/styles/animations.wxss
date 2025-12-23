@@ -1,0 +1,547 @@
+/* animations.wxss - 动画样式库 */
+/* 版本: 1.0.0 */
+/* 最后更新: 2025-12-23 */
+
+/* ========== 基础动画 ========== */
+
+/* 淡入 */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* 淡出 */
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.animate-fade-out {
+  animation: fade-out 0.3s ease-in;
+}
+
+/* ========== 滑动动画 ========== */
+
+/* 从下滑入 */
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out;
+}
+
+/* 从上滑入 */
+@keyframes slide-in-down {
+  from {
+    transform: translateY(-100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-down {
+  animation: slide-in-down 0.3s ease-out;
+}
+
+/* 从左滑入 */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.3s ease-out;
+}
+
+/* 从右滑入 */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100rpx);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out;
+}
+
+/* 向下滑出 */
+@keyframes slide-out-down {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100rpx);
+    opacity: 0;
+  }
+}
+
+.animate-slide-out-down {
+  animation: slide-out-down 0.3s ease-in;
+}
+
+/* ========== 缩放动画 ========== */
+
+/* 缩放进入 */
+@keyframes scale-in {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.3s ease-out;
+}
+
+/* 缩放退出 */
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.animate-scale-out {
+  animation: scale-out 0.3s ease-in;
+}
+
+/* 放大进入 */
+@keyframes zoom-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-zoom-in {
+  animation: zoom-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 放大退出 */
+@keyframes zoom-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+.animate-zoom-out {
+  animation: zoom-out 0.3s ease-in;
+}
+
+/* ========== 旋转动画 ========== */
+
+/* 旋转 */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-rotate {
+  animation: rotate 1s linear infinite;
+}
+
+/* 旋转进入 */
+@keyframes rotate-in {
+  from {
+    transform: rotate(-180deg) scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-rotate-in {
+  animation: rotate-in 0.5s ease-out;
+}
+
+/* ========== 弹跳动画 ========== */
+
+/* 弹跳 */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-30rpx);
+  }
+  60% {
+    transform: translateY(-15rpx);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s ease-in-out;
+}
+
+/* 弹跳进入 */
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.5s ease-out;
+}
+
+/* ========== 摇晃动画 ========== */
+
+/* 摇晃 */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10rpx);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10rpx);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* X轴摇晃 */
+@keyframes shake-x {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.animate-shake-x {
+  animation: shake-x 0.5s ease-in-out;
+}
+
+/* Y轴摇晃 */
+@keyframes shake-y {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  25%, 75% {
+    transform: translateY(-10rpx);
+  }
+  50% {
+    transform: translateY(10rpx);
+  }
+}
+
+.animate-shake-y {
+  animation: shake-y 0.5s ease-in-out;
+}
+
+/* ========== 脉冲动画 ========== */
+
+/* 脉冲 */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* 心跳 */
+@keyframes heartbeat {
+  0%, 100% {
+    transform: scale(1);
+  }
+  10%, 30% {
+    transform: scale(1.1);
+  }
+  20%, 40% {
+    transform: scale(1);
+  }
+}
+
+.animate-heartbeat {
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+/* ========== 闪烁动画 ========== */
+
+/* 闪烁 */
+@keyframes flash {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0;
+  }
+}
+
+.animate-flash {
+  animation: flash 1s ease-in-out infinite;
+}
+
+/* 眨眼 */
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+/* ========== 呼吸动画 ========== */
+
+/* 呼吸 */
+@keyframes breathing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-breathing {
+  animation: breathing 2s ease-in-out infinite;
+}
+
+/* ========== 特殊动画 ========== */
+
+/* 打卡成功 */
+@keyframes checkin-success {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-checkin-success {
+  animation: checkin-success 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* 成就解锁 */
+@keyframes achievement-unlock {
+  0% {
+    transform: rotate(-180deg) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: rotate(20deg) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-achievement-unlock {
+  animation: achievement-unlock 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* 进度条填充 */
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--progress-width, 100%);
+  }
+}
+
+.animate-progress-fill {
+  animation: progress-fill 0.5s ease-out forwards;
+}
+
+/* ========== 加载动画 ========== */
+
+/* 旋转加载 */
+@keyframes loading-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-loading {
+  animation: loading-rotate 1s linear infinite;
+}
+
+/* 脉冲加载 */
+@keyframes loading-pulse {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-loading-pulse {
+  animation: loading-pulse 1.5s ease-in-out infinite;
+}
+
+/* 点点点加载 */
+@keyframes loading-dots {
+  0%, 20% {
+    color: transparent;
+    text-shadow: 0.25em 0 0 transparent, 0.5em 0 0 transparent;
+  }
+  40% {
+    color: currentColor;
+    text-shadow: 0.25em 0 0 transparent, 0.5em 0 0 transparent;
+  }
+  60% {
+    text-shadow: 0.25em 0 0 currentColor, 0.5em 0 0 transparent;
+  }
+  80%, 100% {
+    text-shadow: 0.25em 0 0 currentColor, 0.5em 0 0 currentColor;
+  }
+}
+
+.animate-loading-dots {
+  animation: loading-dots 1.5s infinite;
+}
+
+/* ========== 工具类 ========== */
+
+/* 动画延迟 */
+.animate-delay-100 { animation-delay: 0.1s; }
+.animate-delay-200 { animation-delay: 0.2s; }
+.animate-delay-300 { animation-delay: 0.3s; }
+.animate-delay-500 { animation-delay: 0.5s; }
+.animate-delay-1000 { animation-delay: 1s; }
+
+/* 动画持续时间 */
+.animate-duration-fast { animation-duration: 0.15s; }
+.animate-duration-normal { animation-duration: 0.3s; }
+.animate-duration-slow { animation-duration: 0.5s; }
+.animate-duration-very-slow { animation-duration: 0.8s; }
+
+/* 动画重复 */
+.animate-infinite { animation-iteration-count: infinite; }
+.animate-once { animation-iteration-count: 1; }
+
+/* 动画填充模式 */
+.animate-forwards { animation-fill-mode: forwards; }
+.animate-backwards { animation-fill-mode: backwards; }
+.animate-both { animation-fill-mode: both; }
+
+/* 动画播放状态 */
+.animate-paused { animation-play-state: paused; }
+.animate-running { animation-play-state: running; }
+
+/* ========== 使用示例 ========== */
+/*
+
+1. 淡入动画
+   <view class="animate-fade-in">内容</view>
+
+2. 从下滑入
+   <view class="animate-slide-in-up">内容</view>
+
+3. 缩放进入（延迟300ms）
+   <view class="animate-scale-in animate-delay-300">内容</view>
+
+4. 持续旋转
+   <view class="animate-rotate animate-infinite">图标</view>
+
+5. 打卡成功动画
+   <view class="animate-checkin-success">✓</view>
+
+6. 自定义组合
+   <view class="animate-bounce animate-delay-500 animate-duration-slow">内容</view>
+
+*/

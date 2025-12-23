@@ -32,11 +32,30 @@
 
   <!-- 实际内容 -->
   <view class="content-container" wx:else>
-    <!-- 小教练区域 -->
+    <!-- 小教练区域 - 优化布局 -->
     <view class="coach-section">
-      <app-image class="coach-avatar" src="/assets/images/coach-happy.png" size="120" radius="9999" fallbackText="🤖" />
-      <view class="coach-bubble">
-        <text class="coach-message">{{coachMessage}}</text>
+      <!-- 左侧头像 -->
+      <app-image class="coach-avatar" src="/assets/images/coach-happy.webp" size="120" radius="9999" fallbackText="🤖" />
+
+      <!-- 右侧内容区 -->
+      <view class="coach-content">
+        <!-- 消息气泡 -->
+        <view class="coach-bubble">
+          <text class="coach-message">{{coachMessage}}</text>
+        </view>
+
+        <!-- 操作按钮行 -->
+        <view class="coach-actions">
+          <!-- 提醒订阅入口 -->
+          <view wx:if="{{!reminderSettings.enabled}}" class="action-buttons">
+            <button class="btn-subscribe" bindtap="requestDailyReminderSubscription">启用提醒</button>
+          </view>
+          <view wx:else class="action-buttons">
+            <text class="reminder-info">每晚 {{reminderSettings.time}} 提醒</text>
+            <button class="btn-subscribe" bindtap="disableDailyReminder">停止提醒</button>
+            <button class="btn-subscribe-outline" bindtap="sendReminderTest">发送测试</button>
+          </view>
+        </view>
       </view>
     </view>
 
@@ -92,37 +111,35 @@
         <!-- 卡片内容 -->
         <view class="task-card-body" wx:if="{{item.expanded}}">
           <block wx:for="{{item.tasks}}" wx:for-item="task" wx:key="id">
-            <view
-              class="task-item"
-              bindlongpress="handleLongPress"
-              data-task-id="{{task.id}}"
-              data-task-title="{{task.title}}"
-              data-task-type="{{task.type}}"
-              data-task-unit="{{task.unit}}"
-              data-task-target-value="{{task.targetValue}}"
-              data-task-completed="{{task.completed}}">
-              <view class="task-item-left">
-                <text class="task-item-title">{{task.title}}</text>
-                <text class="task-item-desc">目标: {{task.targetText}}</text>
-              </view>
-              <view class="task-item-right">
-                <view
-                  wx:if="{{!task.completed}}"
-                  class="checkin-btn"
-                  bindtap="handleCheckin"
-                  data-task-id="{{task.id}}"
-                  data-task-title="{{task.title}}"
-                  data-task-type="{{task.type}}"
-                  data-task-unit="{{task.unit}}"
-                  data-task-target-value="{{task.targetValue}}">
-                  打卡
+            <!-- 使用 swipe-action 组件 -->
+            <swipe-action
+              actions="{{task.completed ? [] : swipeActions}}"
+              bind:actiontap="handleSwipeAction"
+              data-task="{{task}}">
+              <view slot="content" class="task-item">
+                <view class="task-item-left">
+                  <text class="task-item-title">{{task.title}}</text>
+                  <text class="task-item-desc">目标: {{task.targetText}}</text>
                 </view>
-                <view wx:else class="task-completed">
-                  <app-icon class="icon-check" type="check" size="32" />
-                  <text class="completed-text">已完成</text>
+                <view class="task-item-right">
+                  <view
+                    wx:if="{{!task.completed}}"
+                    class="checkin-btn"
+                    bindtap="handleCheckin"
+                    data-task-id="{{task.id}}"
+                    data-task-title="{{task.title}}"
+                    data-task-type="{{task.type}}"
+                    data-task-unit="{{task.unit}}"
+                    data-task-target-value="{{task.targetValue}}">
+                    打卡
+                  </view>
+                  <view wx:else class="task-completed">
+                    <app-icon class="icon-check" type="check" size="32" />
+                    <text class="completed-text">已完成</text>
+                  </view>
                 </view>
               </view>
-            </view>
+            </swipe-action>
           </block>
 
           <!-- 空状态 -->
@@ -136,7 +153,7 @@
 
     <!-- 无任务空状态 -->
     <view wx:if="{{dimensions.length === 0}}" class="empty-state">
-      <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📝" />
+      <app-image class="empty-icon" src="/assets/images/empty.webp" size="160" radius="24" fallbackText="📝" />
       <text class="empty-text">还没有创建计划哦</text>
       <button class="btn-primary mt-md" bindtap="goToPlan">创建计划</button>
     </view>
@@ -174,6 +191,14 @@
       <view class="fab {{showFabMenu ? 'fab-active' : ''}}" bindtap="toggleFabMenu">
         <text class="fab-icon">{{showFabMenu ? '×' : '+'}}</text>
       </view>
+    </view>
+
+    <!-- 底部快速添加任务按钮 -->
+    <view class="quick-add-container" wx:if="{{totalTasks > 0}}">
+      <button class="btn-add-task" bindtap="goToPlan">
+        <text class="btn-icon">🔹</text>
+        <text class="btn-text">添加任务</text>
+      </button>
     </view>
   </view> <!-- content-container 结束 -->
 </view> <!-- page-container 结束 -->
@@ -234,7 +259,7 @@
 
 <!-- 打卡成功反馈 -->
 <view wx:if="{{showSuccessFeedback}}" class="success-feedback">
-  <app-image class="coach-avatar-large" src="/assets/images/coach-happy.png" size="160" radius="24" fallbackText="🎉" />
+  <app-image class="coach-avatar-large" src="/assets/images/coach-happy.webp" size="160" radius="24" fallbackText="🎉" />
   <view class="bubble">
     <text>{{successMessage}}</text>
   </view>

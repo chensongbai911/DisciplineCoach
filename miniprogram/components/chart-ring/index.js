@@ -24,7 +24,7 @@ Component({
       type: Object,
       value: {
         completed: '#4FD1C5',
-        background: '#E2E8F0'
+        background: '#EDF2F7'
       }
     }
   },
@@ -147,16 +147,45 @@ Component({
       ctx.lineCap = 'round';
       ctx.stroke();
 
-      // 绘制完成环
-      const startAngle = -Math.PI / 2; // 从12点方向开始
-      const endAngle = startAngle + (animatedPercentage / 100) * 2 * Math.PI;
+      // 绘制完成环 - 添加渐变效果
+      if (animatedPercentage > 0) {
+        const startAngle = -Math.PI / 2; // 从12点方向开始
+        const endAngle = startAngle + (animatedPercentage / 100) * 2 * Math.PI;
 
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-      ctx.strokeStyle = colors.completed;
-      ctx.lineWidth = ringWidth;
-      ctx.lineCap = 'round';
-      ctx.stroke();
+        // 创建渐变色
+        const gradient = ctx.createLinearGradient(
+          centerX - radius,
+          centerY,
+          centerX + radius,
+          centerY
+        );
+        gradient.addColorStop(0, '#4FD1C5');
+        gradient.addColorStop(1, '#38B2AC');
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = ringWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // 添加光晕效果
+        ctx.shadowColor = 'rgba(79, 209, 197, 0.3)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = ringWidth;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // 重置阴影
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+      }
 
       // 绘制中心文字
       this.drawCenterText(ctx, centerX, centerY, animatedPercentage);
@@ -166,17 +195,19 @@ Component({
      * 绘制中心文字
      */
     drawCenterText (ctx, centerX, centerY, percentage) {
-      // 百分比
+      const roundedPercentage = Math.round(percentage);
+
+      // 百分比数字
       ctx.fillStyle = '#2D3748';
-      ctx.font = 'bold 48px sans-serif';
+      ctx.font = '600 28px system-ui, -apple-system, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(Math.round(percentage) + '%', centerX, centerY - 10);
+      ctx.fillText(roundedPercentage + '%', centerX, centerY - 3);
 
       // 完成率文字
-      ctx.fillStyle = '#718096';
-      ctx.font = '14px sans-serif';
-      ctx.fillText('完成率', centerX, centerY + 30);
+      ctx.fillStyle = '#A0AEC0';
+      ctx.font = '400 12px system-ui, -apple-system, sans-serif';
+      ctx.fillText('完成率', centerX, centerY + 22);
     }
   }
 });

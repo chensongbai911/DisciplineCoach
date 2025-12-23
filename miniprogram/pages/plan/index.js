@@ -71,7 +71,8 @@ Page({
     ],
     enabledCount: 0,
     totalTasks: 0,
-    showGuide: true
+    showGuide: true,
+    showPicker: false  // 维度选择器显示状态
   },
 
   onLoad (options) {
@@ -450,5 +451,72 @@ Page({
       showToast('删除失败，请重试');
       console.error('批量删除失败:', error);
     }
+  },
+
+  /**
+   * 显示维度选择器
+   */
+  showDimensionPicker (e) {
+    console.log('[plan] ===== 点击添加任务按钮 =====');
+    console.log('[plan] 事件对象:', e);
+    console.log('[plan] enabledCount:', this.data.enabledCount);
+    console.log('[plan] showPicker当前值:', this.data.showPicker);
+    console.log('[plan] 已开启维度:', this.data.dimensions.filter(d => d.enabled));
+
+    // 边界检查
+    if (this.data.enabledCount === 0) {
+      showToast('请先开启至少一个维度', 'none');
+      return;
+    }
+
+    try {
+      vibrate.light();
+      this.setData({
+        showPicker: true
+      }, () => {
+        console.log('[plan] setData回调 - showPicker已更新为:', this.data.showPicker);
+      });
+    } catch (error) {
+      console.error('[plan] 显示选择器失败:', error);
+      showToast('操作失败，请重试', 'none');
+    }
+  },
+
+  /**
+   * 隐藏维度选择器
+   */
+  hideDimensionPicker () {
+    console.log('[plan] 关闭选择器');
+    this.setData({ showPicker: false });
+  },
+
+  /**
+   * 阻止冒泡
+   */
+  stopPropagation () {
+    // 阻止点击选择器内容时关闭
+  },
+
+  /**
+   * 选择维度后跳转
+   */
+  handlePickerSelect (e) {
+    console.log('[plan] 选择维度:', e.currentTarget.dataset);
+
+    const { category } = e.currentTarget.dataset;
+    const dimension = this.data.dimensions.find(d => d.category === category);
+
+    if (!dimension.enabled) {
+      console.warn('[plan] 维度未开启:', category);
+      showToast('请先开启该维度', 'none');
+      return;
+    }
+
+    vibrate.light();
+    this.hideDimensionPicker();
+
+    // 跳转到详情页添加任务
+    console.log('[plan] 跳转到详情页:', category);
+    this.navigateToDetail(category, 'add');
   }
 });

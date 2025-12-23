@@ -103,6 +103,18 @@
   color: #999999;
 }
 
+/* 完成率环形图专属样式 */
+.completion-rate-section {
+  padding: 40rpx 32rpx;
+}
+
+.ring-chart-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20rpx 0;
+}
+
 /* 空数据提示 */
 .empty-hint {
   display: flex;

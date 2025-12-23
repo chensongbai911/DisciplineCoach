@@ -3,14 +3,9 @@
  * 用于管理订阅消息、提醒设置和智能推荐
  */
 
-// 订阅消息模板ID配置
-// TODO: 在微信公众平台申请后替换为实际ID
-const TEMPLATE_IDS = {
-  CHECKIN_REMINDER: 'YOUR_CHECKIN_REMINDER_TEMPLATE_ID',      // 打卡提醒
-  STREAK_WARNING: 'YOUR_STREAK_WARNING_TEMPLATE_ID',          // 连续中断警告
-  WEEKLY_SUMMARY: 'YOUR_WEEKLY_SUMMARY_TEMPLATE_ID',          // 周总结
-  ACHIEVEMENT_UNLOCK: 'YOUR_ACHIEVEMENT_UNLOCK_TEMPLATE_ID'   // 成就解锁
-};
+// 引入订阅消息配置
+const subscriptionConfig = require('../config/subscription.js');
+const { TEMPLATE_IDS, ENABLE_SUBSCRIPTION, checkSubscriptionAvailable, getConfiguredTemplateIds } = subscriptionConfig;
 
 // 提醒类型枚举
 const REMINDER_TYPES = {
@@ -37,13 +32,36 @@ const DEFAULT_REMINDER_TIME = {
  */
 function requestSubscribe (types = ['CHECKIN_REMINDER']) {
   return new Promise((resolve, reject) => {
-    const tmplIds = types.map(type => TEMPLATE_IDS[type]).filter(id => id && !id.startsWith('YOUR_'));
+    // 检查订阅消息功能是否可用
+    const availability = checkSubscriptionAvailable();
 
-    if (tmplIds.length === 0) {
-      console.warn('未配置有效的订阅消息模板ID');
-      reject(new Error('未配置订阅消息模板'));
+    if (!availability.available) {
+      console.log(`[订阅消息] 功能不可用: ${availability.message}`);
+      // 返回模拟成功,避免阻塞业务流程
+      resolve({
+        success: true,
+        disabled: true,
+        reason: availability.reason,
+        message: availability.message
+      });
       return;
     }
+
+    // 获取已配置的模板ID
+    const tmplIds = getConfiguredTemplateIds(types);
+
+    if (tmplIds.length === 0) {
+      console.warn('[订阅消息] 请求的模板ID均未配置');
+      resolve({
+        success: true,
+        disabled: true,
+        reason: 'no_valid_template',
+        message: '请求的模板ID均未配置'
+      });
+      return;
+    }
+
+    console.log('[订阅消息] 请求授权:', tmplIds);
 
     wx.requestSubscribeMessage({
       tmplIds,

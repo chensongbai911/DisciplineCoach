@@ -88,7 +88,7 @@
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{totalCount === 0}}">
-    <app-image class="empty-icon" src="/assets/images/empty.png" size="160" radius="24" fallbackText="📭" />
+    <app-image class="empty-icon" src="/assets/images/empty.webp" size="160" radius="24" fallbackText="📭" />
     <text class="empty-text">这一天还没有打卡记录</text>
   </view>
 

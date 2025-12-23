@@ -1,0 +1,19 @@
+<view class="custom-loading" wx:if="{{show}}">
+  <view class="loading-content">
+    <!-- 小教练动画 -->
+    <view class="coach-loading">
+      <text class="coach-emoji">🤖</text>
+      <view class="loading-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+
+    <!-- 加载文案 -->
+    <text class="loading-text">{{text || '加载中...'}}</text>
+  </view>
+
+  <!-- 背景遮罩 -->
+  <view class="loading-mask"></view>
+</view>

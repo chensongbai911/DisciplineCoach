@@ -63,4 +63,11 @@
       分享报告
     </button>
   </view>
+
+  <!-- 隐藏的Canvas用于生成海报 -->
+  <canvas
+    type="2d"
+    id="reportCanvas"
+    style="position: fixed; left: -9999px; top: -9999px; width: 750px; height: 1334px;"
+  ></canvas>
 </view>

@@ -18,8 +18,8 @@ page {
   top: 0;
   left: 0;
   right: 0;
-  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);
+  color: var(--color-text-white, #FFFFFF);  /* 使用CSS变量 */
   padding: 20rpx 32rpx;
   display: flex;
   align-items: center;
@@ -75,77 +75,335 @@ page {
   z-index: 0;
 }
 
-/* 小教练区域 */
+/* 小教练区域 - 优化设计 */
 .coach-section {
   display: flex;
-  align-items: center;
-  padding: 40rpx 32rpx 32rpx;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 32rpx 24rpx;
   margin-bottom: 24rpx;
   position: relative;
   z-index: 1;
+  max-width: 100%;
+  border-radius: 24rpx;
+  /* 移除半透明背景，保持透明 */
 }
 
+/* 小屏幕 (< 375px) 时堆叠 */
+@media (max-width: 374px) {
+  .coach-section {
+    flex-direction: column;
+    align-items: center;
+    padding: 28rpx 20rpx;
+    gap: 12rpx;
+  }
+}
+
+/* 中等屏幕 (375-414px) */
+@media (min-width: 375px) and (max-width: 414px) {
+  .coach-section {
+    padding: 32rpx 24rpx;
+  }
+}
+
+/* 大屏幕 (> 414px) */
+@media (min-width: 415px) {
+  .coach-section {
+    padding: 40rpx 32rpx 32rpx;
+    gap: 20rpx;
+  }
+}
+
+/* 右侧内容容器 */
+.coach-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  min-width: 0;
+  /* 防止内容溢出 */
+}
+
+@media (max-width: 374px) {
+  .coach-content {
+    width: 100%;
+    gap: 10rpx;
+  }
+}
+
+/* 操作按钮行 */
+.coach-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  width: 100%;
+}
+
+@media (min-width: 415px) {
+  .coach-actions {
+    gap: 12rpx;
+  }
+}
+
+/* 动作按钮组 */
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+@media (min-width: 415px) {
+  .action-buttons {
+    gap: 12rpx;
+  }
+}
+
+/* 提醒时间显示文本 */
+.reminder-info {
+  font-size: 22rpx;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
+  padding: 0 4rpx;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+@media (max-width: 374px) {
+  .reminder-info {
+    font-size: 20rpx;
+  }
+}
+
+/* 旧的 reminder-row 保持向后兼容（如果有其他地方使用） */
+.reminder-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 374px) {
+  .reminder-row {
+    gap: 8rpx;
+  }
+}
+
+@media (min-width: 415px) {
+  .reminder-row {
+    gap: 16rpx;
+  }
+}
+
+.reminder-text {
+  font-size: 24rpx;
+  color: var(--color-text-primary, #333333);  /* 统一主要文本色 */
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+@media (max-width: 374px) {
+  .reminder-text {
+    font-size: 22rpx;
+  }
+}
+
+/* 提醒操作区容器 */
+.reminder-actions,
+.reminder-enabled {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 374px) {
+  .reminder-actions,
+  .reminder-enabled {
+    gap: 8rpx;
+  }
+}
+
+/* 订阅和轮廓按钮 */
+.btn-subscribe,
+.btn-subscribe-outline {
+  font-size: 24rpx;
+  padding: 14rpx 28rpx;
+  border-radius: 9999rpx;
+  transition: all 0.3s ease;
+  user-select: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: none;
+  cursor: pointer;
+}
+
+/* 响应式按钮大小 */
+@media (max-width: 374px) {
+  .btn-subscribe,
+  .btn-subscribe-outline {
+    font-size: 22rpx;
+    padding: 12rpx 20rpx;
+  }
+}
+
+@media (max-height: 600px) {
+  .btn-subscribe,
+  .btn-subscribe-outline {
+    padding: 10rpx 20rpx;
+    font-size: 22rpx;
+  }
+}
+
+/* 主要按钮 */
+.btn-subscribe {
+  color: #fff;
+  background: linear-gradient(135deg, #4FD1C5 0%, #38B2AC 100%);
+  box-shadow: 0 4rpx 12rpx rgba(79, 209, 197, 0.3);
+}
+
+.btn-subscribe:active {
+  transform: scale(0.95);
+  box-shadow: 0 2rpx 6rpx rgba(79, 209, 197, 0.4);
+}
+
+.btn-subscribe:disabled {
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+/* 轮廓按钮 */
+.btn-subscribe-outline {
+  color: #4A5568;
+  border: 2rpx solid #CBD5E0;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.btn-subscribe-outline:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.8);
+  border-color: #A0AEC0;
+}
+
+.btn-subscribe-outline:disabled {
+  opacity: 0.5;
+  border-color: #E2E8F0;
+}
+
+/* 头像 */
 .coach-avatar {
-  width: 120rpx;
-  height: 120rpx;
+  width: 100rpx;
+  height: 100rpx;
   border-radius: 50%;
-  margin-right: 24rpx;
+  flex-shrink: 0;
   box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.5);
   border: 4rpx solid rgba(255, 255, 255, 0.9);
   animation: float 3s ease-in-out infinite, breathe 4s ease-in-out infinite;
-  transition: transform 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .coach-avatar:active {
-  transform: scale(0.95);
+  transform: scale(0.92);
+  box-shadow: 0 6rpx 18rpx rgba(79, 209, 197, 0.6);
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10rpx); }
+/* 响应式头像大小 */
+@media (min-width: 415px) {
+  .coach-avatar {
+    width: 120rpx;
+    height: 120rpx;
+    flex-shrink: 0;
+  }
 }
 
-@keyframes breathe {
-  0%, 100% { box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.5); }
-  50% { box-shadow: 0 12rpx 36rpx rgba(79, 209, 197, 0.7); }
-}
-
+/* 气泡消息 */
 .coach-bubble {
   flex: 1;
-  background: rgba(255, 255, 255, 0.98);
+  min-width: 200rpx;
+  background: #FFFFFF;  /* 统一为纯白色 */
   backdrop-filter: blur(20rpx);
   border-radius: 20rpx;
   padding: 28rpx 32rpx;
-  box-shadow: 0 8rpx 32rpx rgba(79, 209, 197, 0.15);
+  box-shadow: 0 8rpx 32rpx rgba(79, 209, 197, 0.12);
   position: relative;
   border: 2rpx solid rgba(255, 255, 255, 0.8);
   animation: slideInRight 0.5s ease-out;
 }
 
-.coach-bubble::before {
-  content: '';
-  position: absolute;
-  left: -16rpx;
-  top: 24rpx;
-  width: 0;
-  height: 0;
-  border-top: 16rpx solid transparent;
-  border-bottom: 16rpx solid transparent;
-  border-right: 16rpx solid rgba(255, 255, 255, 0.98);
-  filter: drop-shadow(-2rpx 0 4rpx rgba(79, 209, 197, 0.1));
+/* 响应式气泡内边距 */
+@media (max-width: 374px) {
+  .coach-bubble {
+    padding: 24rpx 28rpx;
+    min-width: auto;
+    width: 100%;
+  }
 }
 
+@media (min-width: 415px) {
+  .coach-bubble {
+    padding: 32rpx 36rpx;
+  }
+}
+
+/* 气泡箭头 - 仅在非堆叠时显示 */
+@media (min-width: 375px) {
+  .coach-bubble::before {
+    content: '';
+    position: absolute;
+    left: -16rpx;
+    top: calc(50% - 16rpx);
+    width: 0;
+    height: 0;
+    border-top: 16rpx solid transparent;
+    border-bottom: 16rpx solid transparent;
+    border-right: 16rpx solid #FFFFFF;  /* 修正为纯白色 */
+    filter: drop-shadow(-2rpx 0 4rpx rgba(79, 209, 197, 0.1));
+  }
+}
+
+/* 气泡箭头隐藏在小屏幕 */
+@media (max-width: 374px) {
+  .coach-bubble::before {
+    display: none;
+  }
+}
+
+/* 消息文本 */
 .coach-message {
-  font-size: 30rpx;
+  font-size: 28rpx;
   color: #2D3748;
-  line-height: 1.7;
-  font-weight: 600;
+  line-height: 1.8;
+  font-weight: 500;
+  word-break: break-word;
+  /* 增加行高，更宽松的显示 */
+}
+
+/* 响应式文字大小 */
+@media (max-width: 374px) {
+  .coach-message {
+    font-size: 26rpx;
+    line-height: 1.6;
+  }
+}
+
+@media (min-width: 415px) {
+  .coach-message {
+    font-size: 30rpx;
+    line-height: 1.9;
+  }
 }
 
 /* 今日概览卡片 */
 .overview-card {
   margin: 0 32rpx 32rpx;
-  background: rgba(255, 255, 255, 0.98) !important;
+  background: #FFFFFF !important;  /* 统一为纯白色 */
   backdrop-filter: blur(20rpx);
   border: 2rpx solid rgba(255, 255, 255, 0.8);
   position: relative;
@@ -198,7 +456,7 @@ page {
 
 .overview-date {
   font-size: 24rpx;
-  color: #718096;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   background: rgba(79, 209, 197, 0.15);
   padding: 10rpx 18rpx;
   border-radius: 14rpx;
@@ -242,7 +500,7 @@ page {
 
 .stat-label {
   font-size: 26rpx;
-  color: #718096;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   font-weight: 600;
   letter-spacing: 0.5rpx;
 }
@@ -284,7 +542,7 @@ page {
   height: 68rpx;
   padding: 0 36rpx;
   background: linear-gradient(135deg, #4FD1C5 0%, #3182CE 100%);
-  color: #FFFFFF;
+  color: var(--color-text-white, #FFFFFF);  /* 使用CSS变量 */
   font-size: 30rpx;
   border-radius: 34rpx;
   font-weight: 700;
@@ -385,27 +643,27 @@ page {
 
 .task-card[data-category="运动"] {
   --card-color-start: #FF6B6B;
-  --card-color-end: #FF8E53;
+  --card-color-end: #FF5252;
 }
 
 .task-card[data-category="饮食"] {
   --card-color-start: #38B2AC;
-  --card-color-end: #319795;
+  --card-color-end: #1E9B96;
 }
 
 .task-card[data-category="睡眠"] {
   --card-color-start: #9F7AEA;
-  --card-color-end: #805AD5;
+  --card-color-end: #7B5FD1;
 }
 
 .task-card[data-category="阅读"] {
   --card-color-start: #F6AD55;
-  --card-color-end: #ED8936;
+  --card-color-end: #E89239;
 }
 
 .task-card[data-category="学习"] {
   --card-color-start: #4299E1;
-  --card-color-end: #3182CE;
+  --card-color-end: #2E7EC9;
 }
 
 .task-card-header {
@@ -448,7 +706,7 @@ page {
 .task-title {
   font-size: 34rpx;
   font-weight: 800;
-  color: #2D3748;
+  color: var(--color-text-primary, #333333);  /* 统一主要文本色 */
   letter-spacing: 0.5rpx;
 }
 
@@ -459,7 +717,7 @@ page {
 
 .task-status {
   font-size: 26rpx;
-  color: #718096;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   margin-right: 16rpx;
   font-weight: 700;
   font-family: -apple-system, "SF Pro Display", "PingFang SC", sans-serif;
@@ -467,7 +725,7 @@ page {
 
 .icon-arrow {
   font-size: 20rpx;
-  color: #999999;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   transition: transform 0.3s;
 }
 
@@ -502,6 +760,7 @@ page {
   border-bottom: 2rpx solid rgba(226, 232, 240, 0.8);
   transition: all 0.3s ease;
   position: relative;
+  background: #ffffff;  /* 确保有白色背景遮盖后面的按钮 */
 }
 
 /* 长按反馈效果 */
@@ -548,7 +807,7 @@ page {
 
 .task-item-title {
   font-size: 30rpx;
-  color: #2D3748;
+  color: var(--color-text-primary, #333333);  /* 统一主要文本色 */
   display: block;
   margin-bottom: 8rpx;
   font-weight: 600;
@@ -556,7 +815,7 @@ page {
 
 .task-item-desc {
   font-size: 26rpx;
-  color: #718096;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   display: block;
   font-weight: 500;
 }
@@ -589,7 +848,7 @@ page {
 
 .empty-tasks .empty-text {
   font-size: 26rpx;
-  color: #A0AEC0;
+  color: var(--color-text-tertiary, #787878);  /* WCAG AA 合规 */
   font-weight: 500;
 }
 
@@ -647,7 +906,7 @@ page {
 .fab-container {
   position: fixed;
   right: 30rpx;
-  bottom: calc(env(safe-area-inset-bottom) + 100rpx);
+  bottom: calc(env(safe-area-inset-bottom) + 180rpx);  /* 调整位置，避免与底部按钮重叠 */
   z-index: 999;
 }
 
@@ -655,10 +914,14 @@ page {
 .fab {
   width: 100rpx;
   height: 100rpx;
-  background: linear-gradient(135deg, #4FD1C5 0%, #38B2AC 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  touch-action: manipulation;
   justify-content: center;
   box-shadow: 0 8rpx 24rpx rgba(79, 209, 197, 0.4);
   color: #fff;
@@ -857,7 +1120,7 @@ page {
   border: none;
   padding: 0;
   margin: 0;
-  width: 64rpx;
+  width: 64rpx !important;
   height: 64rpx;
   display: flex;
   align-items: center;
@@ -1032,7 +1295,7 @@ page {
   justify-content: center;
   padding: 120rpx 64rpx;
   margin: 0 32rpx;
-  background: rgba(255, 255, 255, 0.95);
+  background: #FFFFFF;  /* 统一为纯白色 */
   backdrop-filter: blur(20rpx);
   border-radius: 28rpx;
   border: 2rpx solid rgba(255, 255, 255, 0.8);
@@ -1048,4 +1311,72 @@ page {
   color: #A0AEC0;
   font-weight: 500;
   margin-bottom: 32rpx;
+}
+
+/* 底部快速添加任务按钮 */
+.quick-add-container {
+  position: fixed;
+  bottom: 90rpx;
+  bottom: calc(90rpx + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+}
+
+.btn-add-task {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #FFFFFF;
+  border-radius: 60rpx;
+  padding: 28rpx 64rpx;
+  min-height: 88rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+  box-shadow: 0 12rpx 32rpx rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  line-height: 1.2;
+  touch-action: manipulation;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-add-task::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn-add-task:active::before {
+  width: 300%;
+  height: 300%;
+}
+
+.btn-add-task::after {
+  border: none;
+}
+
+.btn-add-task:active {
+  transform: scale(0.95);
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.3);
+}
+
+.btn-add-task .btn-icon {
+  font-size: 36rpx;
+  line-height: 1;
+}
+
+.btn-add-task .btn-text {
+  font-size: 32rpx;
+  line-height: 1;
 }

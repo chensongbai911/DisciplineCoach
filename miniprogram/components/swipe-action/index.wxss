@@ -1,6 +1,6 @@
 .swipe-action {
   position: relative;
-  overflow: visible;
+  overflow: hidden;  /* 修复：隐藏超出部分，防止按钮默认显示 */
   width: 100%;
 }
 
@@ -12,6 +12,7 @@
   width: 100%;
   will-change: transform;
   touch-action: pan-y;
+  transform: translateX(0);  /* 确保初始位置为0 */
 }
 
 .swipe-content.open {
@@ -36,27 +37,42 @@
   align-items: center;
   justify-content: center;
   min-width: 120rpx;
-  padding: 0 16rpx;
+  padding: 0 20rpx;
   color: #ffffff;
   font-size: 24rpx;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-.action-item:active {
-  opacity: 0.8;
+.action-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0);
+  transition: background 0.2s ease;
+}
+
+.action-item:active::before {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 /* 图标 */
 .action-icon {
-  font-size: 36rpx;
-  margin-bottom: 4rpx;
+  font-size: 40rpx;
+  margin-bottom: 6rpx;
+  filter: drop-shadow(0 2rpx 4rpx rgba(0, 0, 0, 0.15));
 }
 
 /* 文字 */
 .action-text {
-  font-size: 22rpx;
+  font-size: 24rpx;
   font-weight: 500;
   white-space: nowrap;
+  text-shadow: 0 1rpx 2rpx rgba(0, 0, 0, 0.1);
 }
 
 /* 按钮样式变体 */

@@ -2,13 +2,27 @@
  * api.js - 云函数调用封装
  */
 
+const { CacheManager, CACHE_EXPIRE } = require('./storage.js')
+
 /**
- * 调用云函数的统一方法
+ * 调用云函数的统一方法（支持缓存）
  * @param {string} name - 云函数名称
  * @param {object} data - 传递的数据
+ * @param {object} options - 选项 { useCache: boolean, cacheKey: string, expire: number }
  * @returns {Promise}
  */
-function callFunction (name, data = {}) {
+function callFunction (name, data = {}, options = {}) {
+  const { useCache = false, cacheKey = null, expire = CACHE_EXPIRE.SHORT } = options
+
+  // 如果启用缓存且有缓存键，尝试从缓存获取
+  if (useCache && cacheKey) {
+    const cachedData = CacheManager.get(cacheKey)
+    if (cachedData !== null) {
+      console.log(`[API] 使用缓存: ${cacheKey}`)
+      return Promise.resolve(cachedData)
+    }
+  }
+
   return new Promise((resolve, reject) => {
     wx.cloud.callFunction({
       name,
@@ -19,7 +33,14 @@ function callFunction (name, data = {}) {
       // 云函数返回格式：{ result: { success: true, data: ... } }
       if (res.result) {
         if (res.result.success) {
-          resolve(res.result.data || [])
+          const resultData = res.result.data || []
+
+          // 如果启用缓存，保存到缓存
+          if (useCache && cacheKey) {
+            CacheManager.set(cacheKey, resultData, expire)
+          }
+
+          resolve(resultData)
         } else {
           const errMsg = res.result.message || res.result.msg || '请求失败'
           console.error(`云函数 ${name} 业务错误:`, errMsg)
@@ -76,6 +97,10 @@ const planAPI = {
     return callFunction('plan', {
       action: 'create',
       ...planData
+    }).then(result => {
+      // 清除计划列表缓存
+      CacheManager.remove('plans_list')
+      return result
     })
   },
 
@@ -85,6 +110,10 @@ const planAPI = {
       action: 'update',
       planId,
       ...planData
+    }).then(result => {
+      // 清除计划列表缓存
+      CacheManager.remove('plans_list')
+      return result
     })
   },
 
@@ -93,6 +122,10 @@ const planAPI = {
     return callFunction('plan', {
       action: 'delete',
       planId
+    }).then(result => {
+      // 清除计划列表缓存
+      CacheManager.remove('plans_list')
+      return result
     })
   },
 
@@ -101,6 +134,10 @@ const planAPI = {
     return callFunction('plan', {
       action: 'list',
       params  // 云函数期望 event.params
+    }, {
+      useCache: true,
+      cacheKey: 'plans_list',
+      expire: CACHE_EXPIRE.SHORT // 5分钟
     })
   },
 
@@ -110,6 +147,10 @@ const planAPI = {
       action: 'toggle',
       planId,
       isActive
+    }).then(result => {
+      // 清除计划列表缓存
+      CacheManager.remove('plans_list')
+      return result
     })
   }
 }
@@ -123,6 +164,12 @@ const recordAPI = {
     return callFunction('record', {
       action: 'create',
       ...recordData
+    }).then(result => {
+      // 清除今日记录和统计缓存
+      CacheManager.remove('today_records')
+      CacheManager.remove('stats_overview')
+      CacheManager.remove('stats_badges')
+      return result
     })
   },
 
@@ -132,6 +179,11 @@ const recordAPI = {
       action: 'update',
       recordId,
       ...recordData
+    }).then(result => {
+      // 清除今日记录和统计缓存
+      CacheManager.remove('today_records')
+      CacheManager.remove('stats_overview')
+      return result
     })
   },
 
@@ -139,6 +191,10 @@ const recordAPI = {
   getTodayRecords () {
     return callFunction('record', {
       action: 'getTodayRecords'
+    }, {
+      useCache: true,
+      cacheKey: 'today_records',
+      expire: CACHE_EXPIRE.MEDIUM // 30分钟
     })
   },
 
@@ -185,6 +241,10 @@ const statisticsAPI = {
     return callFunction('statistics', {
       action: 'getOverview',
       dateRange
+    }, {
+      useCache: true,
+      cacheKey: 'stats_overview',
+      expire: CACHE_EXPIRE.LONG // 1小时
     })
   },
 
@@ -208,6 +268,10 @@ const statisticsAPI = {
   getBadges () {
     return callFunction('statistics', {
       action: 'getBadges'
+    }, {
+      useCache: true,
+      cacheKey: 'stats_badges',
+      expire: CACHE_EXPIRE.LONG // 1小时
     })
   },
 

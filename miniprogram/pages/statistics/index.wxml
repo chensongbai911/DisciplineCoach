@@ -66,16 +66,18 @@
   </view>
 
   <!-- 完成率环形图 -->
-  <view class="chart-section">
+  <view class="chart-section completion-rate-section">
     <view class="section-header">
       <text class="section-title">🎯 整体完成率</text>
       <text class="section-hint">当前周期完成情况</text>
     </view>
-    <chart-ring
-      percentage="{{completionRate}}"
-      size="300"
-      ring-width="30"
-    />
+    <view class="ring-chart-wrapper">
+      <chart-ring
+        percentage="{{completionRate}}"
+        size="260"
+        ring-width="24"
+      />
+    </view>
   </view>
 
   <!-- 维度对比柱状图 -->

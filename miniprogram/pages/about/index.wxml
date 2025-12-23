@@ -4,7 +4,7 @@
 <view class="container">
   <!-- Logo区域 -->
   <view class="logo-section">
-    <app-image class="app-logo" src="/assets/images/logo.png" size="160" radius="24" fallbackText="🎯" />
+    <app-image class="app-logo" src="/assets/images/logo.webp" size="160" radius="24" fallbackText="🎯" />
     <text class="app-name">自律教练</text>
     <text class="app-slogan">让自律成为习惯</text>
     <text class="app-version">v{{version}}</text>

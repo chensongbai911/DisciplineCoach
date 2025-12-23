@@ -1,45 +1,94 @@
 /* common.wxss - 通用样式工具类 */
 
-/* ========== 颜色工具类 ========== */
-.text-primary { color: #333333; }
-.text-secondary { color: #666666; }
-.text-tertiary { color: #999999; }
-.text-placeholder { color: #CCCCCC; }
-.text-white { color: #FFFFFF; }
-.text-success { color: #07C160; }
-.text-warning { color: #FF9500; }
-.text-error { color: #FA5151; }
-.text-info { color: #10AEFF; }
+/* ========== 颜色工具类 (优化版 - WCAG AA 合规) ========== */
+.text-primary { color: var(--color-text-primary, #333333); }
+.text-secondary { color: var(--color-text-secondary, #666666); }
+.text-tertiary { color: var(--color-text-tertiary, #787878); }  /* 优化: #999999 → #787878 */
+.text-placeholder { color: var(--color-text-disabled, #CCCCCC); }
+.text-white { color: var(--color-text-white, #FFFFFF); }
+.text-success { color: var(--color-success, #07C160); }
+.text-warning { color: var(--color-warning, #E68700); }  /* 优化: #FF9500 → #E68700 */
+.text-error { color: var(--color-error, #FA5151); }
+.text-info { color: var(--color-info, #0E93DB); }  /* 优化: #10AEFF → #0E93DB */
 
-.bg-primary { background: #07C160; }
-.bg-white { background: #FFFFFF; }
-.bg-gray { background: #F7F8FA; }
-.bg-success { background: #07C160; }
-.bg-warning { background: #FF9500; }
-.bg-error { background: #FA5151; }
+.bg-primary { background: var(--color-primary, #07C160); }
+.bg-white { background: var(--color-bg-primary, #FFFFFF); }
+.bg-gray { background: var(--color-bg-secondary, #F7F8FA); }
+.bg-success { background: var(--color-success, #07C160); }
+.bg-warning { background: var(--color-warning, #E68700); }
+.bg-error { background: var(--color-error, #FA5151); }
 
-/* 维度配色（年轻化色系） */
-.text-sport { color: #FF6B6B; }
-.text-diet { color: #38B2AC; }
-.text-sleep { color: #9F7AEA; }
-.text-reading { color: #F6AD55; }
-.text-study { color: #4299E1; }
+/* 维度配色（年轻化色系 - 使用 CSS 变量） */
+.text-sport { color: var(--color-dimension-sport, #FF6B6B); }
+.text-diet { color: var(--color-dimension-diet, #38B2AC); }
+.text-sleep { color: var(--color-dimension-sleep, #9F7AEA); }
+.text-reading { color: var(--color-dimension-reading, #F6AD55); }
+.text-study { color: var(--color-dimension-study, #4299E1); }
 
-.bg-sport { background: #FF6B6B; }
-.bg-diet { background: #38B2AC; }
-.bg-sleep { background: #9F7AEA; }
-.bg-reading { background: #F6AD55; }
-.bg-study { background: #4299E1; }
+.bg-sport { background: var(--color-dimension-sport, #FF6B6B); }
+.bg-diet { background: var(--color-dimension-diet, #38B2AC); }
+.bg-sleep { background: var(--color-dimension-sleep, #9F7AEA); }
+.bg-reading { background: var(--color-dimension-reading, #F6AD55); }
+.bg-study { background: var(--color-dimension-study, #4299E1); }
 
-/* ========== 字体工具类 ========== */
-.text-h1 { font-size: 40rpx; font-weight: 700; line-height: 56rpx; }
-.text-h2 { font-size: 36rpx; font-weight: 700; line-height: 52rpx; }
-.text-h3 { font-size: 32rpx; font-weight: 500; line-height: 48rpx; }
-.text-body1 { font-size: 32rpx; font-weight: 400; line-height: 48rpx; }
-.text-body2 { font-size: 28rpx; font-weight: 400; line-height: 44rpx; }
-.text-caption { font-size: 24rpx; font-weight: 400; line-height: 40rpx; }
-.text-number-lg { font-size: 64rpx; font-weight: 700; line-height: 80rpx; }
-.text-number-md { font-size: 48rpx; font-weight: 500; line-height: 64rpx; }
+/* ========== 字体工具类 (优化版 - 使用 CSS 变量) ========== */
+.text-h1 {
+  font-size: 40rpx;
+  font-weight: 700;
+  line-height: 56rpx;
+  color: var(--color-text-primary, #333333);
+}
+
+.text-h2 {
+  font-size: 36rpx;
+  font-weight: 700;
+  line-height: 52rpx;
+  color: var(--color-text-primary, #333333);
+}
+
+.text-h3 {
+  font-size: 32rpx;
+  font-weight: 500;
+  line-height: 48rpx;
+  color: var(--color-text-primary, #333333);
+}
+
+.text-body1 {
+  font-size: 32rpx;
+  font-weight: 400;
+  line-height: 48rpx;
+  color: var(--color-text-primary, #333333);
+}
+
+.text-body2 {
+  font-size: 28rpx;
+  font-weight: 400;
+  line-height: 44rpx;
+  color: var(--color-text-secondary, #666666);
+}
+
+.text-caption {
+  font-size: 24rpx;
+  font-weight: 400;
+  line-height: 40rpx;
+  color: var(--color-text-tertiary, #787878);  /* 使用优化后的颜色 */
+}
+
+.text-number-lg {
+  font-size: 64rpx;
+  font-weight: 700;
+  line-height: 80rpx;
+  font-family: "SF Pro Display", "Roboto", -apple-system, sans-serif;
+  color: var(--color-text-primary, #333333);
+}
+
+.text-number-md {
+  font-size: 48rpx;
+  font-weight: 500;
+  line-height: 64rpx;
+  font-family: "SF Pro Display", "Roboto", -apple-system, sans-serif;
+  color: var(--color-text-primary, #333333);
+}
 
 .text-bold { font-weight: 700; }
 .text-medium { font-weight: 500; }

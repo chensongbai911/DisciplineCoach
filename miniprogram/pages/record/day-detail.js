@@ -4,6 +4,7 @@
 const { recordAPI, planAPI } = require('../../utils/api');
 const { showToast, showLoading, hideLoading, showModal } = require('../../utils/common');
 const { formatDate, formatDateChinese, getWeekday } = require('../../utils/date');
+const vibrate = require('../../utils/vibrate');
 
 // 维度配置
 const DIMENSIONS = {
@@ -282,6 +283,9 @@ Page({
    * 删除打卡
    */
   async handleDelete (e) {
+    // 删除操作警告震动
+    vibrate.warning();
+
     const { id } = e.currentTarget.dataset;
 
     const res = await showModal({

@@ -16,7 +16,7 @@
     <view class="welcome-section">
       <app-image
         class="logo-image"
-        src="/assets/images/logo.png"
+        src="/assets/images/logo.webp"
         size="200"
         radius="40"
         fallbackText="🎯"
@@ -73,7 +73,7 @@
     <view class="dimension-section">
       <app-image
         class="coach-avatar"
-        src="/assets/images/coach-happy.png"
+        src="/assets/images/coach-happy.webp"
         size="120"
         radius="9999"
         fallbackText="🤖"

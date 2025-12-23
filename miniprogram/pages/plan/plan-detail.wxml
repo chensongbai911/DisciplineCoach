@@ -15,37 +15,41 @@
 
   <!-- 任务列表 -->
   <view class="task-list" wx:if="{{tasks.length > 0}}">
-    <swipe-action
+    <view
+      class="task-item-card"
       wx:for="{{tasks}}"
       wx:key="_id"
-      actions="{{swipeActions}}"
-      bind:actiontap="handleSwipeAction"
-      bind:contenttap="handleEditTask"
-      data-id="{{item._id}}"
-      data-index="{{index}}"
     >
-      <view slot="content" class="task-item-card">
-        <view class="task-item-header">
-          <text class="task-item-title">{{item.title}}</text>
-          <text class="task-status">{{item.status === 'active' ? '⚡ 进行中' : '⏸ 已暂停'}}</text>
+      <view class="task-item-header">
+        <text class="task-item-title">{{item.title}}</text>
+        <text class="task-status">{{item.status === 'active' ? '⚡ 进行中' : '⏸ 已暂停'}}</text>
+      </view>
+      <view class="task-item-body">
+        <view class="task-meta">
+          <text class="meta-label">目标：</text>
+          <text class="meta-value">{{item.targetDesc}}</text>
         </view>
-        <view class="task-item-body">
-          <view class="task-meta">
-            <text class="meta-label">目标：</text>
-            <text class="meta-value">{{item.targetDesc}}</text>
-          </view>
-          <view class="task-meta" wx:if="{{item.reminder}}">
-            <text class="meta-label">提醒：</text>
-            <text class="meta-value">{{item.reminder.time}}</text>
-          </view>
+        <view class="task-meta" wx:if="{{item.reminder}}">
+          <text class="meta-label">提醒：</text>
+          <text class="meta-value">{{item.reminder.time}}</text>
         </view>
       </view>
-    </swipe-action>
+      <view class="task-item-actions">
+        <button class="btn-action btn-edit" bindtap="handleEditTask" data-id="{{item._id}}">
+          <text class="iconfont icon-edit"></text>
+          <text>编辑</text>
+        </button>
+        <button class="btn-action btn-delete" bindtap="handleDeleteTask" data-id="{{item._id}}">
+          <text class="iconfont icon-delete"></text>
+          <text>删除</text>
+        </button>
+      </view>
+    </view>
   </view>
 
   <!-- 空状态 -->
   <view class="empty-state" wx:if="{{tasks.length === 0}}">
-    <app-image class="empty-image" src="/assets/images/empty-task.png" size="200" radius="24" fallbackText="🗒️" />
+    <app-image class="empty-image" src="/assets/images/empty-task.webp" size="200" radius="24" fallbackText="🗒️" />
     <text class="empty-text">还没有添加任务</text>
     <text class="empty-hint">点击下方按钮添加你的第一个任务</text>
   </view>
